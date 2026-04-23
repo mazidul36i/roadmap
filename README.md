@@ -19,7 +19,7 @@
 
 > Dark-themed, single-page app with a polished dashboard layout, smooth interactions, and mobile-friendly responsiveness.
 
-![Dashboard](https://raw.githubusercontent.com/mazidul36i/roadmap/main/preview/dashboard.png)
+![Dashboard](/Dashboard.png)
 
 ---
 
