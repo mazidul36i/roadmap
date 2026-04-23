@@ -1,4 +1,7 @@
-import React, { createContext, type ReactNode, useContext, useEffect, useReducer } from "react";
+import React, { createContext, type ReactNode, useContext, useEffect, useReducer, useRef } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "./AuthContext";
 import type {
   Application,
   AppState,
@@ -41,6 +44,7 @@ type Action =
   | { type: "UPDATE_MOCK"; mock: MockInterview }
   | { type: "DELETE_MOCK"; id: string }
   | { type: "MARK_STUDY_DAY"; date: string }
+  | { type: "SET_STATE"; state: AppState }
   | { type: "IMPORT_STATE"; state: AppState };
 
 // ─── REDUCER ────────────────────────────────────────────────────────────────────
@@ -112,6 +116,7 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         studyStreak: state.studyStreak.includes(action.date) ? state.studyStreak : [...state.studyStreak, action.date]
       };
+    case "SET_STATE":
     case "IMPORT_STATE":
       return action.state;
     default:
@@ -130,23 +135,74 @@ const AppContext = createContext<AppContextValue | null>(null);
 const STORAGE_KEY = "roadmap2_data";
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, undefined, () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as AppState;
-        // Ensure all weeks from seed are present (in case new weeks were added)
-        return parsed;
-      }
-    } catch { /* ignore */
-    }
-    return seedState;
-  });
+  const { user } = useAuth();
+  const [state, dispatch] = useReducer(reducer, seedState);
+  const isInitialMount = useRef(true);
+  const isSyncingFromFirebase = useRef(false);
 
-  // Auto-save to localStorage on every state change
+  // 1. Initial Load from LocalStorage (Sync)
   useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as AppState;
+        dispatch({ type: "SET_STATE", state: parsed });
+      } catch (e) {
+        console.error("Failed to parse local storage", e);
+      }
+    }
+  }, []);
+
+  // 2. Load from Firestore when user logs in
+  useEffect(() => {
+    if (!user) return;
+
+    const loadFirebaseData = async () => {
+      isSyncingFromFirebase.current = true;
+      try {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data() as AppState;
+          dispatch({ type: "SET_STATE", state: cloudData });
+        } else {
+          // If no cloud data, save current local state to cloud
+          await setDoc(docRef, state);
+        }
+      } catch (error) {
+        console.error("Error loading from Firebase:", error);
+      } finally {
+        isSyncingFromFirebase.current = false;
+      }
+    };
+
+    loadFirebaseData();
+  }, [user]);
+
+  // 3. Save to LocalStorage and Firestore on state change
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Save to LocalStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+
+    // Save to Firestore if user is logged in and we aren't currently loading from Firestore
+    if (user && !isSyncingFromFirebase.current) {
+      const timer = setTimeout(async () => {
+        try {
+          await setDoc(doc(db, "users", user.uid), state);
+        } catch (error) {
+          console.error("Error saving to Firebase:", error);
+        }
+      }, 1000); // 1 second debounce
+
+      return () => clearTimeout(timer);
+    }
+  }, [state, user]);
 
   return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
 }

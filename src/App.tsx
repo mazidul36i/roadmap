@@ -13,6 +13,8 @@ import SystemDesign from "@/pages/SystemDesign";
 import Applications from "@/pages/Applications";
 import MockInterviews from "@/pages/MockInterviews";
 import FocusMode from "@/pages/FocusMode";
+import LoginPage from "@/pages/LoginPage";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Your 8-week job-switch prep at a glance" },
@@ -28,8 +30,16 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 };
 
 function Shell() {
+  const { user, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+
+  if (loading) return null; // Or a splash screen
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
   const meta = pageMeta[location.pathname] ?? { title: "Roadmap", subtitle: "" };
 
   if (location.pathname === "/focus") {
@@ -70,10 +80,12 @@ function Shell() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <Shell />
-      </BrowserRouter>
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <BrowserRouter>
+          <Shell />
+        </BrowserRouter>
+      </AppProvider>
+    </AuthProvider>
   );
 }

@@ -6,14 +6,17 @@ import {
   Code2,
   Download,
   LayoutDashboard,
+  LogOut,
   Map,
   Mic2,
   Server,
   StickyNote,
   Upload,
+  User as UserIcon,
   Zap
 } from "lucide-react";
 import { computeProgress, useApp } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -32,6 +35,7 @@ export default function Sidebar({ open }: { open: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { state, dispatch } = useApp();
+  const { user, logout } = useAuth();
 
   const overallPct = computeProgress(state.weeks);
 
@@ -97,7 +101,29 @@ export default function Sidebar({ open }: { open: boolean }) {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="btn btn-ghost btn-sm w-full mb-8" onClick={exportData}
+        {user && (
+          <div className="user-profile-badge mb-4">
+            <div className="bg-accent-dim rounded-full p-1"
+                 style={{ width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <UserIcon size={14} />
+            </div>
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <div style={{
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+              }}>
+                {user.displayName || user.email?.split("@")[0]}
+              </div>
+              <button onClick={logout} className="logout-btn">
+                <LogOut size={12} /> Sign Out
+              </button>
+            </div>
+          </div>
+        )}
+        <button className="btn btn-ghost btn-sm w-full mb-2" onClick={exportData}
                 style={{ justifyContent: "flex-start" }}>
           <Download size={14} /> Export JSON
         </button>

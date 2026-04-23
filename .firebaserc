@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "gs-interview-prep"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }
