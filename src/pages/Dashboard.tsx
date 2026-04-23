@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Code2, Server, Briefcase, Mic2, BookOpen, Flame, Target, ChevronRight } from 'lucide-react';
 import { useApp, computeProgress, computeWeekProgress, getCurrentWeek } from '../context/AppContext';
 
-function ProgressRow({ label, value, max, color = '' }: { label: string; value: number; max: number; color?: string }) {
+function ProgressRow({ label, value, max, color = '', onClick }: { label: string; value: number; max: number; color?: string; onClick?: () => void }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   return (
-    <div className="mb-16">
+    <div className="mb-16" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="flex justify-between mb-4" style={{ fontSize: '0.82rem' }}>
         <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</span>
         <span style={{ color: 'var(--text-accent)', fontWeight: 700 }}>{value}/{max} · {pct}%</span>
@@ -49,20 +49,20 @@ export default function Dashboard() {
   }, 0);
 
   const statCards = [
-    { icon: LayoutDashboard, label: 'Tasks Done', value: `${tasksDone}/${allTasks.length}`, color: 'var(--accent)' },
-    { icon: Code2, label: 'DSA Solved', value: `${dsaSolved}/${dsaProblems.length}`, color: 'var(--success)' },
-    { icon: Server, label: 'SD Topics', value: `${sdDone}/${state.sdTopics.length}`, color: 'var(--info)' },
-    { icon: BookOpen, label: 'Stories', value: `${storyCards.length}`, color: 'var(--warning)' },
-    { icon: Briefcase, label: 'Applications', value: `${applications.length}`, color: 'var(--accent-light)' },
-    { icon: Mic2, label: 'Mock Interviews', value: `${mockInterviews.length}`, color: 'var(--danger)' },
+    { icon: LayoutDashboard, label: 'Tasks Done', value: `${tasksDone}/${allTasks.length}`, color: 'var(--accent)', path: '/roadmap' },
+    { icon: Code2, label: 'DSA Solved', value: `${dsaSolved}/${dsaProblems.length}`, color: 'var(--success)', path: '/dsa' },
+    { icon: Server, label: 'SD Topics', value: `${sdDone}/${state.sdTopics.length}`, color: 'var(--info)', path: '/sysdesign' },
+    { icon: BookOpen, label: 'Stories', value: `${storyCards.length}`, color: 'var(--warning)', path: '/stories' },
+    { icon: Briefcase, label: 'Applications', value: `${applications.length}`, color: 'var(--accent-light)', path: '/applications' },
+    { icon: Mic2, label: 'Mock Interviews', value: `${mockInterviews.length}`, color: 'var(--danger)', path: '/mocks' },
   ];
 
   return (
     <div>
       {/* Stats Row */}
       <div className="stats-grid">
-        {statCards.map(({ icon: Icon, label, value, color }) => (
-          <div key={label} className="stat-card">
+        {statCards.map(({ icon: Icon, label, value, color, path }) => (
+          <div key={label} className="stat-card" style={{ cursor: 'pointer' }} onClick={() => navigate(path)}>
             <div className="stat-card-icon" style={{ background: `${color}20`, color }}>
               <Icon size={18} />
             </div>
@@ -76,24 +76,28 @@ export default function Dashboard() {
         {/* Progress breakdown */}
         <div className="card">
           <div className="section-title"><Target size={16} /> Progress Overview</div>
-          <ProgressRow label="Overall Roadmap" value={tasksDone} max={allTasks.length} />
-          <ProgressRow label="DSA Problems" value={dsaSolved} max={dsaProblems.length} color="success" />
-          <ProgressRow label="System Design Topics" value={sdDone} max={state.sdTopics.length} color="" />
-          <ProgressRow label="Story Bank" value={storyCards.length} max={8} color="warning" />
-          <ProgressRow label="Applications Sent" value={applications.filter(a => a.status !== 'wishlist').length} max={30} />
-          <ProgressRow label="Mock Interviews" value={mockInterviews.length} max={10} />
+          <ProgressRow label="Overall Roadmap" value={tasksDone} max={allTasks.length} onClick={() => navigate('/roadmap')} />
+          <ProgressRow label="DSA Problems" value={dsaSolved} max={dsaProblems.length} color="success" onClick={() => navigate('/dsa')} />
+          <ProgressRow label="System Design Topics" value={sdDone} max={state.sdTopics.length} color="" onClick={() => navigate('/sysdesign')} />
+          <ProgressRow label="Story Bank" value={storyCards.length} max={8} color="warning" onClick={() => navigate('/stories')} />
+          <ProgressRow label="Applications Sent" value={applications.filter(a => a.status !== 'wishlist').length} max={30} onClick={() => navigate('/applications')} />
+          <ProgressRow label="Mock Interviews" value={mockInterviews.length} max={10} onClick={() => navigate('/mocks')} />
         </div>
 
         {/* Right column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Today's Focus */}
           {currentWeekData && (
-            <div className="card" style={{ borderColor: 'var(--border-accent)', background: 'linear-gradient(135deg, var(--bg-card), #1a1f35)' }}>
+            <div className="card" style={{ 
+              borderColor: 'var(--border-accent)', 
+              background: 'linear-gradient(135deg, var(--bg-card), #1a1f35)',
+              cursor: 'pointer'
+            }} onClick={() => navigate('/roadmap')}>
               <div className="flex justify-between items-center mb-8">
                 <div className="section-title" style={{ marginBottom: 0 }}>
                   <Flame size={16} style={{ color: 'var(--warning)' }} /> Week {currentWeek} — Today's Focus
                 </div>
-                <button className="btn btn-ghost btn-sm" onClick={() => navigate('/roadmap')}>
+                <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); navigate('/roadmap'); }}>
                   Open <ChevronRight size={12} />
                 </button>
               </div>
@@ -113,7 +117,7 @@ export default function Dashboard() {
           )}
 
           {/* Study Streak */}
-          <div className="card">
+          <div className="card" style={{ cursor: 'pointer' }} onClick={() => navigate('/planner')}>
             <div className="flex justify-between items-center mb-16">
               <div className="section-title" style={{ marginBottom: 0 }}>
                 <Flame size={16} style={{ color: 'var(--success)' }} /> Study Streak
