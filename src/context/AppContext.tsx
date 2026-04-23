@@ -128,6 +128,8 @@ function reducer(state: AppState, action: Action): AppState {
 interface AppContextValue {
   state: AppState;
   dispatch: React.Dispatch<Action>;
+  needsOnboarding: boolean;
+  setNeedsOnboarding: (val: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -137,6 +139,7 @@ const STORAGE_KEY = "roadmap2_data";
 export function AppProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, seedState);
+  const [needsOnboarding, setNeedsOnboarding] = React.useState(false);
   const isInitialMount = useRef(true);
   const isSyncingFromFirebase = useRef(false);
 
@@ -167,8 +170,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           const cloudData = docSnap.data() as AppState;
           dispatch({ type: "SET_STATE", state: cloudData });
         } else {
-          // If no cloud data, save current local state to cloud
-          await setDoc(docRef, state);
+          // New user: trigger onboarding choice
+          setNeedsOnboarding(true);
         }
       } catch (error) {
         console.error("Error loading from Firebase:", error);
@@ -204,7 +207,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state, user]);
 
-  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={{ state, dispatch, needsOnboarding, setNeedsOnboarding }}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
 export function useApp() {

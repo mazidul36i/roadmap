@@ -1479,3 +1479,176 @@ tbody td {
 .logout-btn:hover {
   color: var(--danger);
 }
+
+/* ─── SETUP CHOICE ───────────────────────────────────────── */
+.setup-choice-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  padding: 20px;
+  z-index: 1100;
+}
+
+.setup-container {
+  width: 100%;
+  max-width: 840px;
+  text-align: center;
+}
+
+.setup-header {
+  margin-bottom: 48px;
+}
+
+.setup-icon {
+  width: 72px;
+  height: 72px;
+  background: var(--accent-dim);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.setup-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 12px;
+}
+
+.setup-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.choice-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition);
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg), 0 0 30px var(--accent-glow);
+}
+
+.choice-card.secondary:hover {
+  border-color: var(--text-secondary);
+  box-shadow: var(--shadow-lg);
+}
+
+.choice-content {
+  flex: 1;
+}
+
+.choice-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.choice-icon-wrap {
+  width: 48px;
+  height: 48px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--accent-light);
+}
+
+.choice-card.secondary .choice-icon-wrap {
+  color: var(--text-secondary);
+}
+
+.choice-card h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.choice-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.choice-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.choice-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.choice-features li svg {
+  color: var(--success);
+}
+
+.choice-card.secondary .choice-features li svg {
+  color: var(--text-muted);
+}
+
+.choice-action {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 12px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.choice-card:hover .choice-action {
+  background: var(--accent);
+  color: #fff;
+}
+
+.choice-card.secondary:hover .choice-action {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+}
+
+@media (max-width: 700px) {
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+}

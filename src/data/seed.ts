@@ -635,3 +635,16 @@ export const seedState: AppState = {
   studyStreak: [yesterday, today],
   startDate: today,
 };
+
+export const emptyState: AppState = {
+  weeks,
+  dayLogs: [],
+  notes: [],
+  storyCards: [],
+  dsaProblems: [],
+  sdTopics: sdTopics.map(t => ({ ...t, status: "not-started", tradeoffs: "", notes: "" })),
+  applications: [],
+  mockInterviews: [],
+  studyStreak: [],
+  startDate: today,
+};

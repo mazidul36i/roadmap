@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { AppProvider } from "@/context/AppContext";
+import { AppProvider, useApp } from "@/context/AppContext";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import Dashboard from "@/pages/Dashboard";
@@ -14,6 +14,7 @@ import Applications from "@/pages/Applications";
 import MockInterviews from "@/pages/MockInterviews";
 import FocusMode from "@/pages/FocusMode";
 import LoginPage from "@/pages/LoginPage";
+import SetupChoice from "@/components/SetupChoice";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
@@ -31,6 +32,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 
 function Shell() {
   const { user, loading } = useAuth();
+  const { needsOnboarding } = useApp();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
@@ -38,6 +40,10 @@ function Shell() {
 
   if (!user) {
     return <LoginPage />;
+  }
+
+  if (needsOnboarding) {
+    return <SetupChoice />;
   }
 
   const meta = pageMeta[location.pathname] ?? { title: "Roadmap", subtitle: "" };
