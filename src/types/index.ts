@@ -1,4 +1,4 @@
-export type TaskStatus = 'todo' | 'inprogress' | 'done';
+export type TaskStatus = "todo" | "inprogress" | "done";
 
 export interface Task {
   id: string;
@@ -25,7 +25,7 @@ export interface DayLog {
   reflection: string;
 }
 
-export type NoteCategory = 'weekly' | 'dsa' | 'systemdesign' | 'interview' | 'company';
+export type NoteCategory = "weekly" | "dsa" | "systemdesign" | "interview" | "company";
 
 export interface Note {
   id: string;
@@ -49,8 +49,8 @@ export interface StoryCard {
   tags: string[];
 }
 
-export type DSADifficulty = 'Easy' | 'Medium' | 'Hard';
-export type DSAPlatform = 'LeetCode' | 'HackerRank' | 'CodeForces' | 'InterviewBit' | 'Other';
+export type DSADifficulty = "Easy" | "Medium" | "Hard";
+export type DSAPlatform = "LeetCode" | "HackerRank" | "CodeForces" | "InterviewBit" | "Other";
 
 export interface DSAProblem {
   id: string;
@@ -65,7 +65,7 @@ export interface DSAProblem {
   url: string;
 }
 
-export type SDStatus = 'not-started' | 'in-progress' | 'done';
+export type SDStatus = "not-started" | "in-progress" | "done";
 
 export interface SystemDesignTopic {
   id: string;
@@ -74,18 +74,18 @@ export interface SystemDesignTopic {
   tradeoffs: string;
   notes: string;
   diagramRef: string;
-  category: 'core' | 'exercise';
+  category: "core" | "exercise";
 }
 
 export type AppStatus =
-  | 'wishlist'
-  | 'applied'
-  | 'referred'
-  | 'interview-scheduled'
-  | 'technical-round'
-  | 'system-design-round'
-  | 'offer'
-  | 'rejected';
+  | "wishlist"
+  | "applied"
+  | "referred"
+  | "interview-scheduled"
+  | "technical-round"
+  | "system-design-round"
+  | "offer"
+  | "rejected";
 
 export interface InterviewDate {
   id: string;
@@ -107,7 +107,7 @@ export interface Application {
   createdAt: string;
 }
 
-export type MockType = 'DSA' | 'System Design' | 'Resume/Story';
+export type MockType = "DSA" | "System Design" | "Resume/Story";
 
 export interface MockInterview {
   id: string;

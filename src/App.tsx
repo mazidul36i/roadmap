@@ -1,38 +1,38 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AppProvider } from './context/AppContext';
-import Sidebar from './components/Sidebar';
-import TopBar from './components/TopBar';
-import Dashboard from './pages/Dashboard';
-import Roadmap from './pages/Roadmap';
-import DailyPlanner from './pages/DailyPlanner';
-import Notes from './pages/Notes';
-import StoryBank from './pages/StoryBank';
-import DSATracker from './pages/DSATracker';
-import SystemDesign from './pages/SystemDesign';
-import Applications from './pages/Applications';
-import MockInterviews from './pages/MockInterviews';
-import FocusMode from './pages/FocusMode';
+import { useState } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { AppProvider } from "@/context/AppContext";
+import Sidebar from "@/components/Sidebar";
+import TopBar from "@/components/TopBar";
+import Dashboard from "@/pages/Dashboard";
+import Roadmap from "@/pages/Roadmap";
+import DailyPlanner from "@/pages/DailyPlanner";
+import Notes from "@/pages/Notes";
+import StoryBank from "@/pages/StoryBank";
+import DSATracker from "@/pages/DSATracker";
+import SystemDesign from "@/pages/SystemDesign";
+import Applications from "@/pages/Applications";
+import MockInterviews from "@/pages/MockInterviews";
+import FocusMode from "@/pages/FocusMode";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
-  '/': { title: 'Dashboard', subtitle: 'Your 8-week job-switch prep at a glance' },
-  '/roadmap': { title: 'Roadmap', subtitle: '8-week plan · track tasks week by week' },
-  '/planner': { title: 'Daily Planner', subtitle: 'Log what you studied and reflect' },
-  '/notes': { title: 'Notes', subtitle: 'Searchable, taggable knowledge base' },
-  '/stories': { title: 'Story Bank', subtitle: 'STAR format interview stories from Prospecta' },
-  '/dsa': { title: 'DSA Tracker', subtitle: 'Problem log · stats · weak areas' },
-  '/sysdesign': { title: 'System Design', subtitle: 'Topics, exercises, and architecture notes' },
-  '/applications': { title: 'Job Applications', subtitle: 'Pipeline tracker · kanban board' },
-  '/mocks': { title: 'Mock Interviews', subtitle: 'Track performance and recurring weak points' },
-  '/focus': { title: 'Focus Mode', subtitle: 'Today only · no distractions' },
+  "/": { title: "Dashboard", subtitle: "Your 8-week job-switch prep at a glance" },
+  "/roadmap": { title: "Roadmap", subtitle: "8-week plan · track tasks week by week" },
+  "/planner": { title: "Daily Planner", subtitle: "Log what you studied and reflect" },
+  "/notes": { title: "Notes", subtitle: "Searchable, taggable knowledge base" },
+  "/stories": { title: "Story Bank", subtitle: "STAR format interview stories from Prospecta" },
+  "/dsa": { title: "DSA Tracker", subtitle: "Problem log · stats · weak areas" },
+  "/sysdesign": { title: "System Design", subtitle: "Topics, exercises, and architecture notes" },
+  "/applications": { title: "Job Applications", subtitle: "Pipeline tracker · kanban board" },
+  "/mocks": { title: "Mock Interviews", subtitle: "Track performance and recurring weak points" },
+  "/focus": { title: "Focus Mode", subtitle: "Today only · no distractions" },
 };
 
 function Shell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const meta = pageMeta[location.pathname] ?? { title: 'Roadmap', subtitle: '' };
+  const meta = pageMeta[location.pathname] ?? { title: "Roadmap", subtitle: "" };
 
-  if (location.pathname === '/focus') {
+  if (location.pathname === "/focus") {
     return (
       <div className="app-shell">
         <FocusMode />

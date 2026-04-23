@@ -1,23 +1,29 @@
-import { useState } from 'react';
-import { Plus, Trash2, Edit3, X, AlertTriangle } from 'lucide-react';
-import { useApp, uid } from '../context/AppContext';
-import type { MockInterview, MockType } from '../types';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { useState } from "react";
+import { AlertTriangle, Edit3, Plus, Trash2, X } from "lucide-react";
+import { uid, useApp } from "@/context/AppContext";
+import type { MockInterview, MockType } from "@/types";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const MOCK_TYPES: MockType[] = ['DSA', 'System Design', 'Resume/Story'];
+const MOCK_TYPES: MockType[] = ["DSA", "System Design", "Resume/Story"];
 
-const emptyMock = (): Omit<MockInterview, 'id'> => ({
-  type: 'DSA', date: new Date().toISOString().slice(0, 10),
-  score: 7, wrongPoints: [], improvements: '', interviewer: ''
+const emptyMock = (): Omit<MockInterview, "id"> => ({
+  type: "DSA", date: new Date().toISOString().slice(0, 10),
+  score: 7, wrongPoints: [], improvements: "", interviewer: ""
 });
 
 function ScoreDots({ score }: { score: number }) {
   return (
     <div className="score-dots">
       {Array.from({ length: 10 }, (_, i) => (
-        <div key={i} className={`score-dot ${i < score ? (score >= 7 ? 'high' : score >= 4 ? 'filled' : 'low') : ''}`} />
+        <div key={i}
+             className={`score-dot ${i < score ? (score >= 7 ? "high" : score >= 4 ? "filled" : "low") : ""}`} />
       ))}
-      <span style={{ fontSize: '0.8rem', fontWeight: 700, marginLeft: 6, color: score >= 7 ? 'var(--success)' : score >= 4 ? 'var(--accent-light)' : 'var(--danger)' }}>{score}/10</span>
+      <span style={{
+        fontSize: "0.8rem",
+        fontWeight: 700,
+        marginLeft: 6,
+        color: score >= 7 ? "var(--success)" : score >= 4 ? "var(--accent-light)" : "var(--danger)"
+      }}>{score}/10</span>
     </div>
   );
 }
@@ -28,57 +34,59 @@ function MockModal({ mock, onClose, onSave }: {
   onSave: (m: any) => void;
 }) {
   const [form, setForm] = useState<any>({ ...emptyMock(), ...mock, wrongPoints: mock.wrongPoints || [] });
-  const [wpInput, setWpInput] = useState('');
+  const [wpInput, setWpInput] = useState("");
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
   const addWP = () => {
     if (!wpInput.trim()) return;
-    set('wrongPoints', [...form.wrongPoints, wpInput.trim()]);
-    setWpInput('');
+    set("wrongPoints", [...form.wrongPoints, wpInput.trim()]);
+    setWpInput("");
   };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">{form.id ? 'Edit Mock' : 'Log Mock Interview'}</h2>
+          <h2 className="modal-title">{form.id ? "Edit Mock" : "Log Mock Interview"}</h2>
           <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={16} /></button>
         </div>
         <div className="grid-2" style={{ gap: 12 }}>
           <div className="form-group">
             <label className="form-label">Type</label>
-            <select className="form-select" value={form.type} onChange={e => set('type', e.target.value)}>
+            <select className="form-select" value={form.type} onChange={e => set("type", e.target.value)}>
               {MOCK_TYPES.map(t => <option key={t}>{t}</option>)}
             </select>
           </div>
           <div className="form-group">
             <label className="form-label">Date</label>
-            <input type="date" className="form-input" value={form.date} onChange={e => set('date', e.target.value)} />
+            <input type="date" className="form-input" value={form.date} onChange={e => set("date", e.target.value)} />
           </div>
           <div className="form-group">
             <label className="form-label">Score (1–10)</label>
-            <input type="number" className="form-input" min={1} max={10} value={form.score} onChange={e => set('score', +e.target.value)} />
+            <input type="number" className="form-input" min={1} max={10} value={form.score}
+                   onChange={e => set("score", +e.target.value)} />
           </div>
           <div className="form-group">
             <label className="form-label">Interviewer / Platform</label>
-            <input className="form-input" value={form.interviewer} onChange={e => set('interviewer', e.target.value)} placeholder="Pramp, peer, company…" />
+            <input className="form-input" value={form.interviewer} onChange={e => set("interviewer", e.target.value)}
+                   placeholder="Pramp, peer, company…" />
           </div>
         </div>
         <div className="form-group">
           <label className="form-label">What Went Wrong</label>
           <div className="flex gap-8 mb-8">
             <input className="form-input" value={wpInput}
-              onChange={e => setWpInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addWP())}
-              placeholder="Add weakness… (Enter to add)" />
+                   onChange={e => setWpInput(e.target.value)}
+                   onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addWP())}
+                   placeholder="Add weakness… (Enter to add)" />
             <button className="btn btn-secondary" onClick={addWP}><Plus size={14} /></button>
           </div>
           {form.wrongPoints.map((p: string, i: number) => (
-            <div key={i} className="flex items-center gap-8 mb-4" style={{ fontSize: '0.82rem' }}>
-              <span style={{ color: 'var(--danger)' }}>•</span>
+            <div key={i} className="flex items-center gap-8 mb-4" style={{ fontSize: "0.82rem" }}>
+              <span style={{ color: "var(--danger)" }}>•</span>
               <span style={{ flex: 1 }}>{p}</span>
               <button className="btn btn-ghost btn-icon"
-                onClick={() => set('wrongPoints', form.wrongPoints.filter((_: any, j: number) => j !== i))}>
+                      onClick={() => set("wrongPoints", form.wrongPoints.filter((_: any, j: number) => j !== i))}>
                 <X size={11} />
               </button>
             </div>
@@ -87,12 +95,16 @@ function MockModal({ mock, onClose, onSave }: {
         <div className="form-group">
           <label className="form-label">What to Improve</label>
           <textarea className="form-textarea" value={form.improvements}
-            onChange={e => set('improvements', e.target.value)}
-            placeholder="Action items for next time…" />
+                    onChange={e => set("improvements", e.target.value)}
+                    placeholder="Action items for next time…" />
         </div>
-        <div className="flex gap-8" style={{ justifyContent: 'flex-end' }}>
+        <div className="flex gap-8" style={{ justifyContent: "flex-end" }}>
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={() => { onSave(form); onClose(); }}>Save</button>
+          <button className="btn btn-primary" onClick={() => {
+            onSave(form);
+            onClose();
+          }}>Save
+          </button>
         </div>
       </div>
     </div>
@@ -102,11 +114,11 @@ function MockModal({ mock, onClose, onSave }: {
 export default function MockInterviews() {
   const { state, dispatch } = useApp();
   const [modal, setModal] = useState<(Partial<MockInterview> & { id?: string }) | null>(null);
-  const [filterType, setFilterType] = useState<MockType | ''>('');
+  const [filterType, setFilterType] = useState<MockType | "">("");
 
   const save = (m: any) => {
-    if (m.id) dispatch({ type: 'UPDATE_MOCK', mock: m });
-    else dispatch({ type: 'ADD_MOCK', mock: { ...m, id: uid() } });
+    if (m.id) dispatch({ type: "UPDATE_MOCK", mock: m });
+    else dispatch({ type: "ADD_MOCK", mock: { ...m, id: uid() } });
   };
 
   const filtered = state.mockInterviews.filter(m => !filterType || m.type === filterType);
@@ -120,7 +132,7 @@ export default function MockInterviews() {
   const topWeakPoints = Object.entries(weakCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const avgScore = state.mockInterviews.length > 0
     ? (state.mockInterviews.reduce((s, m) => s + m.score, 0) / state.mockInterviews.length).toFixed(1)
-    : '—';
+    : "—";
 
   return (
     <div>
@@ -144,10 +156,17 @@ export default function MockInterviews() {
             <ResponsiveContainer width="100%" height={160}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                <YAxis domain={[0, 10]} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
-                <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, color: 'var(--text-primary)' }} />
-                <Line type="monotone" dataKey="score" stroke="var(--accent-light)" strokeWidth={2} dot={{ fill: 'var(--accent)', r: 4 }} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
+                <YAxis domain={[0, 10]} tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
+                <Tooltip contentStyle={{
+                  background: "var(--bg-secondary)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: "var(--text-primary)"
+                }} />
+                <Line type="monotone" dataKey="score" stroke="var(--accent-light)" strokeWidth={2}
+                      dot={{ fill: "var(--accent)", r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
           ) : (
@@ -157,16 +176,19 @@ export default function MockInterviews() {
 
         <div className="card">
           <div className="section-title">
-            <AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> Recurring Weak Points
+            <AlertTriangle size={16} style={{ color: "var(--warning)" }} /> Recurring Weak Points
           </div>
           {topWeakPoints.length === 0 ? (
             <div className="empty-state" style={{ padding: 24 }}><p>No weak points logged yet</p></div>
           ) : topWeakPoints.map(([p, cnt]) => (
             <div key={p} className="flex items-center gap-12 mb-12">
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.82rem', marginBottom: 4 }}>{p}</div>
+                <div style={{ fontSize: "0.82rem", marginBottom: 4 }}>{p}</div>
                 <div className="progress-track" style={{ height: 4 }}>
-                  <div className="progress-fill" style={{ width: `${Math.round((cnt / state.mockInterviews.length) * 100)}%`, background: 'var(--danger)' }} />
+                  <div className="progress-fill" style={{
+                    width: `${Math.round((cnt / state.mockInterviews.length) * 100)}%`,
+                    background: "var(--danger)"
+                  }} />
                 </div>
               </div>
               <span className="badge badge-danger">{cnt}x</span>
@@ -176,10 +198,12 @@ export default function MockInterviews() {
       </div>
 
       <div className="flex gap-8 mb-16">
-        <button className={`btn ${!filterType ? 'btn-primary' : 'btn-secondary'} btn-sm`} onClick={() => setFilterType('')}>All</button>
+        <button className={`btn ${!filterType ? "btn-primary" : "btn-secondary"} btn-sm`}
+                onClick={() => setFilterType("")}>All
+        </button>
         {MOCK_TYPES.map(t => (
-          <button key={t} className={`btn ${filterType === t ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-            onClick={() => setFilterType(t === filterType ? '' : t)}>{t}</button>
+          <button key={t} className={`btn ${filterType === t ? "btn-primary" : "btn-secondary"} btn-sm`}
+                  onClick={() => setFilterType(t === filterType ? "" : t)}>{t}</button>
         ))}
       </div>
 
@@ -191,34 +215,38 @@ export default function MockInterviews() {
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {[...filtered].sort((a, b) => b.date.localeCompare(a.date)).map(m => (
           <div key={m.id} className="card">
             <div className="flex justify-between items-start mb-12">
               <div className="flex items-center gap-12">
                 <span className="badge badge-accent">{m.type}</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{m.date}</span>
-                {m.interviewer && <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>via {m.interviewer}</span>}
+                <span style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{m.date}</span>
+                {m.interviewer &&
+                  <span style={{ color: "var(--text-muted)", fontSize: "0.78rem" }}>via {m.interviewer}</span>}
               </div>
               <div className="flex gap-8 items-center">
                 <ScoreDots score={m.score} />
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(m)}><Edit3 size={13} /></button>
-                <button className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: 'DELETE_MOCK', id: m.id })}>
-                  <Trash2 size={13} style={{ color: 'var(--danger)' }} />
+                <button className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "DELETE_MOCK", id: m.id })}>
+                  <Trash2 size={13} style={{ color: "var(--danger)" }} />
                 </button>
               </div>
             </div>
             {m.wrongPoints.length > 0 && (
               <div className="mb-8">
-                <div style={{ fontSize: '0.75rem', color: 'var(--danger)', fontWeight: 600, marginBottom: 6 }}>❌ What went wrong</div>
-                <div className="flex gap-6" style={{ flexWrap: 'wrap' }}>
-                  {m.wrongPoints.map((p, i) => <span key={i} className="badge badge-danger" style={{ fontSize: '0.72rem' }}>{p}</span>)}
+                <div style={{ fontSize: "0.75rem", color: "var(--danger)", fontWeight: 600, marginBottom: 6 }}>❌ What
+                  went wrong
+                </div>
+                <div className="flex gap-6" style={{ flexWrap: "wrap" }}>
+                  {m.wrongPoints.map((p, i) => <span key={i} className="badge badge-danger"
+                                                     style={{ fontSize: "0.72rem" }}>{p}</span>)}
                 </div>
               </div>
             )}
             {m.improvements && (
-              <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                <span style={{ color: 'var(--success)', fontWeight: 600 }}>→ </span>{m.improvements}
+              <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+                <span style={{ color: "var(--success)", fontWeight: 600 }}>→ </span>{m.improvements}
               </div>
             )}
           </div>

@@ -17,7 +17,8 @@
 
 ## 📸 Preview
 
-> Dark-themed, single-page app with a polished dashboard layout, smooth interactions, and mobile-friendly responsiveness.
+> Dark-themed, single-page app with a polished dashboard layout, smooth interactions, and mobile-friendly
+> responsiveness.
 
 ![Dashboard](/Dashboard.png)
 
@@ -27,45 +28,48 @@
 
 ### 10 fully-functional sections
 
-| Section | What it does |
-|---|---|
-| 📊 **Dashboard** | Overall progress bars, study streak tracker, week-by-week overview, today's focus card |
-| 🗓 **Roadmap** | 8 collapsible week cards · task status cycling (todo → in-progress → done) · per-task notes |
-| 📅 **Daily Planner** | Log study sessions with focus area, planned/completed hours, reflection · history timeline |
-| 📝 **Notes** | Categorised notes (DSA, System Design, Interview, Company, Weekly) · autosave · tag system |
-| 📖 **Story Bank** | STAR-format interview stories · tag filtering · copy short/long version to clipboard |
-| 💻 **DSA Tracker** | Problem log with topic/difficulty filters · topic & difficulty bar charts · weak area panel |
-| 🏗 **System Design** | Exercises + core concepts tabs · status tracking · tradeoffs & architecture notes |
-| 💼 **Applications** | Kanban pipeline from Wishlist → Offer/Rejected · inline status updates · company details |
-| 🎙 **Mock Interviews** | Session log · score trend line chart · recurring weak points aggregated automatically |
-| ⚡ **Focus Mode** | Full-screen minimal view of today's tasks · Esc to exit |
+| Section                | What it does                                                                                |
+|------------------------|---------------------------------------------------------------------------------------------|
+| 📊 **Dashboard**       | Overall progress bars, study streak tracker, week-by-week overview, today's focus card      |
+| 🗓 **Roadmap**         | 8 collapsible week cards · task status cycling (todo → in-progress → done) · per-task notes |
+| 📅 **Daily Planner**   | Log study sessions with focus area, planned/completed hours, reflection · history timeline  |
+| 📝 **Notes**           | Categorised notes (DSA, System Design, Interview, Company, Weekly) · autosave · tag system  |
+| 📖 **Story Bank**      | STAR-format interview stories · tag filtering · copy short/long version to clipboard        |
+| 💻 **DSA Tracker**     | Problem log with topic/difficulty filters · topic & difficulty bar charts · weak area panel |
+| 🏗 **System Design**   | Exercises + core concepts tabs · status tracking · tradeoffs & architecture notes           |
+| 💼 **Applications**    | Kanban pipeline from Wishlist → Offer/Rejected · inline status updates · company details    |
+| 🎙 **Mock Interviews** | Session log · score trend line chart · recurring weak points aggregated automatically       |
+| ⚡ **Focus Mode**       | Full-screen minimal view of today's tasks · Esc to exit                                     |
 
 ### Extras
+
 - **`Ctrl+K` Global Search** — searches across tasks, notes, stories, companies, and DSA problems simultaneously
 - **Export / Import JSON** — full data backup and restore from the sidebar
 - **Auto-save to `localStorage`** — zero backend, works offline, persists across sessions
-- **Seeded sample data** — 8-week roadmap, 5 Prospecta STAR stories, 10 DSA problems, 11 system design topics, 3 sample applications, pre-loaded on first launch
+- **Seeded sample data** — 8-week roadmap, 5 Prospecta STAR stories, 10 DSA problems, 11 system design topics, 3 sample
+  applications, pre-loaded on first launch
 - **Responsive layout** — adapts cleanly to tablet and mobile viewports
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Framework | React 18 + TypeScript 5 |
-| Build Tool | Vite 5 |
-| Routing | React Router v6 |
-| Charts | Recharts |
-| Icons | Lucide React |
-| Styling | Vanilla CSS (custom design system, no Tailwind) |
-| Persistence | `localStorage` — no backend required |
+| Layer       | Choice                                          |
+|-------------|-------------------------------------------------|
+| Framework   | React 18 + TypeScript 5                         |
+| Build Tool  | Vite 5                                          |
+| Routing     | React Router v6                                 |
+| Charts      | Recharts                                        |
+| Icons       | Lucide React                                    |
+| Styling     | Vanilla CSS (custom design system, no Tailwind) |
+| Persistence | `localStorage` — no backend required            |
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js **18+**
 - npm or yarn
 
@@ -155,25 +159,25 @@ interface AppState {
 
 ## 📅 The 8-Week Roadmap
 
-| Week | Focus |
-|---|---|
-| Week 1 | Story Bank + DSA Baseline |
+| Week   | Focus                                                             |
+|--------|-------------------------------------------------------------------|
+| Week 1 | Story Bank + DSA Baseline                                         |
 | Week 2 | DSA Patterns (two-pointer, sliding window, binary search, stacks) |
-| Week 3 | Trees, Graphs, Heaps, DP Intro |
-| Week 4 | System Design Foundations |
-| Week 5 | Backend Architecture Depth (Kafka, CQRS, distributed systems) |
-| Week 6 | Mock Interviews + Applications Start |
-| Week 7 | Full Interview Mode |
-| Week 8 | Offers, Negotiation & Close |
+| Week 3 | Trees, Graphs, Heaps, DP Intro                                    |
+| Week 4 | System Design Foundations                                         |
+| Week 5 | Backend Architecture Depth (Kafka, CQRS, distributed systems)     |
+| Week 6 | Mock Interviews + Applications Start                              |
+| Week 7 | Full Interview Mode                                               |
+| Week 8 | Offers, Negotiation & Close                                       |
 
 ---
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl + K` | Open global search |
-| `Esc` | Close any modal / exit Focus Mode |
+| Shortcut   | Action                            |
+|------------|-----------------------------------|
+| `Ctrl + K` | Open global search                |
+| `Esc`      | Close any modal / exit Focus Mode |
 
 ---
 
@@ -189,6 +193,7 @@ Your data is stored entirely in the browser's `localStorage`. To back it up:
 ## 🤝 Contributing
 
 This is a personal productivity tool, but PRs are welcome for:
+
 - Bug fixes
 - New DSA topics or system design exercises
 - UI improvements
