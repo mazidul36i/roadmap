@@ -224,12 +224,13 @@ ul { list-style: none; }
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 10px;
+  gap: 6px;
+  padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+  line-height: 1;
 }
 .badge-success { background: var(--success-dim); color: var(--success); }
 .badge-warning { background: var(--warning-dim); color: var(--warning); }
@@ -241,17 +242,32 @@ ul { list-style: none; }
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
+  justify-content: center;
+  padding: 6px 14px;
   border-radius: 999px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 500;
   background: var(--accent-dim);
   color: var(--accent-light);
   border: 1px solid var(--border-accent);
   cursor: pointer;
   transition: all var(--transition);
+  line-height: 1;
+  white-space: nowrap;
 }
 .tag:hover, .tag.active { background: var(--accent); color: #fff; }
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+.tag-cloud .tag {
+  flex: 1 0 auto;
+  max-width: 180px;
+}
 
 /* ─── PROGRESS BAR ───────────────────────────────────────── */
 .progress-track {
@@ -624,6 +640,9 @@ tbody td { padding: 12px 16px; color: var(--text-primary); vertical-align: middl
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
+.gap-2 { gap: 2px; }
+.gap-4 { gap: 4px; }
+.gap-6 { gap: 6px; }
 .gap-8 { gap: 8px; }
 .gap-12 { gap: 12px; }
 .gap-16 { gap: 16px; }

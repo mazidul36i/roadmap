@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Edit3, X, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, ExternalLink, AlertTriangle, Wand2, Loader2 } from 'lucide-react';
 import { useApp, uid } from '../context/AppContext';
 import type { DSAProblem, DSADifficulty, DSAPlatform } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -10,35 +10,119 @@ const PLATFORMS: DSAPlatform[] = ['LeetCode', 'HackerRank', 'CodeForces', 'Inter
 const DIFF_COLORS: Record<string, string> = { Easy: 'var(--success)', Medium: 'var(--warning)', Hard: 'var(--danger)' };
 
 const emptyProblem = (): Omit<DSAProblem, 'id'> => ({
-  name: '', topic: 'Arrays', difficulty: 'Medium', platform: 'LeetCode',
+  name: '', topics: ['Arrays'], difficulty: 'Medium', platform: 'LeetCode',
   solved: false, timeTaken: 0, pattern: '', mistakes: '', url: ''
 });
 
 function ProblemModal({ problem, onClose, onSave }: { problem: Partial<DSAProblem> & { id?: string }; onClose: () => void; onSave: (p: any) => void }) {
-  const [form, setForm] = useState<any>({ ...emptyProblem(), ...problem });
+  const [form, setForm] = useState<any>(() => {
+    const base = { ...emptyProblem(), ...problem };
+    const topics = problem.topics || ((problem as any).topic ? [(problem as any).topic] : ['Arrays']);
+    return { ...base, topics };
+  });
+  const [isFetching, setIsFetching] = useState(false);
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
+
+  const fetchLeetCodeDetails = async () => {
+    if (!form.url.includes('leetcode.com/problems/')) {
+      alert('Please enter a valid LeetCode problem URL first');
+      return;
+    }
+    setIsFetching(true);
+    try {
+      const parts = form.url.split('problems/')[1].split('/');
+      const slug = parts[0];
+      const res = await fetch(`https://alfa-leetcode-api.onrender.com/select?titleSlug=${slug}`);
+      const data = await res.json();
+      if (data.questionTitle) {
+        set('name', data.questionTitle);
+        set('difficulty', data.difficulty);
+
+        const TOPIC_MAP: Record<string, string> = {
+          'Array': 'Arrays',
+          'String': 'Strings',
+          'Hash Table': 'Hashmaps',
+          'Binary Tree': 'Trees',
+          'Tree': 'Trees',
+          'Binary Search Tree': 'BST',
+          'Graph': 'Graphs',
+          'Depth-First Search': 'Graphs',
+          'Breadth-First Search': 'Graphs',
+          'Union Find': 'Graphs',
+          'Priority Queue': 'Heap',
+          'Two Pointers': 'Two Pointer',
+        };
+
+        if (data.topicTags && data.topicTags.length > 0) {
+          const mappedTopics = data.topicTags
+            .map((t: any) => TOPIC_MAP[t.name] || TOPICS.find(topic =>
+              topic.toLowerCase().includes(t.name.toLowerCase()) ||
+              t.name.toLowerCase().includes(topic.toLowerCase().replace(/s$/, ''))
+            ))
+            .filter(Boolean);
+
+          if (mappedTopics.length > 0) {
+            set('topics', Array.from(new Set(mappedTopics)));
+          }
+        }
+      } else {
+        alert('Could not find problem details for this URL');
+      }
+    } catch (e) {
+      alert('Failed to fetch details. The API might be down.');
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="modal-title">{form.id ? 'Edit Problem' : 'Add Problem'}</h2>
+          <h2 className="modal-title">{form.id ? 'Edit Topic' : 'Add Problem'}</h2>
           <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={16} /></button>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Problem URL</label>
+          <div className="flex gap-8">
+            <input className="form-input" value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://leetcode.com/…" />
+            <button
+              className="btn btn-secondary btn-icon"
+              onClick={fetchLeetCodeDetails}
+              disabled={isFetching}
+              title="Auto-fill details from LeetCode URL"
+            >
+              {isFetching ? <Loader2 size={16} className="animate-spin" /> : <Wand2 size={16} />}
+            </button>
+          </div>
         </div>
         <div className="form-group"><label className="form-label">Problem Name</label>
           <input className="form-input" value={form.name} onChange={e => set('name', e.target.value)} placeholder="Two Sum…" />
         </div>
-        <div className="grid-2" style={{ gap: 12 }}>
-          <div className="form-group"><label className="form-label">Topic</label>
-            <select className="form-select" value={form.topic} onChange={e => set('topic', e.target.value)}>
-              {TOPICS.map(t => <option key={t}>{t}</option>)}
-            </select>
+        <div className="form-group">
+          <label className="form-label">Topics</label>
+          <div className="tag-cloud" style={{ marginTop: 10 }}>
+            {TOPICS.map(t => (
+              <span
+                key={t}
+                className={`tag ${form.topics.includes(t) ? 'active' : ''}`}
+                onClick={() => {
+                  const next = form.topics.includes(t)
+                    ? form.topics.filter((x: string) => x !== t)
+                    : [...form.topics, t];
+                  if (next.length > 0) set('topics', next);
+                }}
+              >
+                {t}
+              </span>
+            ))}
           </div>
-          <div className="form-group"><label className="form-label">Difficulty</label>
-            <select className="form-select" value={form.difficulty} onChange={e => set('difficulty', e.target.value)}>
-              {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
-            </select>
-          </div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Difficulty</label>
+          <select className="form-select" value={form.difficulty} onChange={e => set('difficulty', e.target.value)}>
+            {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
+          </select>
         </div>
         <div className="grid-2" style={{ gap: 12 }}>
           <div className="form-group"><label className="form-label">Platform</label>
@@ -55,9 +139,6 @@ function ProblemModal({ problem, onClose, onSave }: { problem: Partial<DSAProble
         </div>
         <div className="form-group"><label className="form-label">Mistakes Made</label>
           <textarea className="form-textarea" value={form.mistakes} onChange={e => set('mistakes', e.target.value)} placeholder="What did you get wrong?" />
-        </div>
-        <div className="form-group"><label className="form-label">Problem URL</label>
-          <input className="form-input" value={form.url} onChange={e => set('url', e.target.value)} placeholder="https://leetcode.com/…" />
         </div>
         <div className="form-group">
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
@@ -83,7 +164,7 @@ export default function DSATracker() {
   const [search, setSearch] = useState('');
 
   const filtered = state.dsaProblems.filter(p => {
-    if (filterTopic && p.topic !== filterTopic) return false;
+    if (filterTopic && !p.topics.includes(filterTopic)) return false;
     if (filterDiff && p.difficulty !== filterDiff) return false;
     if (filterSolved === 'solved' && !p.solved) return false;
     if (filterSolved === 'unsolved' && p.solved) return false;
@@ -98,9 +179,10 @@ export default function DSATracker() {
 
   // Stats
   const byTopic = TOPICS.map(t => ({
+    fullTopic: t,
     topic: t.slice(0, 8),
-    solved: state.dsaProblems.filter(p => p.topic === t && p.solved).length,
-    total: state.dsaProblems.filter(p => p.topic === t).length,
+    solved: state.dsaProblems.filter(p => p.topics?.includes(t) && p.solved).length,
+    total: state.dsaProblems.filter(p => p.topics?.includes(t)).length,
   })).filter(x => x.total > 0);
 
   const byDiff = DIFFICULTIES.map(d => ({
@@ -126,7 +208,10 @@ export default function DSATracker() {
             <BarChart data={byTopic} layout="vertical" margin={{ left: 0, right: 16 }}>
               <XAxis type="number" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} />
               <YAxis type="category" dataKey="topic" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} width={70} />
-              <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }} />
+              <Tooltip
+                formatter={(value, name, props) => [value, props.payload.fullTopic]}
+                contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', fontSize: 12 }}
+              />
               <Bar dataKey="solved" fill="var(--accent)" name="Solved" radius={[0, 4, 4, 0]} />
               <Bar dataKey="total" fill="rgba(255,255,255,0.05)" name="Total" radius={[0, 4, 4, 0]} />
             </BarChart>
@@ -148,7 +233,7 @@ export default function DSATracker() {
                 <AlertTriangle size={14} /> Weak Areas (solve rate &lt;50%)
               </div>
               <div className="flex gap-8" style={{ flexWrap: 'wrap' }}>
-                {weakTopics.map(t => <span key={t.topic} className="badge badge-warning">{t.topic} ({t.solved}/{t.total})</span>)}
+                {weakTopics.map(t => <span key={t.fullTopic} className="badge badge-warning">{t.fullTopic} ({t.solved}/{t.total})</span>)}
               </div>
             </div>
           )}
@@ -190,7 +275,11 @@ export default function DSATracker() {
                   <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.name}</div>
                   {p.mistakes && <div style={{ fontSize: '0.72rem', color: 'var(--danger)', marginTop: 2 }}>⚠ {p.mistakes.slice(0, 50)}</div>}
                 </td>
-                <td><span className="badge badge-muted">{p.topic}</span></td>
+                <td>
+                  <div className="flex gap-12" style={{ flexWrap: 'wrap' }}>
+                    {p.topics?.map(t => <span key={t} className="badge badge-muted">{t}</span>)}
+                  </div>
+                </td>
                 <td><span className="badge" style={{ background: `${DIFF_COLORS[p.difficulty]}20`, color: DIFF_COLORS[p.difficulty] }}>{p.difficulty}</span></td>
                 <td style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>{p.platform}</td>
                 <td style={{ color: 'var(--text-secondary)', fontSize: '0.82rem' }}>{p.pattern || '—'}</td>

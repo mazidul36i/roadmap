@@ -174,16 +174,16 @@ const storyCards: StoryCard[] = [
 
 // ─── DSA PROBLEMS ──────────────────────────────────────────────────────────────
 const dsaProblems: DSAProblem[] = [
-  { id: uid(), name: 'Two Sum', topic: 'Arrays', difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 15, pattern: 'Hashmap', mistakes: '', url: 'https://leetcode.com/problems/two-sum' },
-  { id: uid(), name: 'Best Time to Buy and Sell Stock', topic: 'Arrays', difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 20, pattern: 'Sliding Window', mistakes: '', url: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock' },
-  { id: uid(), name: 'Longest Substring Without Repeating Characters', topic: 'Strings', difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 35, pattern: 'Sliding Window', mistakes: 'Forgot to update left pointer correctly', url: 'https://leetcode.com/problems/longest-substring-without-repeating-characters' },
-  { id: uid(), name: 'Container With Most Water', topic: 'Arrays', difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 30, pattern: 'Two Pointer', mistakes: '', url: 'https://leetcode.com/problems/container-with-most-water' },
-  { id: uid(), name: 'Valid Parentheses', topic: 'Stack', difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 12, pattern: 'Stack', mistakes: '', url: 'https://leetcode.com/problems/valid-parentheses' },
-  { id: uid(), name: 'Binary Search', topic: 'Binary Search', difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 18, pattern: 'Binary Search', mistakes: '', url: 'https://leetcode.com/problems/binary-search' },
-  { id: uid(), name: 'Number of Islands', topic: 'Graphs', difficulty: 'Medium', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'DFS/BFS', mistakes: '', url: 'https://leetcode.com/problems/number-of-islands' },
-  { id: uid(), name: 'Merge K Sorted Lists', topic: 'Heap', difficulty: 'Hard', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'Heap', mistakes: '', url: 'https://leetcode.com/problems/merge-k-sorted-lists' },
-  { id: uid(), name: 'Coin Change', topic: 'Dynamic Programming', difficulty: 'Medium', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'DP - Unbounded Knapsack', mistakes: '', url: 'https://leetcode.com/problems/coin-change' },
-  { id: uid(), name: 'Lowest Common Ancestor of BST', topic: 'Trees', difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 25, pattern: 'Tree Traversal', mistakes: '', url: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree' },
+  { id: uid(), name: 'Two Sum', topics: ['Arrays'], difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 15, pattern: 'Hashmap', mistakes: '', url: 'https://leetcode.com/problems/two-sum' },
+  { id: uid(), name: 'Best Time to Buy and Sell Stock', topics: ['Arrays'], difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 20, pattern: 'Sliding Window', mistakes: '', url: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock' },
+  { id: uid(), name: 'Longest Substring Without Repeating Characters', topics: ['Strings'], difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 35, pattern: 'Sliding Window', mistakes: 'Forgot to update left pointer correctly', url: 'https://leetcode.com/problems/longest-substring-without-repeating-characters' },
+  { id: uid(), name: 'Container With Most Water', topics: ['Arrays'], difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 30, pattern: 'Two Pointer', mistakes: '', url: 'https://leetcode.com/problems/container-with-most-water' },
+  { id: uid(), name: 'Valid Parentheses', topics: ['Stack'], difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 12, pattern: 'Stack', mistakes: '', url: 'https://leetcode.com/problems/valid-parentheses' },
+  { id: uid(), name: 'Binary Search', topics: ['Binary Search'], difficulty: 'Easy', platform: 'LeetCode', solved: true, timeTaken: 18, pattern: 'Binary Search', mistakes: '', url: 'https://leetcode.com/problems/binary-search' },
+  { id: uid(), name: 'Number of Islands', topics: ['Graphs'], difficulty: 'Medium', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'DFS/BFS', mistakes: '', url: 'https://leetcode.com/problems/number-of-islands' },
+  { id: uid(), name: 'Merge K Sorted Lists', topics: ['Heap'], difficulty: 'Hard', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'Heap', mistakes: '', url: 'https://leetcode.com/problems/merge-k-sorted-lists' },
+  { id: uid(), name: 'Coin Change', topics: ['Dynamic Programming'], difficulty: 'Medium', platform: 'LeetCode', solved: false, timeTaken: 0, pattern: 'DP - Unbounded Knapsack', mistakes: '', url: 'https://leetcode.com/problems/coin-change' },
+  { id: uid(), name: 'Lowest Common Ancestor of BST', topics: ['Trees'], difficulty: 'Medium', platform: 'LeetCode', solved: true, timeTaken: 25, pattern: 'Tree Traversal', mistakes: '', url: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree' },
 ];
 
 // ─── SYSTEM DESIGN TOPICS ──────────────────────────────────────────────────────

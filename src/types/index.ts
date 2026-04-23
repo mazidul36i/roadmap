@@ -55,7 +55,7 @@ export type DSAPlatform = 'LeetCode' | 'HackerRank' | 'CodeForces' | 'InterviewB
 export interface DSAProblem {
   id: string;
   name: string;
-  topic: string;
+  topics: string[];
   difficulty: DSADifficulty;
   platform: DSAPlatform;
   solved: boolean;
