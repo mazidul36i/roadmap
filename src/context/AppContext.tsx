@@ -1,6 +1,6 @@
 import React, { createContext, type ReactNode, useContext, useEffect, useReducer, useRef } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@lib/firebase";
 import { useAuth } from "./AuthContext";
 import type {
   Application,
@@ -14,8 +14,8 @@ import type {
   SystemDesignTopic,
   TaskStatus,
   Week
-} from "@/types";
-import { seedState } from "@/data/seed";
+} from "@app-types/index";
+import { seedState } from "@data/seed";
 
 // ─── ACTION TYPES ───────────────────────────────────────────────────────────────
 type Action =

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, ChevronDown, Circle, Clock, StickyNote } from "lucide-react";
-import { computeWeekProgress, useApp } from "@/context/AppContext";
-import type { TaskStatus } from "@/types";
+import { computeWeekProgress, useApp } from "@context/AppContext";
+import type { TaskStatus } from "@app-types/index";
 
 const STATUS_ORDER: TaskStatus[] = ["todo", "inprogress", "done"];
 

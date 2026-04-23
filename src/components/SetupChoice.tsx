@@ -1,6 +1,6 @@
 import React from "react";
-import { useApp } from "@/context/AppContext";
-import { emptyState, seedState } from "@/data/seed";
+import { useApp } from "@context/AppContext";
+import { emptyState, seedState } from "@data/seed";
 import { CheckCircle2, ListFilter, Sparkles, Trash2 } from "lucide-react";
 
 export default function SetupChoice() {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Trash2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { Application, AppStatus, InterviewDate } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { Application, AppStatus, InterviewDate } from "@app-types/index";
 
 const STATUSES: { key: AppStatus; label: string; color: string }[] = [
   { key: "wishlist", label: "Wishlist", color: "var(--text-muted)" },

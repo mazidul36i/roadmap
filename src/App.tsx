@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import { AppProvider, useApp } from "@/context/AppContext";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
-import Dashboard from "@/pages/Dashboard";
-import Roadmap from "@/pages/Roadmap";
-import DailyPlanner from "@/pages/DailyPlanner";
-import Notes from "@/pages/Notes";
-import StoryBank from "@/pages/StoryBank";
-import DSATracker from "@/pages/DSATracker";
-import SystemDesign from "@/pages/SystemDesign";
-import Applications from "@/pages/Applications";
-import MockInterviews from "@/pages/MockInterviews";
-import FocusMode from "@/pages/FocusMode";
-import LoginPage from "@/pages/LoginPage";
-import SetupChoice from "@/components/SetupChoice";
-import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { AppProvider, useApp } from "@context/AppContext";
+import Sidebar from "@components/Sidebar";
+import TopBar from "@components/TopBar";
+import Dashboard from "@pages/Dashboard";
+import Roadmap from "@pages/Roadmap";
+import DailyPlanner from "@pages/DailyPlanner";
+import Notes from "@pages/Notes";
+import StoryBank from "@pages/StoryBank";
+import DSATracker from "@pages/DSATracker";
+import SystemDesign from "@pages/SystemDesign";
+import Applications from "@pages/Applications";
+import MockInterviews from "@pages/MockInterviews";
+import FocusMode from "@pages/FocusMode";
+import LoginPage from "@pages/LoginPage";
+import SetupChoice from "@components/SetupChoice";
+import { AuthProvider, useAuth } from "@context/AuthContext";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Your 8-week job-switch prep at a glance" },

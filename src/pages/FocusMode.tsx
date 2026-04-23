@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Circle, Clock, X } from "lucide-react";
-import { getCurrentWeek, useApp } from "@/context/AppContext";
-import type { TaskStatus } from "@/types";
+import { getCurrentWeek, useApp } from "@context/AppContext";
+import type { TaskStatus } from "@app-types/index";
 
 function statusNext(s: TaskStatus): TaskStatus {
   const order: TaskStatus[] = ["todo", "inprogress", "done"];

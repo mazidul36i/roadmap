@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Command, Menu, Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useApp } from "@/context/AppContext";
+import { useApp } from "@context/AppContext";
 
 interface Props {
   title: string;

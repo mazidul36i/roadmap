@@ -15,8 +15,8 @@ import {
   User as UserIcon,
   Zap
 } from "lucide-react";
-import { computeProgress, useApp } from "@/context/AppContext";
-import { useAuth } from "@/context/AuthContext";
+import { computeProgress, useApp } from "@context/AppContext";
+import { useAuth } from "@context/AuthContext";
 
 const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },

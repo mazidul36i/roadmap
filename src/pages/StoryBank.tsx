@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Copy, Edit3, Plus, Trash2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { StoryCard } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { StoryCard } from "@app-types/index";
 
 const ALL_TAGS = ["performance", "search", "async processing", "data pipeline", "architecture", "reliability", "optimization"];
 

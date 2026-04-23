@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BookOpen, CheckCircle2, Circle, Clock, Edit3, Layout, Plus, Trash2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { SDStatus, SystemDesignTopic } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { SDStatus, SystemDesignTopic } from "@app-types/index";
 
 const STATUS_LABELS: Record<SDStatus, string> = {
   "not-started": "Not Started",
@@ -35,7 +35,7 @@ function TopicModal({ topic, onClose, onSave }: {
         <div className="grid-2" style={{ gap: 12 }}>
           <div className="form-group"><label className="form-label">Title</label>
             <input className="form-input" value={form.title} onChange={e => set("title", e.target.value)}
-                   placeholder="e.g. URL Shortener" />
+              placeholder="e.g. URL Shortener" />
           </div>
           <div className="grid-2" style={{ gap: 12 }}>
             <div className="form-group"><label className="form-label">Status</label>
@@ -53,16 +53,16 @@ function TopicModal({ topic, onClose, onSave }: {
         </div>
         <div className="form-group"><label className="form-label">Tradeoffs Learned</label>
           <textarea className="form-textarea" style={{ minHeight: 80 }} value={form.tradeoffs}
-                    onChange={e => set("tradeoffs", e.target.value)}
-                    placeholder="CAP tradeoffs, latency vs consistency…" />
+            onChange={e => set("tradeoffs", e.target.value)}
+            placeholder="CAP tradeoffs, latency vs consistency…" />
         </div>
         <div className="form-group"><label className="form-label">Architecture Notes</label>
           <textarea className="form-textarea" style={{ minHeight: 120 }} value={form.notes}
-                    onChange={e => set("notes", e.target.value)} placeholder="Components, data flow, bottlenecks…" />
+            onChange={e => set("notes", e.target.value)} placeholder="Components, data flow, bottlenecks…" />
         </div>
         <div className="form-group"><label className="form-label">Diagram Reference (URL or text)</label>
           <input className="form-input" value={form.diagramRef} onChange={e => set("diagramRef", e.target.value)}
-                 placeholder="https://excalidraw.com/… or 'see Notion'" />
+            placeholder="https://excalidraw.com/… or 'see Notion'" />
         </div>
         <div className="flex gap-8" style={{ justifyContent: "flex-end" }}>
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
@@ -138,13 +138,13 @@ export default function SystemDesign() {
       <div className="grid-auto">
         {topics.map(t => (
           <div key={t.id} className="card"
-               style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "default" }}>
+            style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "default" }}>
             <div className="flex justify-between items-start">
               <h3 style={{ fontSize: "0.9rem", fontWeight: 700, flex: 1, lineHeight: 1.4 }}>{t.title}</h3>
               <div className="flex gap-4">
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(t)}><Edit3 size={13} /></button>
                 <button className="btn btn-ghost btn-icon"
-                        onClick={() => dispatch({ type: "DELETE_SD_TOPIC", id: t.id })}>
+                  onClick={() => dispatch({ type: "DELETE_SD_TOPIC", id: t.id })}>
                   <Trash2 size={13} style={{ color: "var(--danger)" }} />
                 </button>
               </div>

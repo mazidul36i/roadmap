@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { DSADifficulty, DSAPlatform, DSAProblem } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const TOPICS = ["Arrays", "Strings", "Hashmaps", "Stack", "Queue", "Linked List", "Trees", "BST", "Graphs", "Heap", "Binary Search", "Two Pointer", "Sliding Window", "Dynamic Programming", "Backtracking", "Trie", "Greedy", "Math"];

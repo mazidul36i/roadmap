@@ -7,7 +7,7 @@ import type {
   StoryCard,
   SystemDesignTopic,
   Week
-} from "@/types";
+} from "@app-types/index";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 

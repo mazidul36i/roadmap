@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Briefcase, ChevronRight, Code2, Flame, LayoutDashboard, Mic2, Server, Target } from "lucide-react";
-import { computeProgress, computeWeekProgress, getCurrentWeek, useApp } from "@/context/AppContext";
+import { computeProgress, computeWeekProgress, getCurrentWeek, useApp } from "@context/AppContext";
 
 function ProgressRow({ label, value, max, color = "", onClick }: {
   label: string;

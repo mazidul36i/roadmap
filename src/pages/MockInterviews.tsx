@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AlertTriangle, Edit3, Plus, Trash2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { MockInterview, MockType } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { MockInterview, MockType } from "@app-types/index";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const MOCK_TYPES: MockType[] = ["DSA", "System Design", "Resume/Story"];

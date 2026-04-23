@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, Plus, Trash2 } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { DayLog } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { DayLog } from "@app-types/index";
 
 const FOCUS_AREAS = ["DSA", "System Design", "Story Bank", "Applications", "Mock Interviews", "Resume", "Networking", "Other"];
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Plus, Search, Tag, Trash2, X } from "lucide-react";
-import { uid, useApp } from "@/context/AppContext";
-import type { Note, NoteCategory } from "@/types";
+import { uid, useApp } from "@context/AppContext";
+import type { Note, NoteCategory } from "@app-types/index";
 
 const CATEGORIES: { key: NoteCategory; label: string; color: string }[] = [
   { key: "weekly", label: "Weekly", color: "var(--accent)" },
@@ -25,7 +25,7 @@ export default function Notes() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState(emptyNote());
   const [tagInput, setTagInput] = useState("");
-  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimer = useRef<any>(null);
 
   const filtered = state.notes.filter(n => {
     if (category !== "all" && n.category !== category) return false;
