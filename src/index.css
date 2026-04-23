@@ -479,6 +479,12 @@ tbody td { padding: 12px 16px; color: var(--text-primary); vertical-align: middl
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
+  transition: all var(--transition);
+}
+.kanban-col.drag-over {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent-dim);
 }
 .kanban-col-header {
   font-size: 0.78rem;
@@ -500,6 +506,7 @@ tbody td { padding: 12px 16px; color: var(--text-primary); vertical-align: middl
   transition: all var(--transition);
 }
 .kanban-card:hover { border-color: var(--border-accent); transform: translateY(-1px); box-shadow: var(--shadow); }
+.kanban-card.dragging { opacity: 0.4; cursor: grabbing; border-style: dashed; }
 
 /* ─── GLOBAL SEARCH MODAL ────────────────────────────────── */
 .global-search { max-width: 580px; }
@@ -634,6 +641,7 @@ tbody td { padding: 12px 16px; color: var(--text-primary); vertical-align: middl
 .mb-4 { margin-bottom: 4px; }
 .mb-8 { margin-bottom: 8px; }
 .mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
 .mb-24 { margin-bottom: 24px; }
 .mt-8 { margin-top: 8px; }
 .mt-16 { margin-top: 16px; }
@@ -648,6 +656,37 @@ tbody td { padding: 12px 16px; color: var(--text-primary); vertical-align: middl
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ─── TABS ───────────────────────────────────────────────── */
+.tab-group {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.tab-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+.tab-btn.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ─── FOCUS MODE ─────────────────────────────────────────── */

@@ -110,6 +110,33 @@ export default function Applications() {
   });
 
   const getStatusStyle = (s: AppStatus) => STATUSES.find(x => x.key === s);
+  
+  const handleDragStart = (e: React.DragEvent, id: string) => {
+    e.dataTransfer.setData('appId', id);
+    e.currentTarget.classList.add('dragging');
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    e.currentTarget.classList.remove('dragging');
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDrop = (e: React.DragEvent, status: AppStatus) => {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    const id = e.dataTransfer.getData('appId');
+    if (id) {
+      dispatch({ type: 'UPDATE_APPLICATION_STATUS', id, status });
+    }
+  };
 
   return (
     <div>
@@ -148,13 +175,31 @@ export default function Applications() {
         {STATUSES.map(s => {
           const col = filtered.filter(a => a.status === s.key);
           return (
-            <div key={s.key} className="kanban-col">
+            <div
+              key={s.key}
+              className="kanban-col"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, s.key)}
+            >
               <div className="kanban-col-header" style={{ color: s.color }}>
-                {s.label}
-                <span className="badge badge-muted">{state.applications.filter(a => a.status === s.key).length}</span>
+                <div className="flex items-center gap-8">
+                  {s.label}
+                  <span className="badge badge-muted">{state.applications.filter(a => a.status === s.key).length}</span>
+                </div>
+                <button className="btn btn-ghost btn-icon" style={{ padding: 4 }} onClick={() => setModal({ ...emptyApp(), status: s.key })}>
+                  <Plus size={14} />
+                </button>
               </div>
               {col.map(app => (
-                <div key={app.id} className="kanban-card" onClick={() => setModal(app)}>
+                <div
+                  key={app.id}
+                  className="kanban-card"
+                  draggable="true"
+                  onDragStart={(e) => handleDragStart(e, app.id)}
+                  onDragEnd={handleDragEnd}
+                  onClick={() => setModal(app)}
+                >
                   <div style={{ fontWeight: 700, fontSize: '0.85rem', marginBottom: 4 }}>{app.company}</div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 6 }}>{app.role}</div>
                   {app.comp && <div style={{ fontSize: '0.72rem', color: 'var(--success)' }}>{app.comp}</div>}

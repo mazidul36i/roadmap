@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Edit3, X, CheckCircle2, Clock, Circle } from 'lucide-react';
+import { Plus, Trash2, Edit3, X, CheckCircle2, Clock, Circle, Layout, BookOpen } from 'lucide-react';
 import { useApp, uid } from '../context/AppContext';
 import type { SystemDesignTopic, SDStatus } from '../types';
 
@@ -98,10 +98,15 @@ export default function SystemDesign() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-8 mb-20">
+      <div className="tab-group">
         {(['exercise', 'core'] as const).map(tab => (
-          <button key={tab} className={`btn ${activeTab === tab ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab(tab)}>
-            {tab === 'exercise' ? '🏗 Design Exercises' : '📚 Core Concepts'}
+          <button
+            key={tab}
+            className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab === 'exercise' ? <Layout size={14} /> : <BookOpen size={14} />}
+            {tab === 'exercise' ? 'Design Exercises' : 'Core Concepts'}
           </button>
         ))}
       </div>
