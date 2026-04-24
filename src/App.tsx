@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { AppProvider, useApp } from "@context/AppContext";
 import Sidebar from "@components/Sidebar";
 import TopBar from "@components/TopBar";
@@ -59,7 +60,8 @@ function Shell() {
 
   return (
     <div className="app-shell">
-      <Sidebar open={sidebarOpen} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
       <div className="main-content">
         <TopBar
           title={meta.title}
@@ -67,18 +69,28 @@ function Shell() {
           onMenuToggle={() => setSidebarOpen(o => !o)}
           sidebarOpen={sidebarOpen}
         />
-        <div className="page-area animate-fade-in">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/roadmap" element={<Roadmap />} />
-            <Route path="/planner" element={<DailyPlanner />} />
-            <Route path="/notes" element={<Notes />} />
-            <Route path="/stories" element={<StoryBank />} />
-            <Route path="/dsa" element={<DSATracker />} />
-            <Route path="/sysdesign" element={<SystemDesign />} />
-            <Route path="/applications" element={<Applications />} />
-            <Route path="/mocks" element={<MockInterviews />} />
-          </Routes>
+        <div className="page-area">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Routes location={location} key={location.pathname}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/planner" element={<DailyPlanner />} />
+                <Route path="/notes" element={<Notes />} />
+                <Route path="/stories" element={<StoryBank />} />
+                <Route path="/dsa" element={<DSATracker />} />
+                <Route path="/sysdesign" element={<SystemDesign />} />
+                <Route path="/applications" element={<Applications />} />
+                <Route path="/mocks" element={<MockInterviews />} />
+              </Routes>
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

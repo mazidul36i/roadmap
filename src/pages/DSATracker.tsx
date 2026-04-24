@@ -3,6 +3,7 @@ import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X } f
 import { uid, useApp } from "@context/AppContext";
 import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TOPICS = ["Arrays", "Strings", "Hashmaps", "Stack", "Queue", "Linked List", "Trees", "BST", "Graphs", "Heap", "Binary Search", "Two Pointer", "Sliding Window", "Dynamic Programming", "Backtracking", "Trie", "Greedy", "Math"];
 const DIFFICULTIES: DSADifficulty[] = ["Easy", "Medium", "Hard"];
@@ -195,7 +196,6 @@ export default function DSATracker() {
     else dispatch({ type: "ADD_DSA", problem: { ...p, id: uid() } });
   };
 
-  // Stats
   const byTopic = TOPICS.map(t => ({
     fullTopic: t,
     topic: t.slice(0, 8),
@@ -212,15 +212,18 @@ export default function DSATracker() {
   const weakTopics = byTopic.filter(t => t.total > 0 && (t.solved / t.total) < 0.5);
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
         <button className="btn btn-primary" onClick={() => setModal(emptyProblem())}>
           <Plus size={14} /> Add Problem
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid-2" style={{ gap: 20, marginBottom: 24 }}>
+      <motion.div layout className="grid-2" style={{ gap: 20, marginBottom: 24 }}>
         <div className="card">
           <div className="section-title">Problems by Topic</div>
           <ResponsiveContainer width="100%" height={200}>
@@ -272,9 +275,8 @@ export default function DSATracker() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Filters */}
       <div className="flex gap-8 mb-16" style={{ flexWrap: "wrap" }}>
         <input className="form-input" style={{ maxWidth: 200 }} placeholder="Search problems…" value={search}
                onChange={e => setSearch(e.target.value)} />
@@ -296,7 +298,6 @@ export default function DSATracker() {
         </select>
       </div>
 
-      {/* Table */}
       <div className="table-wrap">
         <table>
           <thead>
@@ -312,67 +313,69 @@ export default function DSATracker() {
           </tr>
           </thead>
           <tbody>
-          {filtered.length === 0 && (
-            <tr>
-              <td colSpan={8} style={{ textAlign: "center", color: "var(--text-muted)", padding: 32 }}>No problems
-                found
-              </td>
-            </tr>
-          )}
-          {filtered.map(p => (
-            <tr key={p.id}>
-              <td>
-                <div style={{ fontWeight: 600, fontSize: "0.85rem" }}>{p.name}</div>
-                {p.mistakes && <div style={{
-                  fontSize: "0.72rem",
-                  color: "var(--danger)",
-                  marginTop: 2
-                }}>⚠ {p.mistakes.slice(0, 50)}</div>}
-              </td>
-              <td>
-                <div className="flex gap-12" style={{ flexWrap: "wrap" }}>
-                  {p.topics?.map(t => <span key={t} className="badge badge-muted">{t}</span>)}
-                </div>
-              </td>
-              <td><span className="badge" style={{
-                background: `${DIFF_COLORS[p.difficulty]}20`,
-                color: DIFF_COLORS[p.difficulty]
-              }}>{p.difficulty}</span></td>
-              <td style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{p.platform}</td>
-              <td style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>{p.pattern || "—"}</td>
-              <td
-                style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{p.timeTaken ? `${p.timeTaken}m` : "—"}</td>
-              <td>
-                <span
-                  className={`badge ${p.solved ? "badge-success" : "badge-muted"}`}>{p.solved ? "✓ Solved" : "Unsolved"}</span>
-              </td>
-              <td>
-                <div className="flex gap-4">
-                  {p.url &&
-                    <a href={p.url} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon"><ExternalLink
-                      size={13} /></a>}
-                  <button className="btn btn-ghost btn-icon" onClick={() => setModal(p)}><Edit3 size={13} /></button>
-                  <button 
-                    className="btn btn-ghost btn-icon" 
-                    onClick={() => confirm({
-                      title: "Delete Problem",
-                      message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
-                      type: "danger",
-                      confirmText: "Delete",
-                      onConfirm: () => dispatch({ type: "DELETE_DSA", id: p.id })
-                    })}
-                  >
-                    <Trash2 size={13} style={{ color: "var(--danger)" }} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {filtered.length === 0 && (
+              <tr key="empty">
+                <td colSpan={8} style={{ textAlign: "center", color: "var(--text-muted)", padding: 32 }}>No problems
+                  found
+                </td>
+              </tr>
+            )}
+            {filtered.map(p => (
+              <motion.tr layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <td>
+                  <div style={{ fontWeight: 600, fontSize: "0.85rem" }}>{p.name}</div>
+                  {p.mistakes && <div style={{
+                    fontSize: "0.72rem",
+                    color: "var(--danger)",
+                    marginTop: 2
+                  }}>⚠ {p.mistakes.slice(0, 50)}</div>}
+                </td>
+                <td>
+                  <div className="flex gap-12" style={{ flexWrap: "wrap" }}>
+                    {p.topics?.map(t => <span key={t} className="badge badge-muted">{t}</span>)}
+                  </div>
+                </td>
+                <td><span className="badge" style={{
+                  background: `${DIFF_COLORS[p.difficulty]}20`,
+                  color: DIFF_COLORS[p.difficulty]
+                }}>{p.difficulty}</span></td>
+                <td style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{p.platform}</td>
+                <td style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>{p.pattern || "—"}</td>
+                <td
+                  style={{ color: "var(--text-muted)", fontSize: "0.82rem" }}>{p.timeTaken ? `${p.timeTaken}m` : "—"}</td>
+                <td>
+                  <span
+                    className={`badge ${p.solved ? "badge-success" : "badge-muted"}`}>{p.solved ? "✓ Solved" : "Unsolved"}</span>
+                </td>
+                <td>
+                  <div className="flex gap-4">
+                    {p.url &&
+                      <a href={p.url} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon"><ExternalLink
+                        size={13} /></a>}
+                    <button className="btn btn-ghost btn-icon" onClick={() => setModal(p)}><Edit3 size={13} /></button>
+                    <button 
+                      className="btn btn-ghost btn-icon" 
+                      onClick={() => confirm({
+                        title: "Delete Problem",
+                        message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
+                        type: "danger",
+                        confirmText: "Delete",
+                        onConfirm: () => dispatch({ type: "DELETE_DSA", id: p.id })
+                      })}
+                    >
+                      <Trash2 size={13} style={{ color: "var(--danger)" }} />
+                    </button>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
+          </AnimatePresence>
           </tbody>
         </table>
       </div>
 
       {modal && <ProblemModal problem={modal} onClose={() => setModal(null)} onSave={save} />}
-    </div>
+    </motion.div>
   );
 }

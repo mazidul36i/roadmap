@@ -224,8 +224,19 @@ ul {
 }
 
 .sidebar-footer {
-  padding: 12px;
+  padding: 16px;
   border-top: 1px solid var(--border);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 95;
+  display: none;
 }
 
 /* ─── TOPBAR ─────────────────────────────────────────────── */
@@ -1281,6 +1292,10 @@ tbody td {
 
   .sidebar.open {
     transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    display: block;
   }
 
   .main-content {

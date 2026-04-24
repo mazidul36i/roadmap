@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
@@ -35,8 +36,20 @@ function AppModal({ app, onClose, onSave }: {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="modal-overlay"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+        className="modal modal-lg"
+        onClick={e => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2 className="modal-title">{form.id ? "Edit Application" : "Add Application"}</h2>
           <button className="btn btn-ghost btn-icon" onClick={onClose}><X size={16} /></button>
@@ -106,8 +119,8 @@ function AppModal({ app, onClose, onSave }: {
           }}>Save
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -222,66 +235,73 @@ export default function Applications() {
                   <Plus size={14} />
                 </button>
               </div>
-              {col.map(app => (
-                  <div
-                    key={app.id}
-                    className="kanban-card"
-                    draggable="true"
-                    onDragStart={(e) => handleDragStart(e, app.id)}
-                    onDragEnd={handleDragEnd}
-                    onClick={() => setModal(app)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setModal(app);
-                      }
-                    }}
-                    aria-label={`View details for ${app.company}`}
-                  >
-                  <div style={{ fontWeight: 700, fontSize: "0.85rem", marginBottom: 4 }}>{app.company}</div>
-                  <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 6 }}>{app.role}</div>
-                  {app.comp && <div style={{ fontSize: "0.72rem", color: "var(--success)" }}>{app.comp}</div>}
-                  {app.referral && <div
-                    style={{ fontSize: "0.68rem", color: "var(--accent-light)", marginTop: 4 }}>👤 {app.referral}</div>}
-                  {app.dates.length > 0 && (
-                    <div style={{ fontSize: "0.68rem", color: "var(--warning)", marginTop: 4 }}>
-                      📅 {app.dates[app.dates.length - 1].date}
-                    </div>
-                  )}
-                  <div className="flex gap-4" style={{ marginTop: 8 }}>
-                    <select
-                      className="form-select"
-                      style={{ fontSize: "0.68rem", padding: "2px 4px" }}
-                      value={app.status}
-                      onClick={e => e.stopPropagation()}
-                      onChange={e => dispatch({
-                        type: "UPDATE_APPLICATION_STATUS",
-                        id: app.id,
-                        status: e.target.value as AppStatus
-                      })}
-                    >
-                      {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
-                    </select>
-                    <button 
-                      className="btn btn-ghost btn-icon" 
-                      onClick={e => {
-                        e.stopPropagation();
-                        confirm({
-                          title: "Delete Application",
-                          message: `Are you sure you want to delete your application for "${app.company}"?`,
-                          type: "danger",
-                          confirmText: "Delete",
-                          onConfirm: () => dispatch({ type: "DELETE_APPLICATION", id: app.id })
-                        });
+              <AnimatePresence mode="popLayout">
+                {col.map(app => (
+                    <motion.div
+                      layout
+                      key={app.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      whileHover={{ y: -2, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
+                      className="kanban-card"
+                      draggable="true"
+                      onDragStart={(e) => handleDragStart(e, app.id)}
+                      onDragEnd={handleDragEnd}
+                      onClick={() => setModal(app)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setModal(app);
+                        }
                       }}
+                      aria-label={`View details for ${app.company}`}
                     >
-                      <Trash2 size={11} style={{ color: "var(--danger)" }} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                    <div style={{ fontWeight: 700, fontSize: "0.85rem", marginBottom: 4 }}>{app.company}</div>
+                    <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 6 }}>{app.role}</div>
+                    {app.comp && <div style={{ fontSize: "0.72rem", color: "var(--success)" }}>{app.comp}</div>}
+                    {app.referral && <div
+                      style={{ fontSize: "0.68rem", color: "var(--accent-light)", marginTop: 4 }}>👤 {app.referral}</div>}
+                    {app.dates.length > 0 && (
+                      <div style={{ fontSize: "0.68rem", color: "var(--warning)", marginTop: 4 }}>
+                        📅 {app.dates[app.dates.length - 1].date}
+                      </div>
+                    )}
+                    <div className="flex gap-4" style={{ marginTop: 8 }}>
+                      <select
+                        className="form-select"
+                        style={{ fontSize: "0.68rem", padding: "2px 4px" }}
+                        value={app.status}
+                        onClick={e => e.stopPropagation()}
+                        onChange={e => dispatch({
+                          type: "UPDATE_APPLICATION_STATUS",
+                          id: app.id,
+                          status: e.target.value as AppStatus
+                        })}
+                      >
+                        {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
+                      </select>
+                      <button 
+                        className="btn btn-ghost btn-icon" 
+                        onClick={e => {
+                          e.stopPropagation();
+                          confirm({
+                            title: "Delete Application",
+                            message: `Are you sure you want to delete your application for "${app.company}"?`,
+                            type: "danger",
+                            confirmText: "Delete",
+                            onConfirm: () => dispatch({ type: "DELETE_APPLICATION", id: app.id })
+                          });
+                        }}
+                      >
+                        <Trash2 size={11} style={{ color: "var(--danger)" }} />
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
               {col.length === 0 && <div
                 style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: 12 }}>—</div>}
             </div>
@@ -289,7 +309,9 @@ export default function Applications() {
         })}
       </div>
 
-      {modal && <AppModal app={modal} onClose={() => setModal(null)} onSave={save} />}
+      <AnimatePresence>
+        {modal && <AppModal app={modal} onClose={() => setModal(null)} onSave={save} />}
+      </AnimatePresence>
     </div>
   );
 }

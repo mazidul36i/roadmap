@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { BookOpen, Briefcase, ChevronRight, Code2, Flame, LayoutDashboard, Mic2, Server, Target } from "lucide-react";
 import { computeProgress, computeWeekProgress, getCurrentWeek, useApp } from "@context/AppContext";
 
@@ -89,24 +90,50 @@ export default function Dashboard() {
     { icon: Mic2, label: "Mock Interviews", value: `${mockInterviews.length}`, color: "var(--danger)", path: "/mocks" },
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {/* Stats Row */}
       <div className="stats-grid">
         {statCards.map(({ icon: Icon, label, value, color, path }) => (
-          <div key={label} className="stat-card" style={{ cursor: "pointer" }} onClick={() => navigate(path)}>
+          <motion.div
+            key={label}
+            variants={itemVariants}
+            className="stat-card"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(path)}
+            whileHover={{ y: -4, boxShadow: "0 12px 24px rgba(0,0,0,0.1)" }}
+          >
             <div className="stat-card-icon" style={{ background: `${color}20`, color }}>
               <Icon size={18} />
             </div>
             <div className="stat-card-value">{value}</div>
             <div className="stat-card-label">{label}</div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <div className="grid-2" style={{ gap: 20 }}>
         {/* Progress breakdown */}
-        <div className="card">
+        <motion.div variants={itemVariants} className="card">
           <div className="section-title"><Target size={16} /> Progress Overview</div>
           <ProgressRow label="Overall Roadmap" value={tasksDone} max={allTasks.length}
                        onClick={() => navigate("/roadmap")} />
@@ -120,17 +147,22 @@ export default function Dashboard() {
                        max={30} onClick={() => navigate("/applications")} />
           <ProgressRow label="Mock Interviews" value={mockInterviews.length} max={10}
                        onClick={() => navigate("/mocks")} />
-        </div>
+        </motion.div>
 
         {/* Right column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <motion.div variants={itemVariants} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Today's Focus */}
           {currentWeekData && (
-            <div className="card" style={{
-              borderColor: "var(--border-accent)",
-              background: "linear-gradient(135deg, var(--bg-card), var(--accent-dim))",
-              cursor: "pointer"
-            }} onClick={() => navigate("/roadmap")}>
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              className="card"
+              style={{
+                borderColor: "var(--border-accent)",
+                background: "linear-gradient(135deg, var(--bg-card), var(--accent-dim))",
+                cursor: "pointer"
+              }}
+              onClick={() => navigate("/roadmap")}
+            >
               <div className="flex justify-between items-center mb-8">
                 <div className="section-title" style={{ marginBottom: 0 }}>
                   <Flame size={16} style={{ color: "var(--warning)" }} /> Week {currentWeek} — Today's Focus
@@ -155,11 +187,11 @@ export default function Dashboard() {
                 {currentWeekData.tasks.filter(t => t.status === "done").length}/{currentWeekData.tasks.length} tasks
                 complete · {computeWeekProgress(currentWeekData)}%
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Study Streak */}
-          <div className="card" style={{ cursor: "pointer" }} onClick={() => navigate("/planner")}>
+          <motion.div variants={itemVariants} className="card" style={{ cursor: "pointer" }} onClick={() => navigate("/planner")}>
             <div className="flex justify-between items-center mb-16">
               <div className="section-title" style={{ marginBottom: 0 }}>
                 <Flame size={16} style={{ color: "var(--success)" }} /> Study Streak
@@ -214,8 +246,8 @@ export default function Dashboard() {
               </div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

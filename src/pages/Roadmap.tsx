@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, ChevronDown, Circle, Clock, Plus, StickyNote, Trash2 } from "lucide-react";
 import { computeWeekProgress, useApp } from "@context/AppContext";
 import type { TaskStatus } from "@app-types/index";
@@ -175,29 +176,40 @@ export default function Roadmap() {
               <ChevronDown size={18} className={`accordion-chevron ${isOpen ? "open" : ""}`} />
             </div>
 
-            {isOpen && (
-              <div className="accordion-body">
-                <div style={{
-                  fontSize: "0.82rem", color: "var(--text-secondary)",
-                  background: "var(--bg-primary)", borderRadius: "var(--radius-sm)",
-                  padding: "10px 14px", marginBottom: 16,
-                  display: "flex", alignItems: "flex-start", gap: 8
-                }}>
-                  <span style={{ marginTop: 2 }}>🎯</span>
-                  <div style={{ flex: 1 }}>
-                    <strong>Goal:</strong>{" "}
-                    <EditableText
-                      value={week.goal}
-                      onSave={(val) => dispatch({ type: "UPDATE_WEEK", weekId: week.id, updates: { goal: val } })}
-                    />
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="accordion-body"
+                  style={{ overflow: "hidden" }}
+                >
+                  <div style={{
+                    fontSize: "0.82rem", color: "var(--text-secondary)",
+                    background: "var(--bg-primary)", borderRadius: "var(--radius-sm)",
+                    padding: "10px 14px", marginBottom: 16,
+                    display: "flex", alignItems: "flex-start", gap: 8
+                  }}>
+                    <span style={{ marginTop: 2 }}>🎯</span>
+                    <div style={{ flex: 1 }}>
+                      <strong>Goal:</strong>{" "}
+                      <EditableText
+                        value={week.goal}
+                        onSave={(val) => dispatch({ type: "UPDATE_WEEK", weekId: week.id, updates: { goal: val } })}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {week.tasks.map(task => {
-                  const noteOpen = openNotes.has(task.id);
-                  return (
-                    <div key={task.id}>
-                      <div className="task-row">
+                  {week.tasks.map(task => {
+                    const noteOpen = openNotes.has(task.id);
+                    return (
+                      <motion.div layout key={task.id}>
+                        <motion.div
+                          className="task-row"
+                          whileHover={{ x: 4 }}
+                        >
                           <button
                             className="status-btn"
                             style={{ borderColor: task.status === "done" ? "var(--success)" : task.status === "inprogress" ? "var(--warning)" : undefined }}
@@ -212,64 +224,72 @@ export default function Roadmap() {
                           >
                             <StatusIcon status={task.status} />
                           </button>
-                        <div style={{ flex: 1 }}>
-                          <div className={`task-title ${task.status}`}>
-                            <EditableText
-                              value={task.title}
-                              onSave={(val) => dispatch({ type: "UPDATE_TASK", weekId: week.id, taskId: task.id, updates: { title: val } })}
-                            />
+                          <div style={{ flex: 1 }}>
+                            <div className={`task-title ${task.status}`}>
+                              <EditableText
+                                value={task.title}
+                                onSave={(val) => dispatch({ type: "UPDATE_TASK", weekId: week.id, taskId: task.id, updates: { title: val } })}
+                              />
+                            </div>
+                            {task.status === "inprogress" && (
+                              <span className="badge badge-warning" style={{ marginTop: 4, fontSize: "0.65rem" }}>In Progress</span>
+                            )}
                           </div>
-                          {task.status === "inprogress" && (
-                            <span className="badge badge-warning" style={{ marginTop: 4, fontSize: "0.65rem" }}>In Progress</span>
+                          <div className="flex items-center gap-4">
+                            <button
+                              className="btn btn-ghost btn-icon"
+                              style={{ color: noteOpen ? "var(--accent-light)" : "var(--text-muted)" }}
+                              onClick={() => toggleNote(task.id)}
+                              title="Toggle notes"
+                            >
+                              <StickyNote size={14} />
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-icon delete-task-btn"
+                              onClick={() => handleDeleteTask(week.id, task.id)}
+                              title="Delete task"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </motion.div>
+                        <AnimatePresence>
+                          {noteOpen && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              style={{ padding: "8px 0 8px 34px", overflow: "hidden" }}
+                            >
+                              <textarea
+                                className="form-textarea"
+                                style={{ minHeight: 60, fontSize: "0.82rem" }}
+                                placeholder="Add notes for this task…"
+                                value={task.notes}
+                                onChange={e => dispatch({
+                                  type: "UPDATE_TASK_NOTES",
+                                  weekId: week.id,
+                                  taskId: task.id,
+                                  notes: e.target.value
+                                })}
+                              />
+                            </motion.div>
                           )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <button
-                            className="btn btn-ghost btn-icon"
-                            style={{ color: noteOpen ? "var(--accent-light)" : "var(--text-muted)" }}
-                            onClick={() => toggleNote(task.id)}
-                            title="Toggle notes"
-                          >
-                            <StickyNote size={14} />
-                          </button>
-                          <button
-                            className="btn btn-ghost btn-icon delete-task-btn"
-                            onClick={() => handleDeleteTask(week.id, task.id)}
-                            title="Delete task"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                      {noteOpen && (
-                        <div style={{ padding: "8px 0 8px 34px" }}>
-                          <textarea
-                            className="form-textarea"
-                            style={{ minHeight: 60, fontSize: "0.82rem" }}
-                            placeholder="Add notes for this task…"
-                            value={task.notes}
-                            onChange={e => dispatch({
-                              type: "UPDATE_TASK_NOTES",
-                              weekId: week.id,
-                              taskId: task.id,
-                              notes: e.target.value
-                            })}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        </AnimatePresence>
+                      </motion.div>
+                    );
+                  })}
 
-                <button
-                  className="add-item-btn"
-                  onClick={() => dispatch({ type: "ADD_TASK", weekId: week.id })}
-                >
-                  <Plus size={14} />
-                  Add Task
-                </button>
-              </div>
-            )}
+                  <button
+                    className="add-item-btn"
+                    onClick={() => dispatch({ type: "ADD_TASK", weekId: week.id })}
+                  >
+                    <Plus size={14} />
+                    Add Task
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         );
       })}
