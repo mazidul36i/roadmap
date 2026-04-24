@@ -106,10 +106,10 @@ export default function SystemDesign() {
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-left"><h1>System Design</h1><p>Track design exercises and core concept study</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyTopic())}><Plus size={14} /> Add Topic</button>
+      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
+        <button className="btn btn-primary" onClick={() => setModal(emptyTopic())}>
+          <Plus size={14} /> Add Topic
+        </button>
       </div>
 
       {/* Stats */}

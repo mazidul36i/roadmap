@@ -16,6 +16,7 @@ import FocusMode from "@pages/FocusMode";
 import LoginPage from "@pages/LoginPage";
 import SetupChoice from "@components/SetupChoice";
 import { AuthProvider, useAuth } from "@context/AuthContext";
+import { ThemeProvider } from "@context/ThemeContext";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Your 8-week job-switch prep at a glance" },
@@ -89,13 +90,15 @@ import { ConfirmationProvider } from "@context/ConfirmationContext";
 export default function App() {
   return (
     <AuthProvider>
-      <AppProvider>
-        <ConfirmationProvider>
-          <BrowserRouter>
-            <Shell />
-          </BrowserRouter>
-        </ConfirmationProvider>
-      </AppProvider>
+      <ThemeProvider>
+        <AppProvider>
+          <ConfirmationProvider>
+            <BrowserRouter>
+              <Shell />
+            </BrowserRouter>
+          </ConfirmationProvider>
+        </AppProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

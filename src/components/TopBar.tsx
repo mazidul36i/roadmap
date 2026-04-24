@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Command, Menu, Search, X } from "lucide-react";
+import { Command, Menu, Moon, Search, Sun, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@context/AppContext";
+import { useTheme } from "@context/ThemeContext";
 
 interface Props {
   title: string;
   subtitle?: string;
   onMenuToggle: () => void;
   sidebarOpen: boolean;
+  actions?: React.ReactNode;
 }
 
 interface SearchResult {
@@ -17,10 +19,11 @@ interface SearchResult {
   id: string;
 }
 
-export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen }: Props) {
+export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, actions }: Props) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { state } = useApp();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +73,14 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen }: P
           </div>
         </div>
         <div className="topbar-right">
+          {actions && <div className="topbar-actions">{actions}</div>}
+          <button
+            className="btn btn-ghost btn-icon"
+            onClick={toggleTheme}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
           <button className="btn btn-secondary btn-sm" onClick={() => setSearchOpen(true)} id="global-search-btn">
             <Search size={14} /> Search
             <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginLeft: 4 }}>⌘K</span>

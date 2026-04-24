@@ -133,11 +133,7 @@ export default function Roadmap() {
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1>Roadmap</h1>
-          <p>Plan your journey. Click status to cycle, text to edit.</p>
-        </div>
+      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
         <button className="btn btn-primary" onClick={() => dispatch({ type: "ADD_WEEK" })}>
           <Plus size={18} />
           Add Week

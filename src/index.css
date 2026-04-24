@@ -44,6 +44,34 @@
   --transition: 0.2s ease;
 }
 
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --border: rgba(15, 23, 42, 0.1);
+  --border-accent: rgba(99, 102, 241, 0.25);
+
+  --success-dim: rgba(16, 185, 129, 0.1);
+  --warning-dim: rgba(245, 158, 11, 0.1);
+  --danger-dim: rgba(239, 68, 68, 0.1);
+  --info-dim: rgba(59, 130, 246, 0.1);
+  --accent: #4f46e5;
+  --accent-light: #6366f1;
+  --accent-dim: rgba(79, 70, 229, 0.08);
+  --accent-glow: rgba(79, 70, 229, 0.12);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-accent: #4f46e5;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
 /* ─── RESET ─────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -133,7 +161,7 @@ ul {
 .sidebar-logo h2 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--accent-light);
+  color: var(--accent);
   letter-spacing: -0.02em;
 }
 
@@ -182,7 +210,7 @@ ul {
 
 .nav-item.active {
   background: var(--accent-dim);
-  color: var(--accent-light);
+  color: var(--accent);
   border: 1px solid var(--border-accent);
 }
 
@@ -203,7 +231,7 @@ ul {
 /* ─── TOPBAR ─────────────────────────────────────────────── */
 .topbar {
   height: var(--topbar-height);
-  background: rgba(10, 13, 20, 0.8);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   display: flex;
@@ -235,7 +263,16 @@ ul {
 .topbar-right {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
   gap: 8px;
+  margin-right: 4px;
+  padding-right: 12px;
+  border-right: 1px solid var(--border);
 }
 
 /* ─── CARDS ──────────────────────────────────────────────── */
@@ -362,7 +399,7 @@ ul {
 }
 
 .badge-muted {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--accent-dim);
   color: var(--text-secondary);
 }
 
@@ -410,7 +447,7 @@ ul {
 .progress-track {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--accent-dim);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -943,7 +980,7 @@ tbody td {
   width: 14px;
   height: 14px;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--accent-dim);
   transition: background var(--transition);
 }
 
@@ -1032,7 +1069,7 @@ tbody td {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border);
   border-radius: 3px;
 }
 
@@ -1214,7 +1251,7 @@ tbody td {
 
 .tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-card-hover);
 }
 
 .tab-btn.active {
@@ -1350,7 +1387,7 @@ tbody td {
   font-weight: 800;
   letter-spacing: -0.04em;
   margin-bottom: 8px;
-  background: linear-gradient(to right, #fff, var(--text-secondary));
+  background: linear-gradient(to right, var(--text-primary), var(--text-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -1396,7 +1433,7 @@ tbody td {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 16px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 1rem;
   transition: all var(--transition);
 }
@@ -1594,7 +1631,7 @@ tbody td {
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 10px;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .choice-card p {

@@ -128,7 +128,7 @@ export default function Dashboard() {
           {currentWeekData && (
             <div className="card" style={{
               borderColor: "var(--border-accent)",
-              background: "linear-gradient(135deg, var(--bg-card), #1a1f35)",
+              background: "linear-gradient(135deg, var(--bg-card), var(--accent-dim))",
               cursor: "pointer"
             }} onClick={() => navigate("/roadmap")}>
               <div className="flex justify-between items-center mb-8">

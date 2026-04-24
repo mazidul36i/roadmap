@@ -161,10 +161,9 @@ export default function Applications() {
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-left"><h1>Job Applications</h1><p>Track your pipeline from wishlist to offer</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyApp())}><Plus size={14} /> Add Application
+      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
+        <button className="btn btn-primary" onClick={() => setModal(emptyApp())}>
+          <Plus size={14} /> Add Application
         </button>
       </div>
 

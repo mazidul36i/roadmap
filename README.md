@@ -17,7 +17,7 @@
 
 ## 📸 Preview
 
-> Dark-themed, single-page app with a polished dashboard layout, smooth interactions, and mobile-friendly
+> **Light & Dark Mode** support, polished dashboard layout, smooth interactions, and mobile-friendly
 > responsiveness.
 
 ![Dashboard](/Dashboard.png)
@@ -43,6 +43,7 @@
 
 ### Extras
 
+- **Light & Dark Themes** — Toggle between a sleek dark mode and a clean, high-contrast light mode via the TopBar.
 - **`Ctrl+K` Global Search** — searches across tasks, notes, stories, companies, and DSA problems simultaneously
 - **Export / Import JSON** — full data backup and restore from the sidebar
 - **Cloud Sync with Firebase** — Real-time database sync across devices with Google Authentication.

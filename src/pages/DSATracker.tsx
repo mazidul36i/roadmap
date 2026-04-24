@@ -213,9 +213,9 @@ export default function DSATracker() {
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-left"><h1>DSA Tracker</h1><p>Log problems, track patterns, spot weak areas</p></div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyProblem())}><Plus size={14} /> Add Problem
+      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
+        <button className="btn btn-primary" onClick={() => setModal(emptyProblem())}>
+          <Plus size={14} /> Add Problem
         </button>
       </div>
 
@@ -225,8 +225,8 @@ export default function DSATracker() {
           <div className="section-title">Problems by Topic</div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={byTopic} layout="vertical" margin={{ left: 0, right: 16 }}>
-              <XAxis type="number" tick={{ fontSize: 11, fill: "var(--text-muted)" }} />
-              <YAxis type="category" dataKey="topic" tick={{ fontSize: 11, fill: "var(--text-muted)" }} width={70} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: "var(--text-muted)" }} stroke="var(--border)" />
+              <YAxis type="category" dataKey="topic" tick={{ fontSize: 11, fill: "var(--text-muted)" }} width={70} stroke="var(--border)" />
               <Tooltip
                 formatter={(value, name, props) => [value, props.payload.fullTopic]}
                 contentStyle={{
@@ -238,7 +238,7 @@ export default function DSATracker() {
                 }}
               />
               <Bar dataKey="solved" fill="var(--accent)" name="Solved" radius={[0, 4, 4, 0]} />
-              <Bar dataKey="total" fill="rgba(255,255,255,0.05)" name="Total" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="total" fill="var(--accent-dim)" name="Total" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
