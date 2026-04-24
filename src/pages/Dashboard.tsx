@@ -210,8 +210,8 @@ export default function Dashboard() {
             <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 8 }}>
               Last 28 days · green = today · indigo = studied
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
 
       {/* Week-by-week overview */}
@@ -246,7 +246,7 @@ export default function Dashboard() {
               </div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </motion.div>
   );

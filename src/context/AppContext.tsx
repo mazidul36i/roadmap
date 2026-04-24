@@ -12,6 +12,7 @@ import type {
   Note,
   StoryCard,
   SystemDesignTopic,
+  Task,
   TaskStatus,
   Week
 } from "@app-types/index";

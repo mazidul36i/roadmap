@@ -13,6 +13,7 @@ import {
   DragOverEvent,
   DragEndEvent,
   defaultDropAnimationSideEffects,
+  MeasuringStrategy,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -172,12 +173,12 @@ function SortableCard({
     transform: CSS.Translate.toString(transform),
     transition,
     opacity: isDragging ? 0.4 : 1,
+    touchAction: 'none'
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes}>
       <motion.div
-        layout
         className={`kanban-card ${isOverlay ? 'is-overlay' : ''}`}
         onClick={onClick}
         role="button"
@@ -267,17 +268,15 @@ function DroppableColumn({
       
       <div className="kanban-col-content">
         <SortableContext items={apps.map(a => a.id)} strategy={verticalListSortingStrategy}>
-          <AnimatePresence mode="popLayout">
-            {apps.map(app => (
-              <SortableCard
-                key={app.id}
-                app={app}
-                onClick={() => onCardClick(app)}
-                onDelete={() => onCardDelete(app)}
-                onStatusChange={(s) => onStatusChange(app.id, s)}
-              />
-            ))}
-          </AnimatePresence>
+          {apps.map(app => (
+            <SortableCard
+              key={app.id}
+              app={app}
+              onClick={() => onCardClick(app)}
+              onDelete={() => onCardDelete(app)}
+              onStatusChange={(s) => onStatusChange(app.id, s)}
+            />
+          ))}
         </SortableContext>
         {apps.length === 0 && (
           <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: 12 }}>—</div>
@@ -402,6 +401,11 @@ export default function Applications() {
       <DndContext
         sensors={sensors}
         collisionDetection={closestCorners}
+        measuring={{
+          droppable: {
+            strategy: MeasuringStrategy.Always,
+          },
+        }}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}

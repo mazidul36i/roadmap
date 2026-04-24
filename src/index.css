@@ -140,7 +140,7 @@ ul {
 
 .main-content {
   margin-left: var(--sidebar-width);
-  flex: 1;
+  width: calc(100% - var(--sidebar-width));
   display: flex;
   flex-direction: column;
   min-height: 100vh;
