@@ -125,6 +125,15 @@ export default function Notes() {
                 borderColor: selected === n.id ? "var(--accent)" : undefined
               }}
               onClick={() => openNote(n)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openNote(n);
+                }
+              }}
+              aria-label={`Open note: ${n.title}`}
             >
               <div style={{ fontWeight: 600, fontSize: "0.82rem", marginBottom: 4 }}
                    className="truncate">{n.title}</div>

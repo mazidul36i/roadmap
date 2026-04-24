@@ -202,19 +202,20 @@ export default function Roadmap() {
                   return (
                     <div key={task.id}>
                       <div className="task-row">
-                        <button
-                          className="status-btn"
-                          style={{ borderColor: task.status === "done" ? "var(--success)" : task.status === "inprogress" ? "var(--warning)" : undefined }}
-                          onClick={() => dispatch({
-                            type: "UPDATE_TASK_STATUS",
-                            weekId: week.id,
-                            taskId: task.id,
-                            status: statusNext(task.status)
-                          })}
-                          title={`Status: ${task.status} — click to advance`}
-                        >
-                          <StatusIcon status={task.status} />
-                        </button>
+                          <button
+                            className="status-btn"
+                            style={{ borderColor: task.status === "done" ? "var(--success)" : task.status === "inprogress" ? "var(--warning)" : undefined }}
+                            onClick={() => dispatch({
+                              type: "UPDATE_TASK_STATUS",
+                              weekId: week.id,
+                              taskId: task.id,
+                              status: statusNext(task.status)
+                            })}
+                            aria-label={`Current status: ${task.status}. Click to change to ${statusNext(task.status)}.`}
+                            title={`Status: ${task.status} — click to advance`}
+                          >
+                            <StatusIcon status={task.status} />
+                          </button>
                         <div style={{ flex: 1 }}>
                           <div className={`task-title ${task.status}`}>
                             <EditableText

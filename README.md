@@ -45,9 +45,10 @@
 
 - **`Ctrl+K` Global Search** — searches across tasks, notes, stories, companies, and DSA problems simultaneously
 - **Export / Import JSON** — full data backup and restore from the sidebar
-- **Auto-save to `localStorage`** — zero backend, works offline, persists across sessions
+- **Cloud Sync with Firebase** — Real-time database sync across devices with Google Authentication.
+- **Auto-save with Offline Support** — Persistence to both Firestore and `localStorage` ensures data is never lost, even when offline.
 - **Seeded sample data** — 8-week roadmap, 5 Prospecta STAR stories, 10 DSA problems, 11 system design topics, 3 sample
-  applications, pre-loaded on first launch
+  applications, pre-loaded on first launch.
 - **Responsive layout** — adapts cleanly to tablet and mobile viewports
 
 ---
@@ -62,7 +63,8 @@
 | Charts      | Recharts                                        |
 | Icons       | Lucide React                                    |
 | Styling     | Vanilla CSS (custom design system, no Tailwind) |
-| Persistence | `localStorage` — no backend required            |
+| Persistence | **Firebase Firestore** + `localStorage` fallback |
+| Auth        | **Firebase Authentication** (Google Sign-In)    |
 
 ---
 
@@ -109,7 +111,8 @@ src/
 ├── index.css                # Global design system (CSS variables, components)
 │
 ├── context/
-│   └── AppContext.tsx        # Global state — useReducer + localStorage auto-save
+│   ├── AuthContext.tsx       # Firebase Auth state & helpers
+│   └── AppContext.tsx        # Global state — useReducer + Firestore/LocalStorage sync
 │
 ├── data/
 │   └── seed.ts              # Pre-loaded 8-week roadmap + all sample data
@@ -138,7 +141,7 @@ src/
 
 ## 🗂 Data Model
 
-All data lives in a single `AppState` object, persisted to `localStorage` on every change:
+All data lives in a single `AppState` object, persisted to **Firebase Firestore** (if logged in) and `localStorage` on every change:
 
 ```typescript
 interface AppState {

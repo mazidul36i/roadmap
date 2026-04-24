@@ -224,14 +224,23 @@ export default function Applications() {
                 </button>
               </div>
               {col.map(app => (
-                <div
-                  key={app.id}
-                  className="kanban-card"
-                  draggable="true"
-                  onDragStart={(e) => handleDragStart(e, app.id)}
-                  onDragEnd={handleDragEnd}
-                  onClick={() => setModal(app)}
-                >
+                  <div
+                    key={app.id}
+                    className="kanban-card"
+                    draggable="true"
+                    onDragStart={(e) => handleDragStart(e, app.id)}
+                    onDragEnd={handleDragEnd}
+                    onClick={() => setModal(app)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setModal(app);
+                      }
+                    }}
+                    aria-label={`View details for ${app.company}`}
+                  >
                   <div style={{ fontWeight: 700, fontSize: "0.85rem", marginBottom: 4 }}>{app.company}</div>
                   <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 6 }}>{app.role}</div>
                   {app.comp && <div style={{ fontSize: "0.72rem", color: "var(--success)" }}>{app.comp}</div>}
