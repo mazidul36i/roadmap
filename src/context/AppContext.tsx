@@ -45,7 +45,13 @@ type Action =
   | { type: "DELETE_MOCK"; id: string }
   | { type: "MARK_STUDY_DAY"; date: string }
   | { type: "SET_STATE"; state: AppState }
-  | { type: "IMPORT_STATE"; state: AppState };
+  | { type: "IMPORT_STATE"; state: AppState }
+  | { type: "UPDATE_WEEK"; weekId: string; updates: Partial<Week> }
+  | { type: "ADD_WEEK" }
+  | { type: "DELETE_WEEK"; weekId: string }
+  | { type: "ADD_TASK"; weekId: string }
+  | { type: "UPDATE_TASK"; weekId: string; taskId: string; updates: Partial<Task> }
+  | { type: "DELETE_TASK"; weekId: string; taskId: string };
 
 // ─── REDUCER ────────────────────────────────────────────────────────────────────
 function reducer(state: AppState, action: Action): AppState {
@@ -62,6 +68,57 @@ function reducer(state: AppState, action: Action): AppState {
         ...state,
         weeks: state.weeks.map(w => w.id === action.weekId
           ? { ...w, tasks: w.tasks.map(t => t.id === action.taskId ? { ...t, notes: action.notes } : t) }
+          : w)
+      };
+    case "UPDATE_WEEK":
+      return {
+        ...state,
+        weeks: state.weeks.map(w => w.id === action.weekId ? { ...w, ...action.updates } : w)
+      };
+    case "ADD_WEEK": {
+      const nextNumber = state.weeks.length + 1;
+      const newWeek: Week = {
+        id: uid(),
+        number: nextNumber,
+        title: `New Week ${nextNumber}`,
+        goal: "Set a goal for this week...",
+        tasks: []
+      };
+      return { ...state, weeks: [...state.weeks, newWeek] };
+    }
+    case "DELETE_WEEK":
+      return {
+        ...state,
+        weeks: state.weeks.filter(w => w.id !== action.weekId).map((w, i) => ({ ...w, number: i + 1 }))
+      };
+    case "ADD_TASK":
+      return {
+        ...state,
+        weeks: state.weeks.map(w => w.id === action.weekId
+          ? {
+            ...w,
+            tasks: [...w.tasks, {
+              id: uid(),
+              weekId: w.id,
+              title: "New Task",
+              status: "todo",
+              notes: ""
+            }]
+          }
+          : w)
+      };
+    case "UPDATE_TASK":
+      return {
+        ...state,
+        weeks: state.weeks.map(w => w.id === action.weekId
+          ? { ...w, tasks: w.tasks.map(t => t.id === action.taskId ? { ...t, ...action.updates } : t) }
+          : w)
+      };
+    case "DELETE_TASK":
+      return {
+        ...state,
+        weeks: state.weeks.map(w => w.id === action.weekId
+          ? { ...w, tasks: w.tasks.filter(t => t.id !== action.taskId) }
           : w)
       };
     case "ADD_DAY_LOG":

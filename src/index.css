@@ -1652,3 +1652,70 @@ tbody td {
     grid-template-columns: 1fr;
   }
 }
+/* ─── EDITABLE TEXT ───────────────────────────────────────── */
+.editable-text {
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: inline-block;
+  min-width: 20px;
+}
+
+.editable-text:hover {
+  background: var(--bg-card-hover);
+  outline: 1px dashed var(--accent-light);
+}
+
+.delete-task-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: var(--text-muted);
+}
+
+.task-row:hover .delete-task-btn {
+  opacity: 1;
+}
+
+.delete-task-btn:hover {
+  color: var(--danger) !important;
+  background: var(--danger-dim) !important;
+}
+
+.add-item-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.add-item-btn:hover {
+  border-color: var(--accent-light);
+  color: var(--accent-light);
+  background: var(--accent-dim);
+}
+
+.week-delete-btn {
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+
+.accordion-header:hover .week-delete-btn {
+  opacity: 1;
+}
+
+.week-delete-btn:hover {
+  color: var(--danger);
+  background: var(--danger-dim);
+}
