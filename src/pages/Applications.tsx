@@ -1,6 +1,28 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, Trash2, X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+import { Plus, Search, Trash2, X, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  DragOverlay,
+  closestCorners,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragStartEvent,
+  DragOverEvent,
+  DragEndEvent,
+  defaultDropAnimationSideEffects,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Application, AppStatus, InterviewDate } from "@app-types/index";
@@ -124,12 +146,159 @@ function AppModal({ app, onClose, onSave }: {
   );
 }
 
+function SortableCard({
+  app,
+  onClick,
+  onDelete,
+  onStatusChange,
+  isOverlay = false
+}: {
+  app: Application;
+  onClick: () => void;
+  onDelete: () => void;
+  onStatusChange: (s: AppStatus) => void;
+  isOverlay?: boolean;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: app.id });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <motion.div
+        layout
+        className={`kanban-card ${isOverlay ? 'is-overlay' : ''}`}
+        onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        aria-label={`View details for ${app.company}`}
+        whileHover={!isOverlay ? { y: -2, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" } : {}}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div style={{ fontWeight: 700, fontSize: "0.85rem" }}>{app.company}</div>
+          <div {...listeners} className="drag-handle" style={{ cursor: 'grab', color: 'var(--text-muted)' }}>
+            <GripVertical size={14} />
+          </div>
+        </div>
+        <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 6 }}>{app.role}</div>
+        {app.comp && <div style={{ fontSize: "0.72rem", color: "var(--success)" }}>{app.comp}</div>}
+        {app.referral && <div
+          style={{ fontSize: "0.68rem", color: "var(--accent-light)", marginTop: 4 }}>👤 {app.referral}</div>}
+        {app.dates.length > 0 && (
+          <div style={{ fontSize: "0.68rem", color: "var(--warning)", marginTop: 4 }}>
+            📅 {app.dates[app.dates.length - 1].date}
+          </div>
+        )}
+        <div className="flex gap-4" style={{ marginTop: 8 }}>
+          <select
+            className="form-select"
+            style={{ fontSize: "0.68rem", padding: "2px 4px" }}
+            value={app.status}
+            onClick={e => e.stopPropagation()}
+            onChange={e => onStatusChange(e.target.value as AppStatus)}
+          >
+            {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
+          </select>
+          <button
+            className="btn btn-ghost btn-icon"
+            onClick={e => {
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <Trash2 size={11} style={{ color: "var(--danger)" }} />
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function DroppableColumn({
+  status,
+  apps,
+  onAdd,
+  onCardClick,
+  onCardDelete,
+  onStatusChange
+}: {
+  status: typeof STATUSES[0];
+  apps: Application[];
+  onAdd: () => void;
+  onCardClick: (a: Application) => void;
+  onCardDelete: (a: Application) => void;
+  onStatusChange: (id: string, s: AppStatus) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: status.key,
+  });
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      className={`kanban-col ${isOver ? 'drag-over' : ''}`}
+    >
+      <div className="kanban-col-header" style={{ color: status.color }}>
+        <div className="flex items-center gap-8">
+          {status.label}
+          <span className="badge badge-muted">{apps.length}</span>
+        </div>
+        <button className="btn btn-ghost btn-icon" style={{ padding: 4 }} onClick={onAdd}>
+          <Plus size={14} />
+        </button>
+      </div>
+      
+      <div className="kanban-col-content">
+        <SortableContext items={apps.map(a => a.id)} strategy={verticalListSortingStrategy}>
+          <AnimatePresence mode="popLayout">
+            {apps.map(app => (
+              <SortableCard
+                key={app.id}
+                app={app}
+                onClick={() => onCardClick(app)}
+                onDelete={() => onCardDelete(app)}
+                onStatusChange={(s) => onStatusChange(app.id, s)}
+              />
+            ))}
+          </AnimatePresence>
+        </SortableContext>
+        {apps.length === 0 && (
+          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: 12 }}>—</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Applications() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<Application> & { id?: string }) | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<AppStatus | "">("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const save = (a: any) => {
     const now = new Date().toISOString();
@@ -143,34 +312,50 @@ export default function Applications() {
     return true;
   });
 
-  const getStatusStyle = (s: AppStatus) => STATUSES.find(x => x.key === s);
-
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    e.dataTransfer.setData("appId", id);
-    e.currentTarget.classList.add("dragging");
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove("dragging");
-  };
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.currentTarget.classList.add("drag-over");
-  };
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.currentTarget.classList.remove("drag-over");
-  };
+    const activeApp = state.applications.find(a => a.id === activeId);
+    if (!activeApp) return;
 
-  const handleDrop = (e: React.DragEvent, status: AppStatus) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove("drag-over");
-    const id = e.dataTransfer.getData("appId");
-    if (id) {
-      dispatch({ type: "UPDATE_APPLICATION_STATUS", id, status });
+    // Check if dragging over a column or a card
+    const overStatus = STATUSES.find(s => s.key === overId);
+    
+    if (overStatus) {
+      // Dragging over empty column
+      if (activeApp.status !== overStatus.key) {
+        dispatch({ type: "UPDATE_APPLICATION_STATUS", id: activeId, status: overStatus.key as AppStatus });
+      }
+    } else {
+      // Dragging over another card
+      const overApp = state.applications.find(a => a.id === overId);
+      if (overApp && activeApp.status !== overApp.status) {
+        dispatch({ type: "UPDATE_APPLICATION_STATUS", id: activeId, status: overApp.status });
+      }
     }
   };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over) return;
+
+    if (active.id !== over.id) {
+      // Here we would ideally reorder within the column if our AppContext supported it.
+      // For now, we'll just ensure the status is updated (which handleDragOver already does).
+    }
+  };
+
+  const activeApp = activeId ? state.applications.find(a => a.id === activeId) : null;
 
   return (
     <div>
@@ -214,100 +399,53 @@ export default function Applications() {
       </div>
 
       {/* Kanban board */}
-      <div className="kanban-board">
-        {STATUSES.map(s => {
-          const col = filtered.filter(a => a.status === s.key);
-          return (
-            <div
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="kanban-board">
+          {STATUSES.map(s => (
+            <DroppableColumn
               key={s.key}
-              className="kanban-col"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, s.key)}
-            >
-              <div className="kanban-col-header" style={{ color: s.color }}>
-                <div className="flex items-center gap-8">
-                  {s.label}
-                  <span className="badge badge-muted">{state.applications.filter(a => a.status === s.key).length}</span>
-                </div>
-                <button className="btn btn-ghost btn-icon" style={{ padding: 4 }}
-                        onClick={() => setModal({ ...emptyApp(), status: s.key })}>
-                  <Plus size={14} />
-                </button>
-              </div>
-              <AnimatePresence mode="popLayout">
-                {col.map(app => (
-                    <motion.div
-                      layout
-                      key={app.id}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      whileHover={{ y: -2, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
-                      className="kanban-card"
-                      draggable="true"
-                      onDragStart={(e) => handleDragStart(e, app.id)}
-                      onDragEnd={handleDragEnd}
-                      onClick={() => setModal(app)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          setModal(app);
-                        }
-                      }}
-                      aria-label={`View details for ${app.company}`}
-                    >
-                    <div style={{ fontWeight: 700, fontSize: "0.85rem", marginBottom: 4 }}>{app.company}</div>
-                    <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginBottom: 6 }}>{app.role}</div>
-                    {app.comp && <div style={{ fontSize: "0.72rem", color: "var(--success)" }}>{app.comp}</div>}
-                    {app.referral && <div
-                      style={{ fontSize: "0.68rem", color: "var(--accent-light)", marginTop: 4 }}>👤 {app.referral}</div>}
-                    {app.dates.length > 0 && (
-                      <div style={{ fontSize: "0.68rem", color: "var(--warning)", marginTop: 4 }}>
-                        📅 {app.dates[app.dates.length - 1].date}
-                      </div>
-                    )}
-                    <div className="flex gap-4" style={{ marginTop: 8 }}>
-                      <select
-                        className="form-select"
-                        style={{ fontSize: "0.68rem", padding: "2px 4px" }}
-                        value={app.status}
-                        onClick={e => e.stopPropagation()}
-                        onChange={e => dispatch({
-                          type: "UPDATE_APPLICATION_STATUS",
-                          id: app.id,
-                          status: e.target.value as AppStatus
-                        })}
-                      >
-                        {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
-                      </select>
-                      <button 
-                        className="btn btn-ghost btn-icon" 
-                        onClick={e => {
-                          e.stopPropagation();
-                          confirm({
-                            title: "Delete Application",
-                            message: `Are you sure you want to delete your application for "${app.company}"?`,
-                            type: "danger",
-                            confirmText: "Delete",
-                            onConfirm: () => dispatch({ type: "DELETE_APPLICATION", id: app.id })
-                          });
-                        }}
-                      >
-                        <Trash2 size={11} style={{ color: "var(--danger)" }} />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              {col.length === 0 && <div
-                style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: 12 }}>—</div>}
-            </div>
-          );
-        })}
-      </div>
+              status={s}
+              apps={filtered.filter(a => a.status === s.key)}
+              onAdd={() => setModal({ ...emptyApp(), status: s.key })}
+              onCardClick={(app) => setModal(app)}
+              onCardDelete={(app) => confirm({
+                title: "Delete Application",
+                message: `Are you sure you want to delete your application for "${app.company}"?`,
+                type: "danger",
+                confirmText: "Delete",
+                onConfirm: () => dispatch({ type: "DELETE_APPLICATION", id: app.id })
+              })}
+              onStatusChange={(id, status) => dispatch({ type: "UPDATE_APPLICATION_STATUS", id, status })}
+            />
+          ))}
+        </div>
+
+        <DragOverlay dropAnimation={{
+          sideEffects: defaultDropAnimationSideEffects({
+            styles: {
+              active: {
+                opacity: '0.4',
+              },
+            },
+          }),
+        }}>
+          {activeApp ? (
+            <SortableCard
+              app={activeApp}
+              onClick={() => {}}
+              onDelete={() => {}}
+              onStatusChange={() => {}}
+              isOverlay
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       <AnimatePresence>
         {modal && <AppModal app={modal} onClose={() => setModal(null)} onSave={save} />}

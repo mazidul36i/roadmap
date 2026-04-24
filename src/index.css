@@ -1771,3 +1771,46 @@ tbody td {
   color: var(--danger);
   background: var(--danger-dim);
 }
+
+/* ─── KANBAN DND ─────────────────────────────────────────── */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  opacity: 0.5;
+}
+.kanban-card:hover .drag-handle {
+  opacity: 1;
+}
+.drag-handle:hover {
+  background: var(--accent-dim);
+}
+.kanban-card.is-overlay {
+  cursor: grabbing;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: rotate(2deg) scale(1.05);
+  z-index: 1000;
+  pointer-events: none;
+}
+.kanban-col {
+  transition: background-color 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.kanban-col.drag-over {
+  background: var(--accent-dim);
+  border-color: var(--accent-light);
+}
+.kanban-col-content {
+  min-height: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kanban-card {
+  user-select: none;
+}
