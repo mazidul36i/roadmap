@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BookOpen, CheckCircle2, Circle, Clock, Edit3, Layout, Plus, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { SDStatus, SystemDesignTopic } from "@app-types/index";
 
 const STATUS_LABELS: Record<SDStatus, string> = {
@@ -87,6 +88,7 @@ function StatusIcon({ status }: { status: SDStatus }) {
 
 export default function SystemDesign() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<SystemDesignTopic> & { id?: string }) | null>(null);
   const [activeTab, setActiveTab] = useState<"exercise" | "core">("exercise");
 
@@ -143,8 +145,16 @@ export default function SystemDesign() {
               <h3 style={{ fontSize: "0.9rem", fontWeight: 700, flex: 1, lineHeight: 1.4 }}>{t.title}</h3>
               <div className="flex gap-4">
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(t)}><Edit3 size={13} /></button>
-                <button className="btn btn-ghost btn-icon"
-                  onClick={() => dispatch({ type: "DELETE_SD_TOPIC", id: t.id })}>
+                <button 
+                  className="btn btn-ghost btn-icon"
+                  onClick={() => confirm({
+                    title: "Delete Topic",
+                    message: `Are you sure you want to delete "${t.title}"? This action cannot be undone.`,
+                    type: "danger",
+                    confirmText: "Delete",
+                    onConfirm: () => dispatch({ type: "DELETE_SD_TOPIC", id: t.id })
+                  })}
+                >
                   <Trash2 size={13} style={{ color: "var(--danger)" }} />
                 </button>
               </div>

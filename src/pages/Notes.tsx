@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Plus, Search, Tag, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { Note, NoteCategory } from "@app-types/index";
 
 const CATEGORIES: { key: NoteCategory; label: string; color: string }[] = [
@@ -19,6 +20,7 @@ const emptyNote = (): Omit<Note, "id" | "createdAt" | "updatedAt"> => ({
 
 export default function Notes() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [category, setCategory] = useState<NoteCategory | "all">("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -142,10 +144,19 @@ export default function Notes() {
                 {CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
               {selected && (
-                <button className="btn btn-danger btn-sm" onClick={() => {
-                  dispatch({ type: "DELETE_NOTE", id: selected });
-                  setSelected(null);
-                }}>
+                <button 
+                  className="btn btn-danger btn-sm" 
+                  onClick={() => confirm({
+                    title: "Delete Note",
+                    message: `Are you sure you want to delete this note? This action cannot be undone.`,
+                    type: "danger",
+                    confirmText: "Delete",
+                    onConfirm: () => {
+                      dispatch({ type: "DELETE_NOTE", id: selected });
+                      setSelected(null);
+                    }
+                  })}
+                >
                   <Trash2 size={13} /> Delete
                 </button>
               )}

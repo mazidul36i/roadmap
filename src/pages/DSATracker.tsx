@@ -170,8 +170,11 @@ function ProblemModal({ problem, onClose, onSave }: {
   );
 }
 
+import { useConfirm } from "@context/ConfirmationContext";
+
 export default function DSATracker() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<DSAProblem> & { id?: string }) | null>(null);
   const [filterTopic, setFilterTopic] = useState("");
   const [filterDiff, setFilterDiff] = useState("");
@@ -349,8 +352,18 @@ export default function DSATracker() {
                     <a href={p.url} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon"><ExternalLink
                       size={13} /></a>}
                   <button className="btn btn-ghost btn-icon" onClick={() => setModal(p)}><Edit3 size={13} /></button>
-                  <button className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "DELETE_DSA", id: p.id })}>
-                    <Trash2 size={13} style={{ color: "var(--danger)" }} /></button>
+                  <button 
+                    className="btn btn-ghost btn-icon" 
+                    onClick={() => confirm({
+                      title: "Delete Problem",
+                      message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
+                      type: "danger",
+                      confirmText: "Delete",
+                      onConfirm: () => dispatch({ type: "DELETE_DSA", id: p.id })
+                    })}
+                  >
+                    <Trash2 size={13} style={{ color: "var(--danger)" }} />
+                  </button>
                 </div>
               </td>
             </tr>

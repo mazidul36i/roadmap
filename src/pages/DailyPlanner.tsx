@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CalendarDays, Plus, Trash2 } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { DayLog } from "@app-types/index";
 
 const FOCUS_AREAS = ["DSA", "System Design", "Story Bank", "Applications", "Mock Interviews", "Resume", "Networking", "Other"];
@@ -15,6 +16,7 @@ const emptyLog = (): Omit<DayLog, "id"> => ({
 
 export default function DailyPlanner() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [form, setForm] = useState(emptyLog());
   const [editing, setEditing] = useState<string | null>(null);
 
@@ -115,8 +117,17 @@ export default function DailyPlanner() {
                         {log.completedTime}h / {log.plannedTime}h
                       </span>
                       <button className="btn btn-ghost btn-icon" onClick={() => edit(log)} title="Edit">✏️</button>
-                      <button className="btn btn-ghost btn-icon"
-                              onClick={() => dispatch({ type: "DELETE_DAY_LOG", id: log.id })} title="Delete">
+                      <button 
+                        className="btn btn-ghost btn-icon"
+                        onClick={() => confirm({
+                          title: "Delete Entry",
+                          message: `Are you sure you want to delete the log for ${log.date}?`,
+                          type: "danger",
+                          confirmText: "Delete",
+                          onConfirm: () => dispatch({ type: "DELETE_DAY_LOG", id: log.id })
+                        })} 
+                        title="Delete"
+                      >
                         <Trash2 size={13} style={{ color: "var(--danger)" }} />
                       </button>
                     </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AlertTriangle, Edit3, Plus, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { MockInterview, MockType } from "@app-types/index";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -113,6 +114,7 @@ function MockModal({ mock, onClose, onSave }: {
 
 export default function MockInterviews() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<MockInterview> & { id?: string }) | null>(null);
   const [filterType, setFilterType] = useState<MockType | "">("");
 
@@ -228,7 +230,16 @@ export default function MockInterviews() {
               <div className="flex gap-8 items-center">
                 <ScoreDots score={m.score} />
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(m)}><Edit3 size={13} /></button>
-                <button className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "DELETE_MOCK", id: m.id })}>
+                <button 
+                  className="btn btn-ghost btn-icon" 
+                  onClick={() => confirm({
+                    title: "Delete Mock Session",
+                    message: `Are you sure you want to delete this mock session record from ${m.date}?`,
+                    type: "danger",
+                    confirmText: "Delete",
+                    onConfirm: () => dispatch({ type: "DELETE_MOCK", id: m.id })
+                  })}
+                >
                   <Trash2 size={13} style={{ color: "var(--danger)" }} />
                 </button>
               </div>

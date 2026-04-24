@@ -16,6 +16,7 @@ import {
   Zap
 } from "lucide-react";
 import { computeProgress, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import { useAuth } from "@context/AuthContext";
 
 const navItems = [
@@ -35,6 +36,7 @@ export default function Sidebar({ open }: { open: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const { user, logout } = useAuth();
 
   const overallPct = computeProgress(state.weeks);
@@ -50,24 +52,32 @@ export default function Sidebar({ open }: { open: boolean }) {
   }
 
   function importData() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        try {
-          const data = JSON.parse(ev.target?.result as string);
-          dispatch({ type: "IMPORT_STATE", state: data });
-        } catch {
-          alert("Invalid JSON file");
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
+    confirm({
+      title: "Import Data",
+      message: "Are you sure you want to import data? This will overwrite all your current roadmap, notes, and tracker progress.",
+      type: "danger",
+      confirmText: "Overwrite & Import",
+      onConfirm: () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.onchange = (e) => {
+          const file = (e.target as HTMLInputElement).files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              const data = JSON.parse(ev.target?.result as string);
+              dispatch({ type: "IMPORT_STATE", state: data });
+            } catch {
+              alert("Invalid JSON file");
+            }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      }
+    });
   }
 
   return (

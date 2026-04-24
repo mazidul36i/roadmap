@@ -84,13 +84,17 @@ function Shell() {
   );
 }
 
+import { ConfirmationProvider } from "@context/ConfirmationContext";
+
 export default function App() {
   return (
     <AuthProvider>
       <AppProvider>
-        <BrowserRouter>
-          <Shell />
-        </BrowserRouter>
+        <ConfirmationProvider>
+          <BrowserRouter>
+            <Shell />
+          </BrowserRouter>
+        </ConfirmationProvider>
       </AppProvider>
     </AuthProvider>
   );

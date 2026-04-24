@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { Application, AppStatus, InterviewDate } from "@app-types/index";
 
 const STATUSES: { key: AppStatus; label: string; color: string }[] = [
@@ -112,6 +113,7 @@ function AppModal({ app, onClose, onSave }: {
 
 export default function Applications() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<Application> & { id?: string }) | null>(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<AppStatus | "">("");
@@ -254,10 +256,19 @@ export default function Applications() {
                     >
                       {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
                     </select>
-                    <button className="btn btn-ghost btn-icon" onClick={e => {
-                      e.stopPropagation();
-                      dispatch({ type: "DELETE_APPLICATION", id: app.id });
-                    }}>
+                    <button 
+                      className="btn btn-ghost btn-icon" 
+                      onClick={e => {
+                        e.stopPropagation();
+                        confirm({
+                          title: "Delete Application",
+                          message: `Are you sure you want to delete your application for "${app.company}"?`,
+                          type: "danger",
+                          confirmText: "Delete",
+                          onConfirm: () => dispatch({ type: "DELETE_APPLICATION", id: app.id })
+                        });
+                      }}
+                    >
                       <Trash2 size={11} style={{ color: "var(--danger)" }} />
                     </button>
                   </div>

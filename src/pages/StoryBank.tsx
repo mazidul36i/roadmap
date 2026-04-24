@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Copy, Edit3, Plus, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
+import { useConfirm } from "@context/ConfirmationContext";
 import type { StoryCard } from "@app-types/index";
 
 const ALL_TAGS = ["performance", "search", "async processing", "data pipeline", "architecture", "reliability", "optimization"];
@@ -87,6 +88,7 @@ function StoryModal({ story, onClose, onSave }: {
 
 export default function StoryBank() {
   const { state, dispatch } = useApp();
+  const { confirm } = useConfirm();
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [modal, setModal] = useState<(Partial<StoryCard> & { id?: string }) | null>(null);
 
@@ -138,8 +140,17 @@ export default function StoryBank() {
               <div className="flex gap-4">
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(s)} title="Edit"><Edit3 size={14} />
                 </button>
-                <button className="btn btn-ghost btn-icon" onClick={() => dispatch({ type: "DELETE_STORY", id: s.id })}
-                        title="Delete">
+                <button 
+                  className="btn btn-ghost btn-icon" 
+                  onClick={() => confirm({
+                    title: "Delete Story",
+                    message: `Are you sure you want to delete "${s.title}"? This action cannot be undone.`,
+                    type: "danger",
+                    confirmText: "Delete",
+                    onConfirm: () => dispatch({ type: "DELETE_STORY", id: s.id })
+                  })}
+                  title="Delete"
+                >
                   <Trash2 size={14} style={{ color: "var(--danger)" }} />
                 </button>
               </div>
