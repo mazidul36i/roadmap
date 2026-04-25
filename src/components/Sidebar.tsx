@@ -83,6 +83,8 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     });
   }
 
+  const isActive = (path: string) => location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
+
   return (
     <>
       <AnimatePresence>
@@ -99,12 +101,19 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
 
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <div className="sidebar-logo">
-          <h2>🗺 Roadmap Tracker</h2>
-          <span>2-Month Job Switch Prep</span>
-          <div style={{ marginTop: 12 }}>
+          <div className="sidebar-brand">
+            <div className="sidebar-brand-mark">
+              <Map size={18} />
+            </div>
+            <div>
+              <h2>Roadmap Tracker</h2>
+              <span>2-Month Job Switch Prep</span>
+            </div>
+          </div>
+          <div className="sidebar-progress">
             <div className="flex justify-between mb-4" style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-              <span>Overall Progress</span><span
-              style={{ color: "var(--accent-light)", fontWeight: 700 }}>{overallPct}%</span>
+              <span>Overall Progress</span>
+              <span style={{ color: "var(--accent-light)", fontWeight: 700 }}>{overallPct}%</span>
             </div>
             <div className="progress-track">
               <div className="progress-fill" style={{ width: `${overallPct}%` }} />
@@ -119,7 +128,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
               key={path}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
-              className={`nav-item ${location.pathname === path ? "active" : ""}`}
+              className={`nav-item ${isActive(path) ? "active" : ""}`}
               onClick={() => {
                 navigate(path);
                 if (window.innerWidth <= 900) onClose();
