@@ -19,6 +19,7 @@ import LoginPage from "@pages/LoginPage";
 import SetupChoice from "@components/SetupChoice";
 import { AuthProvider, useAuth } from "@context/AuthContext";
 import { ThemeProvider } from "@context/ThemeContext";
+import InterviewTimer from "@components/InterviewTimer";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Your 8-week job-switch prep at a glance" },
@@ -110,6 +111,7 @@ export default function App() {
           <ConfirmationProvider>
             <BrowserRouter>
               <Shell />
+              <InterviewTimer />
             </BrowserRouter>
           </ConfirmationProvider>
         </AppProvider>

@@ -2061,3 +2061,115 @@ tbody td {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+/* ─── INTERVIEW TIMER ────────────────────────────────────── */
+.timer-floating {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  width: 220px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-lg), var(--shadow-accent);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  user-select: none;
+}
+
+.timer-drag-handle {
+  height: 6px;
+  width: 40px;
+  background: var(--border);
+  border-radius: 3px;
+  margin: 0 auto 4px;
+  cursor: grab;
+}
+
+.timer-drag-handle:active {
+  cursor: grabbing;
+}
+
+.timer-display {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  margin: 8px 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.timer-display.running {
+  color: var(--accent-light);
+  text-shadow: 0 0 15px var(--accent-glow);
+}
+
+.timer-display.danger {
+  color: var(--danger);
+  animation: pulse-danger 1s infinite;
+}
+
+@keyframes pulse-danger {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.timer-mode-badge {
+  align-self: center;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-dim);
+  color: var(--accent-light);
+  font-weight: 700;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.timer-presets {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.timer-preset-btn {
+  font-size: 0.7rem;
+  padding: 4px;
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.timer-preset-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+.timer-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.timer-close:hover {
+  color: var(--danger);
+}

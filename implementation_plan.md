@@ -51,7 +51,8 @@ Below is a roadmap for further enhancing the application, categorized by impact 
 - **Action**: Created a dedicated `ResourceLibrary.tsx` page for categorizing and pinning external links (YouTube, articles, repos). Added custom types, reducer actions, and a premium card-based UI with filtering. Fixed icon issues and improved state persistence.
 
 ### ⏱️ Interview Timer
-- **Feature**: A floating timer tool in Focus Mode or Mock Interviews to help users practice time management during problem-solving sessions.
+- **Status**: Completed
+- **Feature**: A floating timer tool in Focus Mode or Mock Interviews to help users practice time management during problem-solving sessions. Added a draggable, glassmorphic UI with countdown and stopwatch modes.
 
 ### 📅 Calendar Sync
 - **Feature**: Export the 8-week roadmap or scheduled interview dates to Google Calendar or iCal.

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Edit3, Plus, Trash2, X } from "lucide-react";
+import { AlertTriangle, Edit3, Plus, Timer as TimerIcon, Trash2, X } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { MockInterview, MockType } from "@app-types/index";
@@ -113,7 +113,7 @@ function MockModal({ mock, onClose, onSave }: {
 }
 
 export default function MockInterviews() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, isTimerVisible, setIsTimerVisible } = useApp();
   const { confirm } = useConfirm();
   const [modal, setModal] = useState<(Partial<MockInterview> & { id?: string }) | null>(null);
   const [filterType, setFilterType] = useState<MockType | "">("");
@@ -143,9 +143,17 @@ export default function MockInterviews() {
           <h1>Mock Interviews</h1>
           <p>Track sessions, spot patterns, improve over time</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyMock())}>
-          <Plus size={14} /> Log Mock
-        </button>
+        <div className="flex gap-8">
+          <button
+            className={`btn ${isTimerVisible ? "btn-primary" : "btn-secondary"}`}
+            onClick={() => setIsTimerVisible(!isTimerVisible)}
+          >
+            <TimerIcon size={14} /> Timer
+          </button>
+          <button className="btn btn-primary" onClick={() => setModal(emptyMock())}>
+            <Plus size={14} /> Log Mock
+          </button>
+        </div>
       </div>
 
       <div className="grid-2" style={{ gap: 20, marginBottom: 24 }}>

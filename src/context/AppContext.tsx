@@ -210,6 +210,8 @@ interface AppContextValue {
   dispatch: React.Dispatch<Action>;
   needsOnboarding: boolean;
   setNeedsOnboarding: (val: boolean) => void;
+  isTimerVisible: boolean;
+  setIsTimerVisible: (val: boolean) => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -220,6 +222,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, seedState);
   const [needsOnboarding, setNeedsOnboarding] = React.useState(false);
+  const [isTimerVisible, setIsTimerVisible] = React.useState(false);
   const isInitialMount = useRef(true);
   const isSyncingFromFirebase = useRef(false);
 
@@ -288,7 +291,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [state, user]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch, needsOnboarding, setNeedsOnboarding }}>
+    <AppContext.Provider value={{ state, dispatch, needsOnboarding, setNeedsOnboarding, isTimerVisible, setIsTimerVisible }}>
       {children}
     </AppContext.Provider>
   );

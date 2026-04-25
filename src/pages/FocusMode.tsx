@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Circle, Clock, X } from "lucide-react";
+import { CheckCircle2, Circle, Clock, Timer as TimerIcon, X } from "lucide-react";
 import { getCurrentWeek, useApp } from "@context/AppContext";
 import type { TaskStatus } from "@app-types/index";
 
@@ -10,7 +10,7 @@ function statusNext(s: TaskStatus): TaskStatus {
 }
 
 export default function FocusMode() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, isTimerVisible, setIsTimerVisible } = useApp();
   const navigate = useNavigate();
   const currentWeekIdx = getCurrentWeek(state.startDate) - 1;
   const week = state.weeks[currentWeekIdx];
@@ -38,6 +38,15 @@ export default function FocusMode() {
       >
         <X size={16} /> Exit Focus Mode
       </button>
+
+      <div style={{ position: "absolute", top: 20, left: 20, display: "flex", gap: 8 }}>
+        <button
+          className={`btn ${isTimerVisible ? "btn-primary" : "btn-secondary"}`}
+          onClick={() => setIsTimerVisible(!isTimerVisible)}
+        >
+          <TimerIcon size={16} /> {isTimerVisible ? "Hide Timer" : "Show Timer"}
+        </button>
+      </div>
 
       <div style={{ maxWidth: 520, width: "100%" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
