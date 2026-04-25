@@ -18,6 +18,8 @@ const emptyNote = (): Omit<Note, "id" | "createdAt" | "updatedAt"> => ({
   title: "", content: "", category: "dsa", tags: []
 });
 
+import Editor from "@components/Editor";
+
 export default function Notes() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
@@ -144,7 +146,7 @@ export default function Notes() {
       </div>
 
       {/* Editor */}
-      <div className="card" style={{ display: "flex", flexDirection: "column" }}>
+      <div className="card" style={{ display: "flex", flexDirection: "column", padding: "16px" }}>
         {(creating || selectedNote) ? (
           <>
             <div className="flex justify-between items-center mb-16">
@@ -171,39 +173,29 @@ export default function Notes() {
               )}
             </div>
             <input
-              className="form-input mb-16"
+              className="form-input mb-8"
               style={{
-                fontSize: "1.1rem",
-                fontWeight: 700,
+                fontSize: "1.25rem",
+                fontWeight: 800,
                 background: "transparent",
                 border: "none",
-                borderBottom: "1px solid var(--border)",
                 borderRadius: 0,
-                padding: "0 0 10px"
+                padding: "0"
               }}
               placeholder="Note title…"
               value={form.title}
               onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
             />
-            <textarea
-              className="form-textarea"
-              style={{
-                flex: 1,
-                minHeight: 300,
-                fontSize: "0.9rem",
-                lineHeight: 1.8,
-                border: "none",
-                background: "transparent",
-                resize: "none",
-                padding: 0
-              }}
-              placeholder="Write your note… (supports Markdown)"
-              value={form.content}
-              onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
+            
+            <Editor 
+              content={form.content} 
+              onChange={(html) => setForm(f => ({ ...f, content: html }))}
+              placeholder="Write your note here..."
             />
-            <div className="divider" />
-            <div className="flex items-center gap-8" style={{ flexWrap: "wrap" }}>
+
+            <div className="flex items-center gap-8 mt-16" style={{ flexWrap: "wrap" }}>
               <Tag size={14} style={{ color: "var(--text-muted)" }} />
+
               {form.tags.map(t => (
                 <span key={t} className="tag">
                   {t}
