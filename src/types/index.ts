@@ -31,9 +31,9 @@ export interface Note {
   id: string;
   title: string;
   content: string;
-  category: NoteCategory;
+  category?: NoteCategory;
   tags: string[];
-  createdAt: string;
+  createdAt?: string;
   updatedAt: string;
 }
 

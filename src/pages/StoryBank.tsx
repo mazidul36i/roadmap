@@ -102,7 +102,7 @@ export default function StoryBank() {
   const [aiReview, setAiReview] = useState<any>(null);
 
   const analyzeStory = (s: StoryCard) => {
-    const tips = [];
+    let tips = new Array<{ type: 'warning' | 'info', text: string }>() as any[];
     let score = 30; // base score
 
     if (s.problem.length > 60) score += 15;

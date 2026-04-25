@@ -1,7 +1,20 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, ChevronDown, Circle, Clock, Plus, StickyNote, Trash2, Wand2, MessageSquare, Sparkles, X, Copy, Check } from "lucide-react";
-import { computeWeekProgress, useApp } from "@context/AppContext";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Circle,
+  Clock,
+  Copy,
+  MessageSquare,
+  Plus,
+  Sparkles,
+  StickyNote,
+  Trash2,
+  X
+} from "lucide-react";
+import { computeWeekProgress, uid, useApp } from "@context/AppContext";
 import type { TaskStatus } from "@app-types/index";
 import { useConfirm } from "@context/ConfirmationContext";
 
@@ -19,13 +32,13 @@ function StatusIcon({ status }: { status: TaskStatus }) {
 }
 
 function EditableText({
-  value,
-  onSave,
-  className,
-  style,
-  multiline = false,
-  placeholder = "Click to edit..."
-}: {
+                        value,
+                        onSave,
+                        className,
+                        style,
+                        multiline = false,
+                        placeholder = "Click to edit..."
+                      }: {
   value: string;
   onSave: (val: string) => void;
   className?: string;
@@ -57,7 +70,15 @@ function EditableText({
         <textarea
           autoFocus
           className="form-textarea"
-          style={{ ...style, width: "100%", padding: "4px 8px", fontSize: "inherit", fontWeight: "inherit", color: "inherit", background: "var(--bg-secondary)" }}
+          style={{
+            ...style,
+            width: "100%",
+            padding: "4px 8px",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            color: "inherit",
+            background: "var(--bg-secondary)"
+          }}
           value={tempValue}
           onChange={e => setTempValue(e.target.value)}
           onBlur={handleBlur}
@@ -70,7 +91,15 @@ function EditableText({
       <input
         autoFocus
         className="form-input"
-        style={{ ...style, width: "100%", padding: "4px 8px", fontSize: "inherit", fontWeight: "inherit", color: "inherit", background: "var(--bg-secondary)" }}
+        style={{
+          ...style,
+          width: "100%",
+          padding: "4px 8px",
+          fontSize: "inherit",
+          fontWeight: "inherit",
+          color: "inherit",
+          background: "var(--bg-secondary)"
+        }}
         value={tempValue}
         onChange={e => setTempValue(e.target.value)}
         onBlur={handleBlur}
@@ -105,7 +134,7 @@ const MOCK_QUESTIONS: Record<string, string[]> = {
 };
 
 export default function Roadmap() {
-  const { state, dispatch, uid } = useApp();
+  const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
   const [openWeeks, setOpenWeeks] = useState<Set<string>>(new Set(["w1"]));
   const [openNotes, setOpenNotes] = useState<Set<string>>(new Set());
@@ -212,7 +241,7 @@ export default function Roadmap() {
                         onSave={(val) => dispatch({ type: "UPDATE_WEEK", weekId: week.id, updates: { goal: val } })}
                       />
                     </div>
-                    <button 
+                    <button
                       className="btn btn-secondary btn-sm"
                       onClick={() => {
                         const topic = Object.keys(MOCK_QUESTIONS).find(k => week.title.toLowerCase().includes(k.toLowerCase())) || "Default";
@@ -250,7 +279,12 @@ export default function Roadmap() {
                             <div className={`task-title ${task.status}`}>
                               <EditableText
                                 value={task.title}
-                                onSave={(val) => dispatch({ type: "UPDATE_TASK", weekId: week.id, taskId: task.id, updates: { title: val } })}
+                                onSave={(val) => dispatch({
+                                  type: "UPDATE_TASK",
+                                  weekId: week.id,
+                                  taskId: task.id,
+                                  updates: { title: val }
+                                })}
                               />
                             </div>
                             {task.status === "inprogress" && (
@@ -328,11 +362,11 @@ export default function Roadmap() {
       <AnimatePresence>
         {mockPrep && (
           <div className="modal-overlay" onClick={() => setMockPrep(null)}>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="modal ai-modal" 
+              className="modal ai-modal"
               onClick={e => e.stopPropagation()}
               style={{ maxWidth: 500 }}
             >
@@ -350,11 +384,12 @@ export default function Roadmap() {
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {mockPrep.questions.map((q, i) => (
-                    <div key={i} className="card" style={{ padding: 12, background: "var(--bg-primary)", border: "1px solid var(--border)" }}>
+                    <div key={i} className="card"
+                         style={{ padding: 12, background: "var(--bg-primary)", border: "1px solid var(--border)" }}>
                       <div className="flex justify-between items-start gap-8">
                         <div style={{ fontSize: "0.88rem", fontWeight: 500, lineHeight: 1.4 }}>{q}</div>
-                        <button 
-                          className="btn btn-ghost btn-icon btn-sm" 
+                        <button
+                          className="btn btn-ghost btn-icon btn-sm"
                           onClick={() => {
                             navigator.clipboard.writeText(q);
                             setCopied(i);
@@ -370,19 +405,20 @@ export default function Roadmap() {
               </div>
 
               <div className="flex gap-8" style={{ marginTop: 16 }}>
-                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setMockPrep(null)}>Got it!</button>
-                <button 
-                  className="btn btn-secondary" 
+                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setMockPrep(null)}>Got it!
+                </button>
+                <button
+                  className="btn btn-secondary"
                   onClick={() => {
-                    dispatch({ 
-                      type: "ADD_NOTE", 
-                      note: { 
-                        id: uid(), 
-                        title: `Mock Prep: ${mockPrep.weekTitle}`, 
+                    dispatch({
+                      type: "ADD_NOTE",
+                      note: {
+                        id: uid(),
+                        title: `Mock Prep: ${mockPrep.weekTitle}`,
                         content: `### Interview Questions\n\n${mockPrep.questions.map(q => `- ${q}`).join("\n")}`,
                         tags: ["MockPrep", "AI"],
-                        lastModified: Date.now()
-                      } 
+                        updatedAt: new Date().toISOString()
+                      }
                     });
                     setMockPrep(null);
                   }}

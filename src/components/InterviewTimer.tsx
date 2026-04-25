@@ -11,7 +11,7 @@ export default function InterviewTimer() {
   const [timeLeft, setTimeLeft] = useState(45 * 60); // 45 minutes default
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (isRunning) {
