@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Copy, Edit3, Plus, Trash2, X } from "lucide-react";
+import { Copy, Edit3, Plus, Trash2, X, Sparkles, Wand2, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { StoryCard } from "@app-types/index";
@@ -98,6 +99,28 @@ export default function StoryBank() {
     if (s.id) dispatch({ type: "UPDATE_STORY", story: s as StoryCard });
     else dispatch({ type: "ADD_STORY", story: { ...s, id: uid() } as StoryCard });
   };
+  const [aiReview, setAiReview] = useState<any>(null);
+
+  const analyzeStory = (s: StoryCard) => {
+    const tips = [];
+    let score = 30; // base score
+
+    if (s.problem.length > 60) score += 15;
+    else tips.push({ type: 'warning', text: 'The Situation could be more detailed. Set the stage for the complexity.' });
+
+    if (s.action.toLowerCase().includes("i ") || s.action.toLowerCase().includes("led") || s.action.toLowerCase().includes("developed")) score += 25;
+    else tips.push({ type: 'info', text: 'Use more "I" statements in Action to highlight your personal contribution.' });
+
+    if (/\d+/.test(s.result) || s.result.toLowerCase().includes("%")) score += 20;
+    else tips.push({ type: 'warning', text: 'Result lacks quantifiable data. Use numbers, %, or time saved to prove impact.' });
+
+    if (s.metrics.length > 5) score += 10;
+    else tips.push({ type: 'info', text: 'Ensure you have a dedicated metrics section for quick reference.' });
+
+    if (s.tags.length >= 2) score += 5;
+
+    setAiReview({ story: s, score: Math.min(score, 100), tips });
+  };
 
   const copy = (text: string) => navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
 
@@ -138,6 +161,9 @@ export default function StoryBank() {
                 flex: 1
               }}>{s.title}</h3>
               <div className="flex gap-4">
+                <button className="btn btn-ghost btn-icon" onClick={() => analyzeStory(s)} title="AI Review">
+                  <Wand2 size={14} style={{ color: "var(--accent)" }} />
+                </button>
                 <button className="btn btn-ghost btn-icon" onClick={() => setModal(s)} title="Edit"><Edit3 size={14} />
                 </button>
                 <button 
@@ -177,6 +203,75 @@ export default function StoryBank() {
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {aiReview && (
+          <div className="modal-overlay" onClick={() => setAiReview(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="modal ai-modal" 
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 500, background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)", border: "1px solid var(--accent-dim)" }}
+            >
+              <div className="modal-header">
+                <div className="flex items-center gap-8">
+                  <Sparkles size={18} style={{ color: "var(--accent)" }} />
+                  <h2 className="modal-title">AI Story Review</h2>
+                </div>
+                <button className="btn btn-ghost btn-icon" onClick={() => setAiReview(null)}><X size={16} /></button>
+              </div>
+
+              <div className="ai-score-section" style={{ textAlign: "center", padding: "20px 0" }}>
+                <div className="ai-score-circle" style={{ 
+                  width: 80, height: 80, borderRadius: "50%", 
+                  border: "4px solid var(--accent)", margin: "0 auto 12px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "1.5rem", fontWeight: 800, color: "var(--accent)",
+                  background: "var(--accent-dim)"
+                }}>
+                  {aiReview.score}%
+                </div>
+                <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>
+                  {aiReview.score >= 80 ? "Excellent Story!" : aiReview.score >= 60 ? "Good Foundation" : "Needs Improvement"}
+                </div>
+              </div>
+
+              <div className="ai-tips-list" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {aiReview.tips.length === 0 ? (
+                  <div className="flex gap-12 p-12" style={{ background: "var(--success-dim)", borderRadius: 8, border: "1px solid var(--success)" }}>
+                    <CheckCircle2 size={16} style={{ color: "var(--success)", flexShrink: 0 }} />
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>Your story follows the STAR method perfectly!</div>
+                  </div>
+                ) : (
+                  aiReview.tips.map((tip: any, i: number) => (
+                    <div key={i} className="flex gap-12 p-12" style={{ 
+                      background: tip.type === 'warning' ? "var(--warning-dim)" : "var(--bg-secondary)", 
+                      borderRadius: 8, 
+                      border: `1px solid ${tip.type === 'warning' ? "var(--warning)" : "var(--border)"}` 
+                    }}>
+                      {tip.type === 'warning' ? 
+                        <AlertCircle size={16} style={{ color: "var(--warning)", flexShrink: 0 }} /> : 
+                        <Info size={16} style={{ color: "var(--accent)", flexShrink: 0 }} />
+                      }
+                      <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{tip.text}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div style={{ marginTop: 24, padding: 16, background: "var(--bg-secondary)", borderRadius: 8, fontSize: "0.8rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                "Great STAR stories are specific and data-driven. Always aim for at least one hard metric in your results."
+              </div>
+
+              <div className="flex gap-8" style={{ justifyContent: "flex-end", marginTop: 24 }}>
+                <button className="btn btn-primary" onClick={() => setAiReview(null)}>Got it</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {modal && <StoryModal story={modal} onClose={() => setModal(null)} onSave={saveStory} />}
     </div>

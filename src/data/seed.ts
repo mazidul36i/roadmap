@@ -4,6 +4,7 @@ import type {
   DSAProblem,
   MockInterview,
   Note,
+  Resource,
   StoryCard,
   SystemDesignTopic,
   Week
@@ -609,6 +610,43 @@ const notes: Note[] = [
   },
 ];
 
+// ─── RESOURCES ────────────────────────────────────────────────────────────────
+const resources: Resource[] = [
+  {
+    id: uid(),
+    title: "System Design Primer",
+    url: "https://github.com/donnemartin/system-design-primer",
+    type: "repo",
+    category: "system-design",
+    tags: ["architecture", "fundamentals"],
+    notes: "The gold standard for system design interview prep. Includes diagrams and deep dives.",
+    isPinned: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: uid(),
+    title: "NeetCode 150",
+    url: "https://neetcode.io/practice",
+    type: "tool",
+    category: "dsa",
+    tags: ["patterns", "leetcode"],
+    notes: "Great categorized list of LeetCode problems with video explanations.",
+    isPinned: true,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: uid(),
+    title: "Tech Interview Handbook",
+    url: "https://www.techinterviewhandbook.org/behavioral-interview-questions/",
+    type: "article",
+    category: "behavioral",
+    tags: ["soft-skills", "star-format"],
+    notes: "Excellent resource for behavioral interview preparation and common questions.",
+    isPinned: false,
+    createdAt: new Date().toISOString()
+  },
+];
+
 // ─── FULL SEED STATE ───────────────────────────────────────────────────────────
 const today = new Date().toISOString().slice(0, 10);
 const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
@@ -632,6 +670,7 @@ export const seedState: AppState = {
   sdTopics,
   applications,
   mockInterviews,
+  resources,
   studyStreak: [yesterday, today],
   startDate: today,
 };
@@ -645,6 +684,7 @@ export const emptyState: AppState = {
   sdTopics: sdTopics.map(t => ({ ...t, status: "not-started", tradeoffs: "", notes: "" })),
   applications: [],
   mockInterviews: [],
+  resources: [],
   studyStreak: [],
   startDate: today,
 };

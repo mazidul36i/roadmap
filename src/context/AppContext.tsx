@@ -10,6 +10,7 @@ import type {
   DSAProblem,
   MockInterview,
   Note,
+  Resource,
   StoryCard,
   SystemDesignTopic,
   Task,
@@ -44,6 +45,10 @@ type Action =
   | { type: "ADD_MOCK"; mock: MockInterview }
   | { type: "UPDATE_MOCK"; mock: MockInterview }
   | { type: "DELETE_MOCK"; id: string }
+  | { type: "ADD_RESOURCE"; resource: Resource }
+  | { type: "UPDATE_RESOURCE"; resource: Resource }
+  | { type: "DELETE_RESOURCE"; id: string }
+  | { type: "TOGGLE_RESOURCE_PIN"; id: string }
   | { type: "MARK_STUDY_DAY"; date: string }
   | { type: "SET_STATE"; state: AppState }
   | { type: "IMPORT_STATE"; state: AppState }
@@ -169,6 +174,14 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, mockInterviews: state.mockInterviews.map(m => m.id === action.mock.id ? action.mock : m) };
     case "DELETE_MOCK":
       return { ...state, mockInterviews: state.mockInterviews.filter(m => m.id !== action.id) };
+    case "ADD_RESOURCE":
+      return { ...state, resources: [action.resource, ...(state.resources || [])] };
+    case "UPDATE_RESOURCE":
+      return { ...state, resources: (state.resources || []).map(r => r.id === action.resource.id ? action.resource : r) };
+    case "DELETE_RESOURCE":
+      return { ...state, resources: (state.resources || []).filter(r => r.id !== action.id) };
+    case "TOGGLE_RESOURCE_PIN":
+      return { ...state, resources: (state.resources || []).map(r => r.id === action.id ? { ...r, isPinned: !r.isPinned } : r) };
     case "MARK_STUDY_DAY":
       return {
         ...state,
@@ -176,7 +189,16 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case "SET_STATE":
     case "IMPORT_STATE":
-      return action.state;
+      return { 
+        ...state, 
+        ...action.state,
+        // Ensure new arrays exist if they were missing in old saved state, 
+        // while preserving empty arrays from the saved state.
+        resources: action.state.resources ?? state.resources ?? [],
+        notes: action.state.notes ?? state.notes ?? [],
+        applications: action.state.applications ?? state.applications ?? [],
+        dsaProblems: action.state.dsaProblems ?? state.dsaProblems ?? [],
+      };
     default:
       return state;
   }

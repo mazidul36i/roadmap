@@ -39,10 +39,12 @@
 | 🏗 **System Design**   | Exercises + core concepts tabs · status tracking · tradeoffs & architecture notes           |
 | 💼 **Applications**    | Kanban pipeline from Wishlist → Offer/Rejected · inline status updates · company details    |
 | 🎙 **Mock Interviews** | Session log · score trend line chart · recurring weak points aggregated automatically       |
+| 📚 **Resource Library**| Personal knowledge base for YouTube, articles, and repos · categorize and pin favorites     |
 | ⚡ **Focus Mode**       | Full-screen minimal view of today's tasks · Esc to exit                                     |
 
 ### Extras
 
+- **Rich Text Editor for Notes** — Full Tiptap integration with custom toolbar, bold/italic/code support, and premium typography.
 - **Light & Dark Themes** — Toggle between a sleek dark mode and a clean, high-contrast light mode via the TopBar.
 - **`Ctrl+K` Global Search** — searches across tasks, notes, stories, companies, and DSA problems simultaneously
 - **Export / Import JSON** — full data backup and restore from the sidebar
@@ -135,6 +137,7 @@ src/
     ├── SystemDesign.tsx     # SD exercises and core concepts tracker
     ├── Applications.tsx     # Kanban pipeline with company detail modal
     ├── MockInterviews.tsx   # Mock session log + score trend + weak points
+    ├── ResourceLibrary.tsx  # Centralized bookmarks for study materials
     └── FocusMode.tsx        # Full-screen focus view for current week
 ```
 
@@ -154,6 +157,7 @@ interface AppState {
   sdTopics: SystemDesignTopic[]; // System design topics
   applications: Application[]; // Job application pipeline
   mockInterviews: MockInterview[]; // Mock interview sessions
+  resources: Resource[];      // Bookmarked links and materials
   studyStreak: string[];      // Array of ISO date strings
   startDate: string;          // Start of the 8-week plan
 }

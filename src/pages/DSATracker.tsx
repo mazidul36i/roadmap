@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X } from "lucide-react";
+import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X, Sparkles, BrainCircuit } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -173,6 +173,22 @@ function ProblemModal({ problem, onClose, onSave }: {
 
 import { useConfirm } from "@context/ConfirmationContext";
 
+const RECOMMENDATIONS: Record<string, string[]> = {
+  "Arrays": ["Spiral Matrix", "Rotate Image", "Subarray Sum Equals K", "Merge Intervals"],
+  "Strings": ["Longest Substring Without Repeating Characters", "Valid Palindrome", "String to Integer (atoi)"],
+  "Hashmaps": ["Group Anagrams", "Top K Frequent Elements", "LRU Cache"],
+  "Linked List": ["Reverse Linked List", "Merge Two Sorted Lists", "Linked List Cycle"],
+  "Trees": ["Invert Binary Tree", "Binary Tree Level Order Traversal", "Lowest Common Ancestor"],
+  "Graphs": ["Number of Islands", "Course Schedule", "Clone Graph"],
+  "Dynamic Programming": ["Coin Change", "Climbing Stairs", "Longest Common Subsequence", "Word Break"],
+  "Binary Search": ["Search in Rotated Sorted Array", "Find Minimum in Rotated Sorted Array"],
+  "Two Pointer": ["3Sum", "Container With Most Water", "Trapping Rain Water"],
+  "Sliding Window": ["Longest Repeating Character Replacement", "Minimum Window Substring"],
+  "Backtracking": ["Permutations", "Subsets", "Combination Sum"],
+  "Greedy": ["Gas Station", "Jump Game", "Partition Labels"],
+  "Heap": ["Kth Largest Element in an Array", "Merge k Sorted Lists"],
+};
+
 export default function DSATracker() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
@@ -181,6 +197,7 @@ export default function DSATracker() {
   const [filterDiff, setFilterDiff] = useState("");
   const [filterSolved, setFilterSolved] = useState("");
   const [search, setSearch] = useState("");
+  const [recommendation, setRecommendation] = useState<any>(null);
 
   const filtered = state.dsaProblems.filter(p => {
     if (filterTopic && !p.topics.includes(filterTopic)) return false;
@@ -269,8 +286,23 @@ export default function DSATracker() {
                 <AlertTriangle size={14} /> Weak Areas (solve rate &lt;50%)
               </div>
               <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
-                {weakTopics.map(t => <span key={t.fullTopic}
-                                           className="badge badge-warning">{t.fullTopic} ({t.solved}/{t.total})</span>)}
+                {weakTopics.map(t => (
+                  <button 
+                    key={t.fullTopic} 
+                    className="badge badge-warning"
+                    style={{ cursor: "pointer", border: "none" }}
+                    onClick={() => {
+                      const recs = RECOMMENDATIONS[t.fullTopic] || ["Practice more problems in this category"];
+                      const picked = recs[Math.floor(Math.random() * recs.length)];
+                      setRecommendation({ topic: t.fullTopic, problem: picked });
+                    }}
+                  >
+                    {t.fullTopic} ({t.solved}/{t.total})
+                  </button>
+                ))}
+              </div>
+              <div style={{ marginTop: 12, fontSize: "0.75rem", color: "var(--warning)", opacity: 0.8 }}>
+                Click a topic for an AI suggestion
               </div>
             </div>
           )}
@@ -374,6 +406,60 @@ export default function DSATracker() {
           </tbody>
         </table>
       </div>
+
+      <AnimatePresence>
+        {recommendation && (
+          <div className="modal-overlay" onClick={() => setRecommendation(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="modal ai-modal" 
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 400, background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)", border: "1px solid var(--accent-dim)" }}
+            >
+              <div className="modal-header">
+                <div className="flex items-center gap-8">
+                  <Sparkles size={18} style={{ color: "var(--accent)" }} />
+                  <h2 className="modal-title">AI Suggestion</h2>
+                </div>
+                <button className="btn btn-ghost btn-icon" onClick={() => setRecommendation(null)}><X size={16} /></button>
+              </div>
+
+              <div style={{ padding: "16px 0", textAlign: "center" }}>
+                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: 4 }}>Based on your {recommendation.topic} progress, you should try:</div>
+                <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--accent)", marginBottom: 20 }}>{recommendation.problem}</div>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={() => {
+                      window.open(`https://www.google.com/search?q=leetcode+${encodeURIComponent(recommendation.problem)}`, "_blank");
+                    }}
+                    style={{ width: "100%" }}
+                  >
+                    <ExternalLink size={14} /> Search on LeetCode
+                  </button>
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => {
+                      setModal({ name: recommendation.problem, topics: [recommendation.topic], platform: "LeetCode" });
+                      setRecommendation(null);
+                    }}
+                    style={{ width: "100%" }}
+                  >
+                    <Plus size={14} /> Add to Tracker
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ marginTop: 16, fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
+                This problem covers patterns you haven't mastered yet.
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {modal && <ProblemModal problem={modal} onClose={() => setModal(null)} onSave={save} />}
     </motion.div>

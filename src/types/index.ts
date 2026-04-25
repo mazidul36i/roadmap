@@ -119,6 +119,20 @@ export interface MockInterview {
   interviewer: string;
 }
 
+export type ResourceType = "article" | "video" | "pdf" | "course" | "tool" | "repo";
+
+export interface Resource {
+  id: string;
+  title: string;
+  url: string;
+  type: ResourceType;
+  category: "dsa" | "system-design" | "behavioral" | "frontend" | "backend" | "general";
+  tags: string[];
+  notes: string;
+  isPinned: boolean;
+  createdAt: string;
+}
+
 export interface AppState {
   weeks: Week[];
   dayLogs: DayLog[];
@@ -128,6 +142,7 @@ export interface AppState {
   sdTopics: SystemDesignTopic[];
   applications: Application[];
   mockInterviews: MockInterview[];
+  resources: Resource[];
   studyStreak: string[]; // Array of ISO date strings
   startDate: string; // When the 8-week plan started
 }

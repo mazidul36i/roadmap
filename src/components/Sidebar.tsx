@@ -10,6 +10,7 @@ import {
   LogOut,
   Map,
   Mic2,
+  Library,
   Server,
   StickyNote,
   Upload,
@@ -30,6 +31,7 @@ const navItems = [
   { path: "/sysdesign", icon: Server, label: "System Design" },
   { path: "/applications", icon: Briefcase, label: "Applications" },
   { path: "/mocks", icon: Mic2, label: "Mock Interviews" },
+  { path: "/resources", icon: Library, label: "Resource Library" },
   { path: "/focus", icon: Zap, label: "Focus Mode" },
 ];
 

@@ -14,6 +14,7 @@ import SystemDesign from "@pages/SystemDesign";
 import Applications from "@pages/Applications";
 import MockInterviews from "@pages/MockInterviews";
 import FocusMode from "@pages/FocusMode";
+import ResourceLibrary from "@pages/ResourceLibrary";
 import LoginPage from "@pages/LoginPage";
 import SetupChoice from "@components/SetupChoice";
 import { AuthProvider, useAuth } from "@context/AuthContext";
@@ -29,6 +30,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/sysdesign": { title: "System Design", subtitle: "Topics, exercises, and architecture notes" },
   "/applications": { title: "Job Applications", subtitle: "Pipeline tracker · kanban board" },
   "/mocks": { title: "Mock Interviews", subtitle: "Track performance and recurring weak points" },
+  "/resources": { title: "Resources", subtitle: "Curated learning materials and documentation" },
   "/focus": { title: "Focus Mode", subtitle: "Today only · no distractions" },
 };
 
@@ -88,6 +90,7 @@ function Shell() {
                 <Route path="/sysdesign" element={<SystemDesign />} />
                 <Route path="/applications" element={<Applications />} />
                 <Route path="/mocks" element={<MockInterviews />} />
+                <Route path="/resources" element={<ResourceLibrary />} />
               </Routes>
             </motion.div>
           </AnimatePresence>

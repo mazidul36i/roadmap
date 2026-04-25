@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, ChevronDown, Circle, Clock, Plus, StickyNote, Trash2 } from "lucide-react";
+import { CheckCircle2, ChevronDown, Circle, Clock, Plus, StickyNote, Trash2, Wand2, MessageSquare, Sparkles, X, Copy, Check } from "lucide-react";
 import { computeWeekProgress, useApp } from "@context/AppContext";
 import type { TaskStatus } from "@app-types/index";
 import { useConfirm } from "@context/ConfirmationContext";
@@ -94,11 +94,23 @@ function EditableText({
   );
 }
 
+const MOCK_QUESTIONS: Record<string, string[]> = {
+  "Array": ["How do you find the missing number in an array of 1 to 100?", "Explain how to remove duplicates from an array in O(n) time.", "What is the difference between a static array and a dynamic array?", "How do you find the second largest element in an array?", "Describe the Kadane's algorithm and its use case."],
+  "String": ["Explain the concept of string immutability in Java/C#.", "How do you check if two strings are anagrams?", "Describe the logic for finding the first non-repeating character in a string.", "How would you reverse a string without using built-in methods?", "What is a Trie and how is it used for string searching?"],
+  "System Design": ["How would you design a rate limiter?", "Explain the difference between SQL and NoSQL databases.", "Describe how a CDN works.", "What is consistent hashing and why is it used?", "How do you handle horizontal scaling for a stateless application?"],
+  "Core CS": ["What is the difference between a process and a thread?", "Explain the ACID properties in databases.", "Describe the OSI model layers.", "How does garbage collection work in modern languages?", "What is the difference between TCP and UDP?"],
+  "React": ["What is the Virtual DOM and how does it improve performance?", "Explain the lifecycle methods of a React component.", "What are React Hooks and why were they introduced?", "Describe the difference between controlled and uncontrolled components.", "How do you optimize a large list in React?"],
+  "Behavioral": ["Tell me about a time you had a conflict with a teammate.", "Describe a difficult technical challenge you solved.", "Why do you want to work for this company?", "Tell me about a time you failed and what you learned.", "Where do you see yourself in five years?"],
+  "Default": ["What is your greatest technical achievement?", "How do you stay updated with new technologies?", "Describe your favorite data structure and its trade-offs.", "Explain a complex technical concept as if I were five.", "What is your approach to debugging a critical production issue?"]
+};
+
 export default function Roadmap() {
-  const { state, dispatch } = useApp();
+  const { state, dispatch, uid } = useApp();
   const { confirm } = useConfirm();
   const [openWeeks, setOpenWeeks] = useState<Set<string>>(new Set(["w1"]));
   const [openNotes, setOpenNotes] = useState<Set<string>>(new Set());
+  const [mockPrep, setMockPrep] = useState<{ weekTitle: string; questions: string[] } | null>(null);
+  const [copied, setCopied] = useState<number | null>(null);
 
   const toggle = (id: string) => setOpenWeeks(s => {
     const n = new Set(s);
@@ -200,6 +212,16 @@ export default function Roadmap() {
                         onSave={(val) => dispatch({ type: "UPDATE_WEEK", weekId: week.id, updates: { goal: val } })}
                       />
                     </div>
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => {
+                        const topic = Object.keys(MOCK_QUESTIONS).find(k => week.title.toLowerCase().includes(k.toLowerCase())) || "Default";
+                        setMockPrep({ weekTitle: week.title, questions: MOCK_QUESTIONS[topic] });
+                      }}
+                      style={{ fontSize: "0.75rem", padding: "4px 8px" }}
+                    >
+                      <Sparkles size={12} /> Mock Prep
+                    </button>
                   </div>
 
                   {week.tasks.map(task => {
@@ -302,6 +324,76 @@ export default function Roadmap() {
         <Plus size={20} />
         Add Next Week
       </button>
+
+      <AnimatePresence>
+        {mockPrep && (
+          <div className="modal-overlay" onClick={() => setMockPrep(null)}>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="modal ai-modal" 
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 500 }}
+            >
+              <div className="modal-header">
+                <div className="flex items-center gap-8">
+                  <MessageSquare size={18} style={{ color: "var(--accent)" }} />
+                  <h2 className="modal-title">Mock Interview Prep: {mockPrep.weekTitle}</h2>
+                </div>
+                <button className="btn btn-ghost btn-icon" onClick={() => setMockPrep(null)}><X size={16} /></button>
+              </div>
+
+              <div style={{ padding: "16px 0" }}>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 16 }}>
+                  Here are 5 questions tailored for this week's focus. Use these to practice your explanations out loud.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {mockPrep.questions.map((q, i) => (
+                    <div key={i} className="card" style={{ padding: 12, background: "var(--bg-primary)", border: "1px solid var(--border)" }}>
+                      <div className="flex justify-between items-start gap-8">
+                        <div style={{ fontSize: "0.88rem", fontWeight: 500, lineHeight: 1.4 }}>{q}</div>
+                        <button 
+                          className="btn btn-ghost btn-icon btn-sm" 
+                          onClick={() => {
+                            navigator.clipboard.writeText(q);
+                            setCopied(i);
+                            setTimeout(() => setCopied(null), 2000);
+                          }}
+                        >
+                          {copied === i ? <Check size={14} style={{ color: "var(--success)" }} /> : <Copy size={14} />}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-8" style={{ marginTop: 16 }}>
+                <button className="btn btn-primary" style={{ flex: 1 }} onClick={() => setMockPrep(null)}>Got it!</button>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => {
+                    dispatch({ 
+                      type: "ADD_NOTE", 
+                      note: { 
+                        id: uid(), 
+                        title: `Mock Prep: ${mockPrep.weekTitle}`, 
+                        content: `### Interview Questions\n\n${mockPrep.questions.map(q => `- ${q}`).join("\n")}`,
+                        tags: ["MockPrep", "AI"],
+                        lastModified: Date.now()
+                      } 
+                    });
+                    setMockPrep(null);
+                  }}
+                >
+                  Save to Notes
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
