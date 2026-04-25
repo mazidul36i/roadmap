@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Plus, Search, Tag, Trash2, X } from "lucide-react";
+import { Plus, Search, Tag, Trash2, X, Wand2 } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Note, NoteCategory } from "@app-types/index";
+import { generateJSON, generateText } from "@lib/gemini";
 
 const CATEGORIES: { key: NoteCategory; label: string; color: string }[] = [
   { key: "weekly", label: "Weekly", color: "var(--accent)" },
@@ -81,6 +82,48 @@ export default function Notes() {
 
   const removeTag = (t: string) => setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }));
 
+  const [isGeneratingTags, setIsGeneratingTags] = useState(false);
+  const handleGenerateTags = async () => {
+    if (!form.content || form.content.length < 20) return alert("Note is too short for tagging.");
+    setIsGeneratingTags(true);
+    try {
+      const prompt = `Extract 2-4 highly relevant, single-word or short-phrase keywords from this note content to use as tags. 
+Content: ${form.content.replace(/<[^>]+>/g, '')}
+Return a JSON array of strings.`;
+      const tags = await generateJSON(prompt);
+      if (Array.isArray(tags)) {
+        setForm(f => {
+          const newTags = tags.filter(t => !f.tags.includes(t.toLowerCase())).map(t => t.toLowerCase());
+          return { ...f, tags: [...f.tags, ...newTags] };
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate tags.");
+    } finally {
+      setIsGeneratingTags(false);
+    }
+  };
+
+  const [isSummarizing, setIsSummarizing] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  
+  const handleSummarize = async () => {
+    if (!form.content || form.content.length < 50) return alert("Note is too short to summarize.");
+    setIsSummarizing(true);
+    try {
+      const prompt = `Summarize the following note into 3-4 concise bullet points. Return ONLY the bullet points, starting each with a dash (-).
+Note Content: ${form.content.replace(/<[^>]+>/g, '')}`;
+      const summary = await generateText(prompt);
+      setAiSummary(summary);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to summarize note.");
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
   return (
     <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20, minHeight: "70vh" }}>
       {/* Sidebar */}
@@ -155,21 +198,29 @@ export default function Notes() {
                 {CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
               {selected && (
-                <button 
-                  className="btn btn-danger btn-sm" 
-                  onClick={() => confirm({
-                    title: "Delete Note",
-                    message: `Are you sure you want to delete this note? This action cannot be undone.`,
-                    type: "danger",
-                    confirmText: "Delete",
-                    onConfirm: () => {
-                      dispatch({ type: "DELETE_NOTE", id: selected });
-                      setSelected(null);
-                    }
-                  })}
-                >
-                  <Trash2 size={13} /> Delete
-                </button>
+                <div className="flex gap-8">
+                  {state.aiEnabled && (
+                    <button className="btn btn-ghost btn-sm" onClick={handleSummarize} disabled={isSummarizing}>
+                      {isSummarizing ? "Summarizing..." : <><Wand2 size={13} style={{ color: "var(--accent)" }} /> Summarize</>}
+                    </button>
+                  )}
+                  <button 
+                    className="btn btn-danger btn-sm" 
+                    onClick={() => confirm({
+                      title: "Delete Note",
+                      message: `Are you sure you want to delete this note? This action cannot be undone.`,
+                      type: "danger",
+                      confirmText: "Delete",
+                      onConfirm: () => {
+                        dispatch({ type: "DELETE_NOTE", id: selected });
+                        setSelected(null);
+                        setAiSummary(null);
+                      }
+                    })}
+                  >
+                    <Trash2 size={13} /> Delete
+                  </button>
+                </div>
               )}
             </div>
             <input
@@ -193,6 +244,21 @@ export default function Notes() {
               placeholder="Write your note here..."
             />
 
+            {aiSummary && (
+              <div className="mt-16 p-12" style={{ background: "var(--bg-secondary)", border: "1px solid var(--accent-dim)", borderRadius: 8, position: "relative" }}>
+                <button className="btn btn-ghost btn-icon" style={{ position: "absolute", top: 8, right: 8 }} onClick={() => setAiSummary(null)}>
+                  <X size={14} />
+                </button>
+                <div className="flex items-center gap-8 mb-8">
+                  <Wand2 size={14} style={{ color: "var(--accent)" }} />
+                  <strong style={{ fontSize: "0.85rem", color: "var(--accent)" }}>AI Summary</strong>
+                </div>
+                <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
+                  {aiSummary}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-8 mt-16" style={{ flexWrap: "wrap" }}>
               <Tag size={14} style={{ color: "var(--text-muted)" }} />
 
@@ -210,6 +276,11 @@ export default function Notes() {
                 onChange={e => setTagInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addTag())}
               />
+              {state.aiEnabled && (
+                <button className="btn btn-ghost btn-sm" onClick={handleGenerateTags} disabled={isGeneratingTags}>
+                  {isGeneratingTags ? "Generating..." : <><Wand2 size={12} /> Auto-Tag</>}
+                </button>
+              )}
             </div>
             <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 8 }}>Auto-saved · Press Enter to
               add tags
