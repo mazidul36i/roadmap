@@ -41,11 +41,6 @@ Below is a roadmap for further enhancing the application, categorized by impact 
 
 ## 3. New Feature Additions
 
-### 🤖 AI-Powered Preparation (High Value)
-- **STAR Story AI Reviewer**: (Completed) Integrated a magic-wand reviewer in the Story Bank that provides STAR-based scoring and improvement tips.
-- **DSA Problem Recommender**: (Completed) Added a recommendation engine that identifies weak areas and suggests high-frequency LeetCode problems with direct search links.
-- **Mock Interview Prep**: (Completed) Generates 5 tailored interview questions for each week's topic in the Roadmap with a 'Save to Notes' feature.
-
 ### ✅ Resource Library
 - **Status**: Completed
 - **Action**: Created a dedicated `ResourceLibrary.tsx` page for categorizing and pinning external links (YouTube, articles, repos). Added custom types, reducer actions, and a premium card-based UI with filtering. Fixed icon issues and improved state persistence.
@@ -72,6 +67,6 @@ Below is a roadmap for further enhancing the application, categorized by impact 
 
 1.  **Refine Persistence Layer**: Sync `README.md` and ensure the onboarding flow is seamless for new users.
 2.  **Enhance UI Polish**: Integrate `framer-motion` for that premium feel.
-3.  **Prototype AI Feature**: Start with the "Story Bank AI Reviewer" as it provides immediate value for interview prep.
+3.  **AI Integration**: Follow the dedicated [AI Implementation Plan](./ai_implementation_plan.md) for real Gemini integration.
 
 Would you like me to start on any of these specific improvements?
