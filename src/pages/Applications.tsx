@@ -27,6 +27,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Application, AppStatus, InterviewDate } from "@app-types/index";
+import { useNavigate } from "react-router-dom";
 
 const STATUSES: { key: AppStatus; label: string; color: string }[] = [
   { key: "wishlist", label: "Wishlist", color: "var(--text-muted)" },
@@ -289,6 +290,7 @@ function DroppableColumn({
 export default function Applications() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [modal, setModal] = useState<(Partial<Application> & { id?: string }) | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -359,7 +361,7 @@ export default function Applications() {
   return (
     <div>
       <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
-        <button className="btn btn-primary" onClick={() => setModal(emptyApp())}>
+        <button className="btn btn-primary" onClick={() => navigate("/applications/new")}>
           <Plus size={14} /> Add Application
         </button>
       </div>
@@ -416,8 +418,8 @@ export default function Applications() {
               key={s.key}
               status={s}
               apps={filtered.filter(a => a.status === s.key)}
-              onAdd={() => setModal({ ...emptyApp(), status: s.key })}
-              onCardClick={(app) => setModal(app)}
+              onAdd={() => navigate(`/applications/new?status=${s.key}`)}
+              onCardClick={(app) => navigate(`/applications/${app.id}`)}
               onCardDelete={(app) => confirm({
                 title: "Delete Application",
                 message: `Are you sure you want to delete your application for "${app.company}"?`,

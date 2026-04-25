@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { StoryCard } from "@app-types/index";
+import { generateJSON, generateText } from "@lib/gemini";
+import { useNavigate } from "react-router-dom";
 
 const ALL_TAGS = ["performance", "search", "async processing", "data pipeline", "architecture", "reliability", "optimization"];
 
@@ -11,10 +13,11 @@ const emptyStory = (): Omit<StoryCard, "id"> => ({
   title: "", problem: "", action: "", result: "", metrics: "", shortVersion: "", longVersion: "", tags: []
 });
 
-function StoryModal({ story, onClose, onSave }: {
+function StoryModal({ story, onClose, onSave, aiEnabled }: {
   story: Partial<StoryCard> & { id?: string };
   onClose: () => void;
-  onSave: (s: Omit<StoryCard, "id"> & { id?: string }) => void
+  onSave: (s: Omit<StoryCard, "id"> & { id?: string }) => void;
+  aiEnabled?: boolean;
 }) {
   const [form, setForm] = useState<Omit<StoryCard, "id"> & { id?: string }>(story as any);
   const set = (k: keyof Omit<StoryCard, "id">, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -22,6 +25,49 @@ function StoryModal({ story, onClose, onSave }: {
     ...f,
     tags: f.tags?.includes(t) ? f.tags.filter(x => x !== t) : [...(f.tags || []), t]
   }));
+
+  const [isGeneratingTags, setIsGeneratingTags] = useState(false);
+  const handleGenerateTags = async () => {
+    if (!form.problem && !form.action && !form.result) return alert("Please fill out the story details first.");
+    setIsGeneratingTags(true);
+    try {
+      const prompt = `Based on this STAR story:
+Problem: ${form.problem}
+Action: ${form.action}
+Result: ${form.result}
+
+Pick up to 3 relevant tags from this exact list: [${ALL_TAGS.join(', ')}].
+Return a JSON array of strings.`;
+      const tags = await generateJSON(prompt);
+      if (Array.isArray(tags)) {
+        setForm(f => ({ ...f, tags: tags.filter(t => ALL_TAGS.includes(t)) }));
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate tags.");
+    } finally {
+      setIsGeneratingTags(false);
+    }
+  };
+
+  const [isGeneratingShort, setIsGeneratingShort] = useState(false);
+  const handleGenerateShort = async () => {
+    if (!form.problem && !form.action && !form.result) return alert("Please fill out the story details first.");
+    setIsGeneratingShort(true);
+    try {
+      const prompt = `Summarize this STAR story into a 1-sentence concise elevator pitch (under 30 words).
+Problem: ${form.problem}
+Action: ${form.action}
+Result: ${form.result}`;
+      const summary = await generateText(prompt);
+      setForm(f => ({ ...f, shortVersion: summary.trim() }));
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate short version.");
+    } finally {
+      setIsGeneratingShort(false);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -54,7 +100,15 @@ function StoryModal({ story, onClose, onSave }: {
                       onChange={e => set("metrics", e.target.value)} placeholder="Numbers, %, time saved…" />
           </div>
         </div>
-        <div className="form-group"><label className="form-label">Short Version (30–60 sec elevator pitch)</label>
+        <div className="form-group">
+          <div className="flex justify-between items-end mb-4">
+            <label className="form-label mb-0">Short Version (30–60 sec elevator pitch)</label>
+            {aiEnabled && (
+              <button className="btn btn-ghost btn-sm" onClick={handleGenerateShort} disabled={isGeneratingShort}>
+                {isGeneratingShort ? "Generating..." : <><Wand2 size={12}/> Auto-Summarize</>}
+              </button>
+            )}
+          </div>
           <textarea className="form-textarea" value={form.shortVersion || ""}
                     onChange={e => set("shortVersion", e.target.value)} />
         </div>
@@ -63,7 +117,14 @@ function StoryModal({ story, onClose, onSave }: {
                     onChange={e => set("longVersion", e.target.value)} />
         </div>
         <div className="form-group">
-          <label className="form-label">Tags</label>
+          <div className="flex justify-between items-end mb-4">
+            <label className="form-label mb-0">Tags</label>
+            {aiEnabled && (
+              <button className="btn btn-ghost btn-sm" onClick={handleGenerateTags} disabled={isGeneratingTags}>
+                {isGeneratingTags ? "Generating..." : <><Wand2 size={12}/> Auto-Tag</>}
+              </button>
+            )}
+          </div>
           <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
             {ALL_TAGS.map(t => (
               <span key={t} className={`tag ${form.tags?.includes(t) ? "active" : ""}`}
@@ -90,6 +151,7 @@ function StoryModal({ story, onClose, onSave }: {
 export default function StoryBank() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [modal, setModal] = useState<(Partial<StoryCard> & { id?: string }) | null>(null);
 
@@ -100,26 +162,52 @@ export default function StoryBank() {
     else dispatch({ type: "ADD_STORY", story: { ...s, id: uid() } as StoryCard });
   };
   const [aiReview, setAiReview] = useState<any>(null);
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
-  const analyzeStory = (s: StoryCard) => {
-    let tips = new Array<{ type: 'warning' | 'info', text: string }>() as any[];
-    let score = 30; // base score
+  const analyzeStory = async (s: StoryCard) => {
+    if (!state.aiEnabled) {
+      // Fallback heuristic
+      let tips = new Array<{ type: 'warning' | 'info', text: string }>() as any[];
+      let score = 30; // base score
 
-    if (s.problem.length > 60) score += 15;
-    else tips.push({ type: 'warning', text: 'The Situation could be more detailed. Set the stage for the complexity.' });
+      if (s.problem.length > 60) score += 15;
+      else tips.push({ type: 'warning', text: 'The Situation could be more detailed. Set the stage for the complexity.' });
 
-    if (s.action.toLowerCase().includes("i ") || s.action.toLowerCase().includes("led") || s.action.toLowerCase().includes("developed")) score += 25;
-    else tips.push({ type: 'info', text: 'Use more "I" statements in Action to highlight your personal contribution.' });
+      if (s.action.toLowerCase().includes("i ") || s.action.toLowerCase().includes("led") || s.action.toLowerCase().includes("developed")) score += 25;
+      else tips.push({ type: 'info', text: 'Use more "I" statements in Action to highlight your personal contribution.' });
 
-    if (/\d+/.test(s.result) || s.result.toLowerCase().includes("%")) score += 20;
-    else tips.push({ type: 'warning', text: 'Result lacks quantifiable data. Use numbers, %, or time saved to prove impact.' });
+      if (/\d+/.test(s.result) || s.result.toLowerCase().includes("%")) score += 20;
+      else tips.push({ type: 'warning', text: 'Result lacks quantifiable data. Use numbers, %, or time saved to prove impact.' });
 
-    if (s.metrics.length > 5) score += 10;
-    else tips.push({ type: 'info', text: 'Ensure you have a dedicated metrics section for quick reference.' });
+      if (s.metrics.length > 5) score += 10;
+      else tips.push({ type: 'info', text: 'Ensure you have a dedicated metrics section for quick reference.' });
 
-    if (s.tags.length >= 2) score += 5;
+      if (s.tags.length >= 2) score += 5;
 
-    setAiReview({ story: s, score: Math.min(score, 100), tips });
+      setAiReview({ story: s, score: Math.min(score, 100), tips });
+      return;
+    }
+
+    setAnalyzingId(s.id);
+    try {
+      const prompt = `Review this STAR format interview story:
+Problem: ${s.problem}
+Action: ${s.action}
+Result: ${s.result}
+Metrics: ${s.metrics}
+
+Provide a JSON object with:
+1. "score": an integer out of 100 representing how well it follows the STAR method and impact.
+2. "tips": an array of objects, each with "type" (either "info" or "warning") and "text" (a short suggestion for improvement).`;
+
+      const response = await generateJSON(prompt);
+      setAiReview({ story: s, score: response.score || 70, tips: response.tips || [] });
+    } catch (e) {
+      console.error(e);
+      alert("Failed to analyze story with AI.");
+    } finally {
+      setAnalyzingId(null);
+    }
   };
 
   const copy = (text: string) => navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
@@ -131,7 +219,7 @@ export default function StoryBank() {
           <h1>Story Bank</h1>
           <p>STAR-format interview stories from your Prospecta experience</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyStory())}><Plus size={14} /> Add Story</button>
+        <button className="btn btn-primary" onClick={() => navigate("/stories/new")}><Plus size={14} /> Add Story</button>
       </div>
 
       {/* Tag filters */}
@@ -151,7 +239,7 @@ export default function StoryBank() {
 
       <div className="grid-auto">
         {filtered.map(s => (
-          <div key={s.id} className="card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div key={s.id} className="card" style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "pointer" }} onClick={() => navigate(`/stories/${s.id}`)}>
             <div className="flex justify-between items-start">
               <h3 style={{
                 fontSize: "0.95rem",
@@ -161,20 +249,20 @@ export default function StoryBank() {
                 flex: 1
               }}>{s.title}</h3>
               <div className="flex gap-4">
-                <button className="btn btn-ghost btn-icon" onClick={() => analyzeStory(s)} title="AI Review">
-                  <Wand2 size={14} style={{ color: "var(--accent)" }} />
+                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); analyzeStory(s); }} title="AI Review" disabled={analyzingId === s.id}>
+                  {analyzingId === s.id ? <div className="spinner" style={{width:14,height:14}}/> : <Wand2 size={14} style={{ color: "var(--accent)" }} />}
                 </button>
-                <button className="btn btn-ghost btn-icon" onClick={() => setModal(s)} title="Edit"><Edit3 size={14} />
+                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/stories/${s.id}`); }} title="Edit"><Edit3 size={14} />
                 </button>
                 <button 
                   className="btn btn-ghost btn-icon" 
-                  onClick={() => confirm({
+                  onClick={(e) => { e.stopPropagation(); confirm({
                     title: "Delete Story",
                     message: `Are you sure you want to delete "${s.title}"? This action cannot be undone.`,
                     type: "danger",
                     confirmText: "Delete",
                     onConfirm: () => dispatch({ type: "DELETE_STORY", id: s.id })
-                  })}
+                  }); }}
                   title="Delete"
                 >
                   <Trash2 size={14} style={{ color: "var(--danger)" }} />
@@ -196,7 +284,7 @@ export default function StoryBank() {
             </div>
             {s.shortVersion && (
               <button className="btn btn-secondary btn-sm" style={{ marginTop: "auto" }}
-                      onClick={() => copy(s.shortVersion)}>
+                      onClick={(e) => { e.stopPropagation(); copy(s.shortVersion); }}>
                 <Copy size={12} /> Copy Short Version
               </button>
             )}
@@ -273,7 +361,7 @@ export default function StoryBank() {
         )}
       </AnimatePresence>
 
-      {modal && <StoryModal story={modal} onClose={() => setModal(null)} onSave={saveStory} />}
+      {modal && <StoryModal story={modal} onClose={() => setModal(null)} onSave={saveStory} aiEnabled={state.aiEnabled} />}
     </div>
   );
 }

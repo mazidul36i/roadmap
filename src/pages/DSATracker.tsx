@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X, Sparkles, BrainCircuit } from "lucide-react";
+import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X, Sparkles, BrainCircuit, Lightbulb, BookOpen } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+import { generateJSON, generateText } from "@lib/gemini";
+import { useNavigate } from "react-router-dom";
 
 const TOPICS = ["Arrays", "Strings", "Hashmaps", "Stack", "Queue", "Linked List", "Trees", "BST", "Graphs", "Heap", "Binary Search", "Two Pointer", "Sliding Window", "Dynamic Programming", "Backtracking", "Trie", "Greedy", "Math"];
 const DIFFICULTIES: DSADifficulty[] = ["Easy", "Medium", "Hard"];
@@ -192,12 +194,44 @@ const RECOMMENDATIONS: Record<string, string[]> = {
 export default function DSATracker() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [modal, setModal] = useState<(Partial<DSAProblem> & { id?: string }) | null>(null);
   const [filterTopic, setFilterTopic] = useState("");
   const [filterDiff, setFilterDiff] = useState("");
   const [filterSolved, setFilterSolved] = useState("");
   const [search, setSearch] = useState("");
   const [recommendation, setRecommendation] = useState<any>(null);
+
+  const [aiAction, setAiAction] = useState<{ type: 'hint' | 'explain', problem: DSAProblem } | null>(null);
+  const [aiResult, setAiResult] = useState<any>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
+  const handleAiAction = async (type: 'hint' | 'explain', p: DSAProblem) => {
+    setAiAction({ type, problem: p });
+    setAiResult(null);
+    setIsAiLoading(true);
+    try {
+      if (type === 'hint') {
+        const prompt = `Provide 3 progressively revealing hints for the algorithmic problem "${p.name}".
+Return a JSON array of exactly 3 strings.
+Hint 1: Very subtle, just points in the right direction.
+Hint 2: Mentions the data structure or algorithm pattern.
+Hint 3: Almost describes the solution steps without writing code.`;
+        const hints = await generateJSON(prompt);
+        setAiResult({ hints, currentHint: 0 });
+      } else if (type === 'explain') {
+        const prompt = `Provide a concise, easy-to-understand explanation of the optimal solution for the algorithmic problem "${p.name}".
+Do not write the full code, just explain the intuition, the time complexity, and the space complexity. Use markdown.`;
+        const explanation = await generateText(prompt);
+        setAiResult({ explanation });
+      }
+    } catch (e) {
+      console.error(e);
+      setAiResult({ error: "Failed to generate response." });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const filtered = state.dsaProblems.filter(p => {
     if (filterTopic && !p.topics.includes(filterTopic)) return false;
@@ -235,7 +269,7 @@ export default function DSATracker() {
       transition={{ duration: 0.4 }}
     >
       <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
-        <button className="btn btn-primary" onClick={() => setModal(emptyProblem())}>
+        <button className="btn btn-primary" onClick={() => navigate("/dsa/new")}>
           <Plus size={14} /> Add Problem
         </button>
       </div>
@@ -354,7 +388,7 @@ export default function DSATracker() {
               </tr>
             )}
             {filtered.map(p => (
-              <motion.tr layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.tr layout key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => navigate(`/dsa/${p.id}`)} style={{ cursor: "pointer" }}>
                 <td>
                   <div style={{ fontWeight: 600, fontSize: "0.85rem" }}>{p.name}</div>
                   {p.mistakes && <div style={{
@@ -382,19 +416,29 @@ export default function DSATracker() {
                 </td>
                 <td>
                   <div className="flex gap-4">
+                    {state.aiEnabled && !p.solved && (
+                      <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); handleAiAction('hint', p); }} title="Get Hints">
+                        <Lightbulb size={13} style={{ color: "var(--warning)" }} />
+                      </button>
+                    )}
+                    {state.aiEnabled && p.solved && (
+                      <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); handleAiAction('explain', p); }} title="Explain Optimal Solution">
+                        <BookOpen size={13} style={{ color: "var(--accent)" }} />
+                      </button>
+                    )}
                     {p.url &&
-                      <a href={p.url} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon"><ExternalLink
+                      <a href={p.url} target="_blank" rel="noreferrer" className="btn btn-ghost btn-icon" onClick={(e) => e.stopPropagation()}><ExternalLink
                         size={13} /></a>}
-                    <button className="btn btn-ghost btn-icon" onClick={() => setModal(p)}><Edit3 size={13} /></button>
+                    <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/dsa/${p.id}`); }}><Edit3 size={13} /></button>
                     <button 
                       className="btn btn-ghost btn-icon" 
-                      onClick={() => confirm({
+                      onClick={(e) => { e.stopPropagation(); confirm({
                         title: "Delete Problem",
                         message: `Are you sure you want to delete "${p.name}"? This action cannot be undone.`,
                         type: "danger",
                         confirmText: "Delete",
                         onConfirm: () => dispatch({ type: "DELETE_DSA", id: p.id })
-                      })}
+                      }); }}
                     >
                       <Trash2 size={13} style={{ color: "var(--danger)" }} />
                     </button>
@@ -410,11 +454,11 @@ export default function DSATracker() {
       <AnimatePresence>
         {recommendation && (
           <div className="modal-overlay" onClick={() => setRecommendation(null)}>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="modal ai-modal" 
+              className="modal ai-modal"
               onClick={e => e.stopPropagation()}
               style={{ maxWidth: 400, background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)", border: "1px solid var(--accent-dim)" }}
             >
@@ -455,6 +499,69 @@ export default function DSATracker() {
 
               <div style={{ marginTop: 16, fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
                 This problem covers patterns you haven't mastered yet.
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {aiAction && (
+          <div className="modal-overlay" onClick={() => setAiAction(null)}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="modal ai-modal"
+              onClick={e => e.stopPropagation()}
+              style={{ maxWidth: 500, background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)", border: "1px solid var(--accent-dim)" }}
+            >
+              <div className="modal-header">
+                <div className="flex items-center gap-8">
+                  <BrainCircuit size={18} style={{ color: "var(--accent)" }} />
+                  <h2 className="modal-title">
+                    {aiAction.type === 'hint' ? `Hints: ${aiAction.problem.name}` : `Explanation: ${aiAction.problem.name}`}
+                  </h2>
+                </div>
+                <button className="btn btn-ghost btn-icon" onClick={() => setAiAction(null)}><X size={16} /></button>
+              </div>
+
+              <div style={{ padding: "16px 0", minHeight: 150 }}>
+                {isAiLoading ? (
+                  <div className="flex items-center justify-center" style={{ height: "100%", flexDirection: "column", gap: 12 }}>
+                    <Loader2 size={24} className="animate-spin" style={{ color: "var(--accent)" }} />
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                      {aiAction.type === 'hint' ? "Generating progressive hints..." : "Analyzing optimal solution..."}
+                    </div>
+                  </div>
+                ) : aiResult?.error ? (
+                  <div style={{ color: "var(--danger)", textAlign: "center" }}>{aiResult.error}</div>
+                ) : aiAction.type === 'hint' && aiResult?.hints ? (
+                  <div className="flex" style={{ flexDirection: "column", gap: 16 }}>
+                    {aiResult.hints.slice(0, aiResult.currentHint + 1).map((hint: string, i: number) => (
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                        key={i}
+                        style={{ padding: 12, background: "var(--bg-primary)", borderRadius: 8, borderLeft: `3px solid var(--accent)` }}
+                      >
+                        <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", marginBottom: 4 }}>Hint {i + 1}</div>
+                        <div style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.5 }}>{hint}</div>
+                      </motion.div>
+                    ))}
+                    {aiResult.currentHint < 2 && (
+                      <button
+                        className="btn btn-secondary mt-8"
+                        onClick={() => setAiResult((r: any) => ({ ...r, currentHint: r.currentHint + 1 }))}
+                      >
+                        Reveal Next Hint
+                      </button>
+                    )}
+                  </div>
+                ) : aiAction.type === 'explain' && aiResult?.explanation ? (
+                  <div style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+                    {aiResult.explanation}
+                  </div>
+                ) : null}
               </div>
             </motion.div>
           </div>

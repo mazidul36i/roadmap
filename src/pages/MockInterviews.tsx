@@ -4,6 +4,7 @@ import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { MockInterview, MockType } from "@app-types/index";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const MOCK_TYPES: MockType[] = ["DSA", "System Design", "Resume/Story"];
 
@@ -115,6 +116,7 @@ function MockModal({ mock, onClose, onSave }: {
 export default function MockInterviews() {
   const { state, dispatch, isTimerVisible, setIsTimerVisible } = useApp();
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [modal, setModal] = useState<(Partial<MockInterview> & { id?: string }) | null>(null);
   const [filterType, setFilterType] = useState<MockType | "">("");
 
@@ -150,7 +152,7 @@ export default function MockInterviews() {
           >
             <TimerIcon size={14} /> Timer
           </button>
-          <button className="btn btn-primary" onClick={() => setModal(emptyMock())}>
+          <button className="btn btn-primary" onClick={() => navigate("/mocks/new")}>
             <Plus size={14} /> Log Mock
           </button>
         </div>
@@ -227,7 +229,7 @@ export default function MockInterviews() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {[...filtered].sort((a, b) => b.date.localeCompare(a.date)).map(m => (
-          <div key={m.id} className="card">
+          <div key={m.id} className="card" onClick={() => navigate(`/mocks/${m.id}`)} style={{ cursor: "pointer" }}>
             <div className="flex justify-between items-start mb-12">
               <div className="flex items-center gap-12">
                 <span className="badge badge-accent">{m.type}</span>
@@ -237,16 +239,16 @@ export default function MockInterviews() {
               </div>
               <div className="flex gap-8 items-center">
                 <ScoreDots score={m.score} />
-                <button className="btn btn-ghost btn-icon" onClick={() => setModal(m)}><Edit3 size={13} /></button>
+                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/mocks/${m.id}`); }}><Edit3 size={13} /></button>
                 <button 
                   className="btn btn-ghost btn-icon" 
-                  onClick={() => confirm({
+                  onClick={(e) => { e.stopPropagation(); confirm({
                     title: "Delete Mock Session",
                     message: `Are you sure you want to delete this mock session record from ${m.date}?`,
                     type: "danger",
                     confirmText: "Delete",
                     onConfirm: () => dispatch({ type: "DELETE_MOCK", id: m.id })
-                  })}
+                  }); }}
                 >
                   <Trash2 size={13} style={{ color: "var(--danger)" }} />
                 </button>

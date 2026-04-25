@@ -20,6 +20,7 @@ import {
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Resource, ResourceType } from "@app-types/index";
+import { useNavigate } from "react-router-dom";
 
 const CATEGORIES = ["dsa", "system-design", "behavioral", "frontend", "backend", "general"] as const;
 const TYPES: { value: ResourceType; label: string; icon: any }[] = [
@@ -157,6 +158,7 @@ function ResourceModal({ resource, onClose, onSave }: {
 export default function ResourceLibrary() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
+  const navigate = useNavigate();
   const [modal, setModal] = useState<(Partial<Resource> & { id?: string }) | null>(null);
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState<string | "all">("all");
@@ -186,7 +188,7 @@ export default function ResourceLibrary() {
     const TypeIcon = typeInfo.icon;
 
     return (
-      <div className="card resource-card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div className="card resource-card" style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "pointer" }} onClick={() => navigate(`/resources/${r.id}`)}>
         <div className="flex justify-between items-start">
           <div className="flex gap-12 items-center">
             <div className="resource-icon-wrapper">
@@ -204,15 +206,16 @@ export default function ResourceLibrary() {
           <div className="flex gap-4">
             <button 
               className={`btn btn-ghost btn-icon ${r.isPinned ? "active" : ""}`}
-              onClick={() => dispatch({ type: "TOGGLE_RESOURCE_PIN", id: r.id })}
+              onClick={(e) => { e.stopPropagation(); dispatch({ type: "TOGGLE_RESOURCE_PIN", id: r.id }); }}
               title={r.isPinned ? "Unpin" : "Pin"}
             >
               {r.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
             </button>
-            <button className="btn btn-ghost btn-icon" onClick={() => setModal(r)}><Edit3 size={14} /></button>
+            <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/resources/${r.id}`); }}><Edit3 size={14} /></button>
             <button 
               className="btn btn-ghost btn-icon" 
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 navigator.clipboard.writeText(r.url);
                 alert("Link copied to clipboard!");
               }}
@@ -222,12 +225,12 @@ export default function ResourceLibrary() {
             </button>
             <button 
               className="btn btn-ghost btn-icon btn-danger-hover"
-              onClick={() => confirm({
+              onClick={(e) => { e.stopPropagation(); confirm({
                 title: "Delete Resource",
                 message: `Delete "${r.title}"?`,
                 type: "danger",
                 onConfirm: () => dispatch({ type: "DELETE_RESOURCE", id: r.id })
-              })}
+              }); }}
             >
               <Trash2 size={14} />
             </button>
@@ -248,6 +251,7 @@ export default function ResourceLibrary() {
           rel="noopener noreferrer" 
           className="btn btn-secondary btn-sm w-full mt-8"
           style={{ justifyContent: "center" }}
+          onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink size={12} /> Open Resource
         </a>
@@ -262,7 +266,7 @@ export default function ResourceLibrary() {
           <h1>Resource Library</h1>
           <p>Curated learning materials and documentation</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setModal(emptyResource())}>
+        <button className="btn btn-primary" onClick={() => navigate("/resources/new")}>
           <Plus size={14} /> Add Resource
         </button>
       </div>

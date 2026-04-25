@@ -47,6 +47,8 @@ export interface StoryCard {
   shortVersion: string;
   longVersion: string;
   tags: string[];
+  notes?: string;
+  linkedNoteIds?: string[];
 }
 
 export type DSADifficulty = "Easy" | "Medium" | "Hard";
@@ -63,6 +65,8 @@ export interface DSAProblem {
   pattern: string;
   mistakes: string;
   url: string;
+  notes?: string;
+  linkedNoteIds?: string[];
 }
 
 export type SDStatus = "not-started" | "in-progress" | "done";
@@ -75,6 +79,7 @@ export interface SystemDesignTopic {
   notes: string;
   diagramRef: string;
   category: "core" | "exercise";
+  linkedNoteIds?: string[];
 }
 
 export type AppStatus =
@@ -105,6 +110,7 @@ export interface Application {
   referral: string;
   dates: InterviewDate[];
   createdAt: string;
+  linkedNoteIds?: string[];
 }
 
 export type MockType = "DSA" | "System Design" | "Resume/Story";
@@ -117,6 +123,8 @@ export interface MockInterview {
   wrongPoints: string[];
   improvements: string;
   interviewer: string;
+  notes?: string;
+  linkedNoteIds?: string[];
 }
 
 export type ResourceType = "article" | "video" | "pdf" | "course" | "tool" | "repo";
@@ -131,6 +139,7 @@ export interface Resource {
   notes: string;
   isPinned: boolean;
   createdAt: string;
+  linkedNoteIds?: string[];
 }
 
 export interface AppState {
@@ -145,4 +154,5 @@ export interface AppState {
   resources: Resource[];
   studyStreak: string[]; // Array of ISO date strings
   startDate: string; // When the 8-week plan started
+  aiEnabled?: boolean; // Whether AI features are enabled for this user
 }

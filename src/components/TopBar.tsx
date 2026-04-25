@@ -52,11 +52,17 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, act
     state.notes.filter(n => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q)).slice(0, 3)
       .forEach(n => out.push({ type: "Note", title: n.title, path: "/notes", id: n.id }));
     state.storyCards.filter(s => s.title.toLowerCase().includes(q)).slice(0, 3)
-      .forEach(s => out.push({ type: "Story", title: s.title, path: "/stories", id: s.id }));
+      .forEach(s => out.push({ type: "Story", title: s.title, path: `/stories/${s.id}`, id: s.id }));
     state.applications.filter(a => a.company.toLowerCase().includes(q) || a.role.toLowerCase().includes(q)).slice(0, 3)
       .forEach(a => out.push({ type: "App", title: `${a.company} — ${a.role}`, path: "/applications", id: a.id }));
     state.dsaProblems.filter(p => p.name.toLowerCase().includes(q)).slice(0, 3)
-      .forEach(p => out.push({ type: "DSA", title: p.name, path: "/dsa", id: p.id }));
+      .forEach(p => out.push({ type: "DSA", title: p.name, path: `/dsa/${p.id}`, id: p.id }));
+    state.sdTopics.filter(t => t.title.toLowerCase().includes(q)).slice(0, 2)
+      .forEach(t => out.push({ type: "System Design", title: t.title, path: `/sysdesign/${t.id}`, id: t.id }));
+    state.mockInterviews.filter(m => m.type.toLowerCase().includes(q) || m.interviewer.toLowerCase().includes(q)).slice(0, 2)
+      .forEach(m => out.push({ type: "Mock", title: `${m.type} - ${m.date}`, path: `/mocks/${m.id}`, id: m.id }));
+    (state.resources || []).filter(r => r.title.toLowerCase().includes(q)).slice(0, 2)
+      .forEach(r => out.push({ type: "Resource", title: r.title, path: `/resources/${r.id}`, id: r.id }));
     return out.slice(0, 10);
   }, [query, state])();
 
@@ -106,7 +112,7 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, act
               <div>
                 {results.map(r => (
                   <div key={r.id} className="global-search-result" onClick={() => {
-                    navigate(r.path);
+                    navigate(r.type === "App" ? `/applications/${r.id}` : r.path);
                     setSearchOpen(false);
                     setQuery("");
                   }}>
