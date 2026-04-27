@@ -211,17 +211,15 @@ Provide a JSON object with:
 
   return (
     <div>
-      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
+      <div className="flex justify-between items-center mb-24" style={{ flexWrap: "wrap", gap: 12 }}>
+        <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
+          <span className={`tag ${!filterTag ? "active" : ""}`} onClick={() => setFilterTag(null)}>All</span>
+          {ALL_TAGS.map(t => (
+            <span key={t} className={`tag ${filterTag === t ? "active" : ""}`}
+                  onClick={() => setFilterTag(t === filterTag ? null : t)}>{t}</span>
+          ))}
+        </div>
         <button className="btn btn-primary" onClick={() => navigate("/stories/new")}><Plus size={14} /> Add Story</button>
-      </div>
-
-      {/* Tag filters */}
-      <div className="flex gap-8 mb-24" style={{ flexWrap: "wrap" }}>
-        <span className={`tag ${!filterTag ? "active" : ""}`} onClick={() => setFilterTag(null)}>All</span>
-        {ALL_TAGS.map(t => (
-          <span key={t} className={`tag ${filterTag === t ? "active" : ""}`}
-                onClick={() => setFilterTag(t === filterTag ? null : t)}>{t}</span>
-        ))}
       </div>
 
       {filtered.length === 0 && (
