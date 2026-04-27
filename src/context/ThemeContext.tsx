@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useApp } from "./AppContext";
 
 type Theme = "dark" | "light";
 
@@ -10,18 +11,22 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem("roadmap_theme");
-    return (saved as Theme) || "dark";
-  });
+  const { themePreference, setThemePreference } = useApp();
+  const [theme, setTheme] = useState<Theme>(themePreference);
+
+  // Sync local state when Firestore data loads (themePreference changes)
+  useEffect(() => {
+    setTheme(themePreference);
+  }, [themePreference]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("roadmap_theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === "dark" ? "light" : "dark"));
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    setThemePreference(next);
   };
 
   return (

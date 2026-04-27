@@ -45,7 +45,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 
 function Shell() {
   const { user, loading } = useAuth();
-  const { needsOnboarding } = useApp();
+  const { needsOnboarding, isLoadingData } = useApp();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
@@ -53,6 +53,14 @@ function Shell() {
 
   if (!user) {
     return <LoginPage />;
+  }
+
+  if (isLoadingData) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
+        <div className="spinner" />
+      </div>
+    );
   }
 
   if (needsOnboarding) {
@@ -127,16 +135,16 @@ import { ConfirmationProvider } from "@context/ConfirmationContext";
 export default function App() {
   return (
     <AuthProvider>
-      <ThemeProvider>
-        <AppProvider>
+      <AppProvider>
+        <ThemeProvider>
           <ConfirmationProvider>
             <BrowserRouter>
               <Shell />
               <InterviewTimer />
             </BrowserRouter>
           </ConfirmationProvider>
-        </AppProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </AppProvider>
     </AuthProvider>
   );
 }

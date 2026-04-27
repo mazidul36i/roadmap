@@ -10,7 +10,7 @@ import type {
   Week
 } from "@app-types/index";
 
-const uid = () => Math.random().toString(36).slice(2, 10);
+const uid = () => crypto.randomUUID();
 
 // ─── 8-WEEK ROADMAP ────────────────────────────────────────────────────────────
 const weeks: Week[] = [

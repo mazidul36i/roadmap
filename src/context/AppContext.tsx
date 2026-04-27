@@ -52,6 +52,7 @@ type Action =
   | { type: "MARK_STUDY_DAY"; date: string }
   | { type: "SET_STATE"; state: AppState }
   | { type: "IMPORT_STATE"; state: AppState }
+  | { type: "SET_THEME"; theme: "dark" | "light" }
   | { type: "UPDATE_WEEK"; weekId: string; updates: Partial<Week> }
   | { type: "ADD_WEEK" }
   | { type: "DELETE_WEEK"; weekId: string }
@@ -189,16 +190,18 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case "SET_STATE":
     case "IMPORT_STATE":
-      return { 
-        ...state, 
+      return {
+        ...state,
         ...action.state,
-        // Ensure new arrays exist if they were missing in old saved state, 
+        // Ensure new arrays exist if they were missing in old saved state,
         // while preserving empty arrays from the saved state.
         resources: action.state.resources ?? state.resources ?? [],
         notes: action.state.notes ?? state.notes ?? [],
         applications: action.state.applications ?? state.applications ?? [],
         dsaProblems: action.state.dsaProblems ?? state.dsaProblems ?? [],
       };
+    case "SET_THEME":
+      return { ...state, theme: action.theme };
     default:
       return state;
   }
@@ -212,39 +215,29 @@ interface AppContextValue {
   setNeedsOnboarding: (val: boolean) => void;
   isTimerVisible: boolean;
   setIsTimerVisible: (val: boolean) => void;
+  isLoadingData: boolean;
+  themePreference: "dark" | "light";
+  setThemePreference: (theme: "dark" | "light") => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
-
-const STORAGE_KEY = "roadmap2_data";
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [state, dispatch] = useReducer(reducer, seedState);
   const [needsOnboarding, setNeedsOnboarding] = React.useState(false);
   const [isTimerVisible, setIsTimerVisible] = React.useState(false);
+  const [isLoadingData, setIsLoadingData] = React.useState(false);
   const isInitialMount = useRef(true);
   const isSyncingFromFirebase = useRef(false);
 
-  // 1. Initial Load from LocalStorage (Sync)
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as AppState;
-        dispatch({ type: "SET_STATE", state: parsed });
-      } catch (e) {
-        console.error("Failed to parse local storage", e);
-      }
-    }
-  }, []);
-
-  // 2. Load from Firestore when user logs in
+  // Load from Firestore when user logs in
   useEffect(() => {
     if (!user) return;
 
     const loadFirebaseData = async () => {
       isSyncingFromFirebase.current = true;
+      setIsLoadingData(true);
       try {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
@@ -260,21 +253,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         console.error("Error loading from Firebase:", error);
       } finally {
         isSyncingFromFirebase.current = false;
+        setIsLoadingData(false);
       }
     };
 
     loadFirebaseData();
   }, [user]);
 
-  // 3. Save to LocalStorage and Firestore on state change
+  // Save to Firestore on state change
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
-
-    // Save to LocalStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
     // Save to Firestore if user is logged in and we aren't currently loading from Firestore
     if (user && !isSyncingFromFirebase.current) {
@@ -290,8 +281,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [state, user]);
 
+  const setThemePreference = React.useCallback((theme: "dark" | "light") => {
+    dispatch({ type: "SET_THEME", theme });
+  }, []);
+
   return (
-    <AppContext.Provider value={{ state, dispatch, needsOnboarding, setNeedsOnboarding, isTimerVisible, setIsTimerVisible }}>
+    <AppContext.Provider value={{
+      state,
+      dispatch,
+      needsOnboarding,
+      setNeedsOnboarding,
+      isTimerVisible,
+      setIsTimerVisible,
+      isLoadingData,
+      themePreference: state.theme ?? "dark",
+      setThemePreference,
+    }}>
       {children}
     </AppContext.Provider>
   );
@@ -323,8 +328,5 @@ export function getCurrentWeek(startDate: string): number {
 }
 
 export function uid() {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+  return crypto.randomUUID();
 }

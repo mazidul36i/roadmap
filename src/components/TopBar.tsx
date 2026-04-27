@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "@context/AppContext";
 import { useTheme } from "@context/ThemeContext";
 
-const RECENT_PAGES_KEY = "roadmap_recent_pages";
 const PAGE_LABELS: Record<string, string> = {
   "/": "Dashboard",
   "/roadmap": "Roadmap",
@@ -19,21 +18,6 @@ const PAGE_LABELS: Record<string, string> = {
   "/focus": "Focus Mode",
 };
 
-function getRecentPages(): { path: string; label: string }[] {
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_PAGES_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function addRecentPage(path: string) {
-  const label = PAGE_LABELS[path];
-  if (!label) return;
-  const pages = getRecentPages().filter(p => p.path !== path);
-  pages.unshift({ path, label });
-  localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(pages.slice(0, 5)));
-}
 
 interface Props {
   title: string;
@@ -54,6 +38,7 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, act
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [recentPages, setRecentPages] = useState<{ path: string; label: string }[]>([]);
+  const recentPagesRef = useRef<{ path: string; label: string }[]>([]);
   const { state } = useApp();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -61,11 +46,16 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, act
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    addRecentPage(location.pathname);
+    const label = PAGE_LABELS[location.pathname];
+    if (!label) return;
+    recentPagesRef.current = [
+      { path: location.pathname, label },
+      ...recentPagesRef.current.filter(p => p.path !== location.pathname),
+    ].slice(0, 5);
   }, [location.pathname]);
 
   useEffect(() => {
-    if (searchOpen) setRecentPages(getRecentPages());
+    if (searchOpen) setRecentPages(recentPagesRef.current);
   }, [searchOpen]);
 
   useEffect(() => {
