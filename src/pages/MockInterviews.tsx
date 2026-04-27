@@ -220,10 +220,13 @@ export default function MockInterviews() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="empty-state">
+        <div className="empty-state" style={{ minHeight: 260, justifyContent: "center" }}>
           <div className="empty-state-icon">🎙</div>
           <h3>No mocks logged yet</h3>
           <p>Start logging practice sessions to track your progress.</p>
+          <button className="btn btn-primary" onClick={() => navigate("/mocks/new")}>
+            <Plus size={14} /> Log your first mock
+          </button>
         </div>
       )}
 

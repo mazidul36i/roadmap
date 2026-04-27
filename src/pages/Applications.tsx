@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
-import { Plus, Search, Trash2, X, GripVertical } from "lucide-react";
+import { Plus, Search, X, GripVertical } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -33,7 +33,7 @@ const STATUSES: { key: AppStatus; label: string; color: string }[] = [
   { key: "wishlist", label: "Wishlist", color: "var(--text-muted)" },
   { key: "applied", label: "Applied", color: "var(--info)" },
   { key: "referred", label: "Referred", color: "var(--accent-light)" },
-  { key: "interview-scheduled", label: "Interview Sched.", color: "var(--warning)" },
+  { key: "interview-scheduled", label: "Interview", color: "var(--warning)" },
   { key: "technical-round", label: "Technical Round", color: "var(--warning)" },
   { key: "system-design-round", label: "SD Round", color: "var(--warning)" },
   { key: "offer", label: "Offer 🎉", color: "var(--success)" },
@@ -218,15 +218,6 @@ function SortableCard({
           >
             {STATUSES.map(s2 => <option key={s2.key} value={s2.key}>{s2.label}</option>)}
           </select>
-          <button
-            className="btn btn-ghost btn-icon"
-            onClick={e => {
-              e.stopPropagation();
-              onDelete();
-            }}
-          >
-            <Trash2 size={11} style={{ color: "var(--danger)" }} />
-          </button>
         </div>
       </motion.div>
     </div>
@@ -280,7 +271,17 @@ function DroppableColumn({
           ))}
         </SortableContext>
         {apps.length === 0 && (
-          <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: 12 }}>—</div>
+          <div style={{
+            fontSize: "0.72rem",
+            color: "var(--text-muted)",
+            textAlign: "center",
+            padding: "16px 8px",
+            border: "1px dashed var(--border)",
+            borderRadius: "var(--radius-sm)",
+            lineHeight: 1.5
+          }}>
+            No applications yet
+          </div>
         )}
       </div>
     </div>

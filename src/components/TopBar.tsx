@@ -1,8 +1,39 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Command, Menu, Moon, Search, Sun, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Clock, Command, Menu, Moon, Search, Sun, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "@context/AppContext";
 import { useTheme } from "@context/ThemeContext";
+
+const RECENT_PAGES_KEY = "roadmap_recent_pages";
+const PAGE_LABELS: Record<string, string> = {
+  "/": "Dashboard",
+  "/roadmap": "Roadmap",
+  "/dsa": "DSA Tracker",
+  "/applications": "Job Applications",
+  "/notes": "Notes",
+  "/stories": "Story Bank",
+  "/sysdesign": "System Design",
+  "/mocks": "Mock Interviews",
+  "/planner": "Daily Planner",
+  "/resources": "Resources",
+  "/focus": "Focus Mode",
+};
+
+function getRecentPages(): { path: string; label: string }[] {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_PAGES_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function addRecentPage(path: string) {
+  const label = PAGE_LABELS[path];
+  if (!label) return;
+  const pages = getRecentPages().filter(p => p.path !== path);
+  pages.unshift({ path, label });
+  localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(pages.slice(0, 5)));
+}
 
 interface Props {
   title: string;
@@ -22,10 +53,20 @@ interface SearchResult {
 export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, actions }: Props) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [recentPages, setRecentPages] = useState<{ path: string; label: string }[]>([]);
   const { state } = useApp();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    addRecentPage(location.pathname);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (searchOpen) setRecentPages(getRecentPages());
+  }, [searchOpen]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -127,8 +168,27 @@ export default function TopBar({ title, subtitle, onMenuToggle, sidebarOpen, act
                 <p>No results for "{query}"</p>
               </div>
             ) : (
-              <div className="text-muted" style={{ padding: "8px 4px", fontSize: "0.8rem" }}>
-                Type to search across tasks, notes, stories, companies and DSA problems…
+              <div>
+                {recentPages.length > 0 && (
+                  <>
+                    <div style={{ padding: "8px 12px 4px", fontSize: "0.68rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      Recent Pages
+                    </div>
+                    {recentPages.map(p => (
+                      <div key={p.path} className="global-search-result" onClick={() => {
+                        navigate(p.path);
+                        setSearchOpen(false);
+                        setQuery("");
+                      }}>
+                        <Clock size={13} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
+                        <span className="global-search-result-title">{p.label}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
+                <div className="text-muted" style={{ padding: "8px 12px", fontSize: "0.78rem" }}>
+                  Type to search tasks, notes, stories, companies and DSA problems…
+                </div>
               </div>
             )}
           </div>

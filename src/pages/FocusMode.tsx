@@ -80,7 +80,7 @@ export default function FocusMode() {
             textTransform: "uppercase",
             letterSpacing: "0.06em"
           }}>
-            Pending — {pending.length} tasks
+            Pending — {pending.length} {pending.length === 1 ? "TASK" : "TASKS"}
           </div>
           {pending.length === 0 ? (
             <div style={{ color: "var(--success)", fontSize: "0.9rem", textAlign: "center", padding: "12px 0" }}>
@@ -113,7 +113,7 @@ export default function FocusMode() {
               textTransform: "uppercase",
               letterSpacing: "0.06em"
             }}>
-              Done — {done.length} tasks
+              Done — {done.length} {done.length === 1 ? "TASK" : "TASKS"}
             </div>
             {done.map(task => (
               <div key={task.id} className="task-row">

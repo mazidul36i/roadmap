@@ -241,6 +241,15 @@ export default function Dashboard() {
           {weeks.map(w => {
             const pct = computeWeekProgress(w);
             const isActive = w.number === currentWeek;
+            const weekStartDate = startDate
+              ? new Date(new Date(startDate).getTime() + (w.number - 1) * 7 * 86400000)
+              : null;
+            const weekEndDate = weekStartDate
+              ? new Date(weekStartDate.getTime() + 6 * 86400000)
+              : null;
+            const dateRange = weekStartDate
+              ? `${weekStartDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${weekEndDate!.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+              : null;
             return (
               <button
                 key={w.id}
@@ -253,6 +262,11 @@ export default function Dashboard() {
                   <span>{pct}%</span>
                 </div>
                 <div className="week-mini-title">{w.title}</div>
+                <div style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginBottom: 6 }}>
+                  {pct === 0 && !isActive
+                    ? dateRange ?? "Not started"
+                    : dateRange ?? ""}
+                </div>
                 <div className="progress-track" style={{ height: 4 }}>
                   <div className="progress-fill" style={{ width: `${pct}%`, height: "100%" }} />
                 </div>

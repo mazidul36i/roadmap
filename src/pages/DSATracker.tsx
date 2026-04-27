@@ -277,24 +277,31 @@ Do not write the full code, just explain the intuition, the time complexity, and
       <motion.div layout className="grid-2" style={{ gap: 20, marginBottom: 24 }}>
         <div className="card">
           <div className="section-title">Problems by Topic</div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={byTopic} layout="vertical" margin={{ left: 0, right: 16 }}>
-              <XAxis type="number" tick={{ fontSize: 11, fill: "var(--text-muted)" }} stroke="var(--border)" />
-              <YAxis type="category" dataKey="topic" tick={{ fontSize: 11, fill: "var(--text-muted)" }} width={70} stroke="var(--border)" />
-              <Tooltip
-                formatter={(value, name, props) => [value, props.payload.fullTopic]}
-                contentStyle={{
-                  background: "var(--bg-secondary)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  color: "var(--text-primary)",
-                  fontSize: 12
-                }}
-              />
-              <Bar dataKey="solved" fill="var(--accent)" name="Solved" radius={[0, 4, 4, 0]} />
-              <Bar dataKey="total" fill="var(--accent-dim)" name="Total" radius={[0, 4, 4, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {byTopic.length === 0 ? (
+            <div className="empty-state" style={{ padding: "28px 16px" }}>
+              <div className="empty-state-icon">📊</div>
+              <p style={{ fontSize: "0.85rem" }}>Add your first problem to see topic distribution</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={byTopic} layout="vertical" margin={{ left: 0, right: 16 }}>
+                <XAxis type="number" tick={{ fontSize: 11, fill: "var(--text-muted)" }} stroke="var(--border)" />
+                <YAxis type="category" dataKey="topic" tick={{ fontSize: 11, fill: "var(--text-muted)" }} width={70} stroke="var(--border)" />
+                <Tooltip
+                  formatter={(value, name, props) => [value, props.payload.fullTopic]}
+                  contentStyle={{
+                    background: "var(--bg-secondary)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    color: "var(--text-primary)",
+                    fontSize: 12
+                  }}
+                />
+                <Bar dataKey="solved" fill="var(--accent)" name="Solved" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="total" fill="var(--accent-dim)" name="Total" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
         <div className="card">
           <div className="section-title">By Difficulty</div>

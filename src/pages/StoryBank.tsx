@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Copy, Edit3, Plus, Trash2, X, Sparkles, Wand2, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { Plus, X, Sparkles, Wand2, CheckCircle2, AlertCircle, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uid, useApp } from "@context/AppContext";
-import { useConfirm } from "@context/ConfirmationContext";
 import type { StoryCard } from "@app-types/index";
 import { generateJSON, generateText } from "@lib/gemini";
 import { useNavigate } from "react-router-dom";
@@ -150,7 +149,6 @@ Result: ${form.result}`;
 
 export default function StoryBank() {
   const { state, dispatch } = useApp();
-  const { confirm } = useConfirm();
   const navigate = useNavigate();
   const [filterTag, setFilterTag] = useState<string | null>(null);
   const [modal, setModal] = useState<(Partial<StoryCard> & { id?: string }) | null>(null);
@@ -210,15 +208,10 @@ Provide a JSON object with:
     }
   };
 
-  const copy = (text: string) => navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1>Story Bank</h1>
-          <p>STAR-format interview stories from your Prospecta experience</p>
-        </div>
+      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
         <button className="btn btn-primary" onClick={() => navigate("/stories/new")}><Plus size={14} /> Add Story</button>
       </div>
 
@@ -252,21 +245,6 @@ Provide a JSON object with:
                 <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); analyzeStory(s); }} title="AI Review" disabled={analyzingId === s.id}>
                   {analyzingId === s.id ? <div className="spinner" style={{width:14,height:14}}/> : <Wand2 size={14} style={{ color: "var(--accent)" }} />}
                 </button>
-                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/stories/${s.id}`); }} title="Edit"><Edit3 size={14} />
-                </button>
-                <button 
-                  className="btn btn-ghost btn-icon" 
-                  onClick={(e) => { e.stopPropagation(); confirm({
-                    title: "Delete Story",
-                    message: `Are you sure you want to delete "${s.title}"? This action cannot be undone.`,
-                    type: "danger",
-                    confirmText: "Delete",
-                    onConfirm: () => dispatch({ type: "DELETE_STORY", id: s.id })
-                  }); }}
-                  title="Delete"
-                >
-                  <Trash2 size={14} style={{ color: "var(--danger)" }} />
-                </button>
               </div>
             </div>
             <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
@@ -282,12 +260,6 @@ Provide a JSON object with:
             <div className="flex gap-4" style={{ flexWrap: "wrap" }}>
               {s.tags.map(t => <span key={t} className="tag" style={{ fontSize: "0.68rem" }}>{t}</span>)}
             </div>
-            {s.shortVersion && (
-              <button className="btn btn-secondary btn-sm" style={{ marginTop: "auto" }}
-                      onClick={(e) => { e.stopPropagation(); copy(s.shortVersion); }}>
-                <Copy size={12} /> Copy Short Version
-              </button>
-            )}
           </div>
         ))}
       </div>

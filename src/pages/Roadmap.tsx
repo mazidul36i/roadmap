@@ -175,12 +175,6 @@ export default function Roadmap() {
 
   return (
     <div>
-      <div className="page-header" style={{ justifyContent: "flex-end", marginBottom: 20 }}>
-        <button className="btn btn-primary" onClick={() => dispatch({ type: "ADD_WEEK" })}>
-          <Plus size={18} />
-          Add Week
-        </button>
-      </div>
 
       {state.weeks.map(week => {
         const pct = computeWeekProgress(week);
@@ -351,7 +345,7 @@ export default function Roadmap() {
       })}
 
       <button
-        className="btn btn-secondary add-item-btn"
+        className="add-item-btn"
         style={{ marginTop: 16, padding: 16, fontSize: "0.9rem" }}
         onClick={() => dispatch({ type: "ADD_WEEK" })}
       >

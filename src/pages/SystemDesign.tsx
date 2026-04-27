@@ -115,15 +115,45 @@ export default function SystemDesign() {
       </div>
 
       {/* Stats */}
-      <div className="stats-grid" style={{ marginBottom: 24 }}>
-        {(["not-started", "in-progress", "done"] as SDStatus[]).map(s => (
-          <div key={s} className="stat-card">
-            <div className="stat-card-icon"><StatusIcon status={s} /></div>
-            <div className="stat-card-value">{state.sdTopics.filter(t => t.status === s).length}</div>
-            <div className="stat-card-label">{STATUS_LABELS[s]}</div>
+      {(() => {
+        const total = state.sdTopics.length;
+        const counts: Record<SDStatus, number> = {
+          "not-started": state.sdTopics.filter(t => t.status === "not-started").length,
+          "in-progress": state.sdTopics.filter(t => t.status === "in-progress").length,
+          "done": state.sdTopics.filter(t => t.status === "done").length,
+        };
+        const statusColors: Record<SDStatus, string> = {
+          "not-started": "var(--text-muted)",
+          "in-progress": "var(--warning)",
+          "done": "var(--success)",
+        };
+        return (
+          <div className="stats-grid" style={{ marginBottom: 24 }}>
+            {(["not-started", "in-progress", "done"] as SDStatus[]).map(s => (
+              <div key={s} className="stat-card">
+                <div className="stat-card-value" style={{ color: statusColors[s] }}>{counts[s]}</div>
+                <div className="stat-card-label">{STATUS_LABELS[s]}</div>
+                <div style={{ marginTop: 8 }}>
+                  <div style={{
+                    height: 4,
+                    borderRadius: 99,
+                    background: "var(--border)",
+                    overflow: "hidden"
+                  }}>
+                    <div style={{
+                      height: "100%",
+                      width: total > 0 ? `${Math.round((counts[s] / total) * 100)}%` : "0%",
+                      background: statusColors[s],
+                      borderRadius: 99,
+                      transition: "width 0.4s ease"
+                    }} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        );
+      })()}
 
       {/* Tabs */}
       <div className="tab-group">
@@ -140,9 +170,15 @@ export default function SystemDesign() {
       </div>
 
       <div className="grid-auto">
-        {topics.map(t => (
+        {topics.map(t => {
+          const borderColors: Record<SDStatus, string> = {
+            "not-started": "var(--text-muted)",
+            "in-progress": "var(--warning)",
+            "done": "var(--success)",
+          };
+          return (
           <div key={t.id} className="card"
-            style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "pointer" }}
+            style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "pointer", borderLeft: `3px solid ${borderColors[t.status]}` }}
             onClick={() => navigate(`/sysdesign/${t.id}`)}>
             <div className="flex justify-between items-start">
               <h3 style={{ fontSize: "0.9rem", fontWeight: 700, flex: 1, lineHeight: 1.4 }}>{t.title}</h3>
@@ -184,7 +220,8 @@ export default function SystemDesign() {
               <div style={{ fontSize: "0.72rem", color: "var(--accent-light)" }}>📐 {t.diagramRef}</div>
             )}
           </div>
-        ))}
+          );
+        })}
         {topics.length === 0 && (
           <div className="empty-state" style={{ gridColumn: "1/-1" }}>
             <div className="empty-state-icon">🏗</div>

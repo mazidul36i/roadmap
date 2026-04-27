@@ -180,9 +180,22 @@ Note Content: ${form.content.replace(/<[^>]+>/g, '')}`;
               }}
               aria-label={`Open note: ${n.title}`}
             >
-              <div style={{ fontWeight: 600, fontSize: "0.82rem", marginBottom: 4 }}
+              <div style={{ fontWeight: 600, fontSize: "0.82rem", marginBottom: 2 }}
                    className="truncate">{n.title}</div>
-              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{n.updatedAt.slice(0, 10)}</div>
+              {n.content && (
+                <div style={{
+                  fontSize: "0.72rem",
+                  color: "var(--text-secondary)",
+                  marginBottom: 3,
+                  overflow: "hidden",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 1,
+                  WebkitBoxOrient: "vertical"
+                }}>
+                  {n.content.replace(/<[^>]+>/g, "").slice(0, 80)}
+                </div>
+              )}
+              <div style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>{n.updatedAt.slice(0, 10)}</div>
             </div>
           ))}
         </div>
