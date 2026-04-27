@@ -84,6 +84,18 @@ Configured in both `tsconfig.json` and `vite.config.ts`:
 
 Single global stylesheet at [src/index.css](src/index.css) (~54KB). Uses CSS custom properties for theming — no CSS-in-JS, no Tailwind. Theme is toggled via `data-theme="light"` on `<html>`. Dark mode is the default. Framer Motion handles page transitions and component animations.
 
+## Shorthand Commands
+
+When the user says any of the following, act immediately without asking for clarification:
+
+| Command | Action |
+|---------|--------|
+| `commit` | Stage all changed tracked files, generate a clean conventional commit message from the diff, and commit. No confirmation needed. |
+| `build` | Run `npm run build` and report errors. |
+| `dev` | Run `npm run dev`. |
+
+**Commit message rules:** Use conventional commits (`feat:`, `fix:`, `refactor:`, `style:`, `docs:`). One concise subject line. No body unless the change is genuinely complex. Always append the co-author trailer.
+
 ## Conventions
 
 - Entity IDs are generated with `Math.random().toString(36)` — prefer `crypto.randomUUID()` for new code
