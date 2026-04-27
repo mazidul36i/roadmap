@@ -6,9 +6,9 @@
 
 **Track DSA · System Design · Stories · Applications · Mocks — all in one place**
 
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)](https://typescriptlang.org)
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite)](https://vitejs.dev)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript)](https://typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite)](https://vitejs.dev)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 </div>
@@ -33,25 +33,25 @@
 | 📊 **Dashboard**       | Overall progress bars, study streak tracker, week-by-week overview, today's focus card      |
 | 🗓 **Roadmap**         | 8 collapsible week cards · task status cycling (todo → in-progress → done) · per-task notes |
 | 📅 **Daily Planner**   | Log study sessions with focus area, planned/completed hours, reflection · history timeline  |
-| 📝 **Notes**           | Categorised notes (DSA, System Design, Interview, Company, Weekly) · autosave · tag system  |
-| 📖 **Story Bank**      | STAR-format interview stories · tag filtering · copy short/long version to clipboard        |
-| 💻 **DSA Tracker**     | Problem log with topic/difficulty filters · topic & difficulty bar charts · weak area panel |
+| 📝 **Notes**           | Categorised notes (DSA, System Design, Interview, Company, Weekly) · autosave · AI tag extractor & summarizer |
+| 📖 **Story Bank**      | STAR-format interview stories · tag filtering · AI story reviewer · copy short/long version |
+| 💻 **DSA Tracker**     | Problem log with topic/difficulty filters · topic & difficulty bar charts · AI hint generator |
 | 🏗 **System Design**   | Exercises + core concepts tabs · status tracking · tradeoffs & architecture notes           |
-| 💼 **Applications**    | Kanban pipeline from Wishlist → Offer/Rejected · inline status updates · company details    |
+| 💼 **Applications**    | Kanban pipeline from Wishlist → Offer/Rejected · drag-and-drop · company details            |
 | 🎙 **Mock Interviews** | Session log · score trend line chart · recurring weak points aggregated automatically       |
 | 📚 **Resource Library**| Personal knowledge base for YouTube, articles, and repos · categorize and pin favorites     |
 | ⚡ **Focus Mode**       | Full-screen minimal view of today's tasks · Esc to exit                                     |
 
 ### Extras
 
-- **Rich Text Editor for Notes** — Full Tiptap integration with custom toolbar, bold/italic/code support, and premium typography.
-- **Light & Dark Themes** — Toggle between a sleek dark mode and a clean, high-contrast light mode via the TopBar.
+- **AI-Powered Features** — Gemini-powered story reviewer, DSA hint generator, note summarizer, and tag extractor
+- **Rich Text Editor for Notes** — Full Tiptap integration with custom toolbar, bold/italic/code support, and premium typography
+- **Light & Dark Themes** — Toggle between a sleek dark mode and a clean, high-contrast light mode via the TopBar
 - **`Ctrl+K` Global Search** — searches across tasks, notes, stories, companies, and DSA problems simultaneously
 - **Export / Import JSON** — full data backup and restore from the sidebar
-- **Cloud Sync with Firebase** — Real-time database sync across devices with Google Authentication.
-- **Auto-save with Offline Support** — Persistence to both Firestore and `localStorage` ensures data is never lost, even when offline.
-- **Seeded sample data** — 8-week roadmap, 5 Prospecta STAR stories, 10 DSA problems, 11 system design topics, 3 sample
-  applications, pre-loaded on first launch.
+- **Cloud Sync with Firebase** — Real-time database sync across devices with Google Authentication
+- **Auto-save with Offline Support** — Persistence to both Firestore and `localStorage` ensures data is never lost, even when offline
+- **Seeded sample data** — 8-week roadmap, STAR stories, DSA problems, system design topics, and sample applications pre-loaded on first launch
 - **Responsive layout** — adapts cleanly to tablet and mobile viewports
 
 ---
@@ -60,10 +60,14 @@
 
 | Layer       | Choice                                          |
 |-------------|-------------------------------------------------|
-| Framework   | React 18 + TypeScript 5                         |
-| Build Tool  | Vite 5                                          |
-| Routing     | React Router v6                                 |
+| Framework   | React 19 + TypeScript 6                         |
+| Build Tool  | Vite 8                                          |
+| Routing     | React Router v7                                 |
+| AI          | Google Gemini (`@google/generative-ai`)         |
+| Rich Text   | Tiptap                                          |
+| Drag & Drop | dnd-kit                                         |
 | Charts      | Recharts                                        |
+| Animations  | Framer Motion                                   |
 | Icons       | Lucide React                                    |
 | Styling     | Vanilla CSS (custom design system, no Tailwind) |
 | Persistence | **Firebase Firestore** + `localStorage` fallback |
@@ -77,6 +81,7 @@
 
 - Node.js **18+**
 - npm or yarn
+- A Google Gemini API key (for AI features)
 
 ### Installation
 
@@ -88,13 +93,18 @@ cd roadmap
 # Install dependencies
 npm install
 
+# Set up environment variables
+cp .env.example .env
+# Edit .env and add your Gemini API key:
+# VITE_GEMINI_API_KEY=<your key>
+
 # Start the development server
 npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-The app loads immediately with pre-seeded data — no sign-up, no configuration required.
+The app loads immediately with pre-seeded data — no sign-up required. Sign in with Google to enable cloud sync across devices.
 
 ### Build for production
 
@@ -191,10 +201,10 @@ interface AppState {
 
 ## 💾 Data Backup
 
-Your data is stored entirely in the browser's `localStorage`. To back it up:
+Your data is persisted to **Firebase Firestore** (when signed in) and `localStorage` (always). To manually back up or migrate:
 
 1. Click **Export JSON** in the sidebar → saves `roadmap-data.json`
-2. To restore on another device: click **Import JSON** → select your backup file
+2. To restore: click **Import JSON** → select your backup file
 
 ---
 
