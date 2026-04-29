@@ -6,6 +6,7 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { motion, AnimatePresence } from "framer-motion";
 import { generateJSON, generateText } from "@lib/gemini";
 import { useNavigate } from "react-router-dom";
+import LeetCodeStats from "@components/LeetCodeStats";
 
 const TOPICS = ["Arrays", "Strings", "Hashmaps", "Stack", "Queue", "Linked List", "Trees", "BST", "Graphs", "Heap", "Binary Search", "Two Pointer", "Sliding Window", "Dynamic Programming", "Backtracking", "Trie", "Greedy", "Math"];
 const DIFFICULTIES: DSADifficulty[] = ["Easy", "Medium", "Hard"];
@@ -205,6 +206,12 @@ export default function DSATracker() {
   const [aiAction, setAiAction] = useState<{ type: 'hint' | 'explain', problem: DSAProblem } | null>(null);
   const [aiResult, setAiResult] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const leetcodeUsername = state.leetcodeUsername || "";
+  const [tempUsername, setTempUsername] = useState(leetcodeUsername);
+
+  const saveUsername = () => {
+    dispatch({ type: "SET_LEETCODE_USERNAME", username: tempUsername });
+  };
 
   const handleAiAction = async (type: 'hint' | 'explain', p: DSAProblem) => {
     setAiAction({ type, problem: p });
@@ -272,6 +279,37 @@ Do not write the full code, just explain the intuition, the time complexity, and
         <button className="btn btn-primary" onClick={() => navigate("/dsa/new")}>
           <Plus size={14} /> Add Problem
         </button>
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        {!leetcodeUsername ? (
+          <div className="card" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <div style={{ fontWeight: 600 }}>Link LeetCode Account:</div>
+            <input 
+              className="form-input" 
+              placeholder="Username" 
+              value={tempUsername} 
+              onChange={e => setTempUsername(e.target.value)} 
+              style={{ maxWidth: 200 }}
+            />
+            <button className="btn btn-primary" onClick={saveUsername}>Save</button>
+          </div>
+        ) : (
+          <div style={{ position: "relative" }}>
+            <button 
+              className="btn btn-ghost btn-icon" 
+              style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
+              onClick={() => {
+                setTempUsername("");
+                dispatch({ type: "SET_LEETCODE_USERNAME", username: "" });
+              }}
+              title="Unlink LeetCode Account"
+            >
+              <X size={14} />
+            </button>
+            <LeetCodeStats username={leetcodeUsername} />
+          </div>
+        )}
       </div>
 
       <motion.div layout className="grid-2" style={{ gap: 20, marginBottom: 24 }}>
