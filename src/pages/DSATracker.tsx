@@ -206,12 +206,11 @@ export default function DSATracker() {
   const [aiAction, setAiAction] = useState<{ type: 'hint' | 'explain', problem: DSAProblem } | null>(null);
   const [aiResult, setAiResult] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const [leetcodeUsername, setLeetcodeUsername] = useState(() => localStorage.getItem("leetcodeUsername") || "");
+  const leetcodeUsername = state.leetcodeUsername || "";
   const [tempUsername, setTempUsername] = useState(leetcodeUsername);
 
   const saveUsername = () => {
-    localStorage.setItem("leetcodeUsername", tempUsername);
-    setLeetcodeUsername(tempUsername);
+    dispatch({ type: "SET_LEETCODE_USERNAME", username: tempUsername });
   };
 
   const handleAiAction = async (type: 'hint' | 'explain', p: DSAProblem) => {
@@ -301,9 +300,8 @@ Do not write the full code, just explain the intuition, the time complexity, and
               className="btn btn-ghost btn-icon" 
               style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
               onClick={() => {
-                setLeetcodeUsername("");
                 setTempUsername("");
-                localStorage.removeItem("leetcodeUsername");
+                dispatch({ type: "SET_LEETCODE_USERNAME", username: "" });
               }}
               title="Unlink LeetCode Account"
             >

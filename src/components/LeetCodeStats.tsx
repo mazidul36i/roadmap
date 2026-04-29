@@ -97,6 +97,7 @@ export default function LeetCodeStats({ username }: LeetCodeStatsProps) {
       }
 
       let successCount = 0;
+      let newStats = { ...stats };
 
       for (const sub of toProcess) {
         try {
@@ -119,6 +120,11 @@ export default function LeetCodeStats({ username }: LeetCodeStatsProps) {
 
           const difficulty = detailData.difficulty || "Medium";
 
+          if (difficulty === "Easy") newStats.easySolved = (newStats.easySolved || 0) + 1;
+          else if (difficulty === "Medium") newStats.mediumSolved = (newStats.mediumSolved || 0) + 1;
+          else if (difficulty === "Hard") newStats.hardSolved = (newStats.hardSolved || 0) + 1;
+          newStats.totalSolved = (newStats.totalSolved || 0) + 1;
+
           dispatch({
             type: "ADD_DSA",
             problem: {
@@ -138,6 +144,10 @@ export default function LeetCodeStats({ username }: LeetCodeStatsProps) {
         } catch (e) {
           console.error("Failed to process submission:", sub.title, e);
         }
+      }
+      
+      if (successCount > 0) {
+        setStats(newStats);
       }
       
       alert(`Successfully synced ${successCount} new problem(s)!`);

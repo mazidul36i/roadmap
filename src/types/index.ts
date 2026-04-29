@@ -156,4 +156,5 @@ export interface AppState {
   startDate: string; // When the 8-week plan started
   aiEnabled?: boolean; // Whether AI features are enabled for this user
   theme?: "dark" | "light";
+  leetcodeUsername?: string;
 }

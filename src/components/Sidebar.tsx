@@ -107,7 +107,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
             </div>
             <div>
               <h2>Roadmap Tracker</h2>
-              <span>2-Month Job Switch Prep</span>
+              <span>Track Your Custom Roadmap</span>
             </div>
           </div>
           <div className="sidebar-progress">
@@ -144,7 +144,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           {user && (
             <div className="user-profile-badge mb-4">
               <div className="bg-accent-dim rounded-full p-1"
-                   style={{ width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                style={{ width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <UserIcon size={14} />
               </div>
               <div style={{ flex: 1, overflow: "hidden" }}>
@@ -164,7 +164,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
             </div>
           )}
           <button className="btn btn-ghost btn-sm w-full mb-2" onClick={exportData}
-                  style={{ justifyContent: "flex-start" }}>
+            style={{ justifyContent: "flex-start" }}>
             <Download size={14} /> Export JSON
           </button>
           <button className="btn btn-ghost btn-sm w-full" onClick={importData} style={{ justifyContent: "flex-start" }}>
