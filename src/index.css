@@ -2758,3 +2758,472 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── DSA PATTERNS PAGE ─────────────────────────────────── */
+
+:root {
+  --cat-array: #6366f1;
+  --cat-string: #8b5cf6;
+  --cat-hashmap: #ec4899;
+  --cat-stack: #f59e0b;
+  --cat-queue: #f97316;
+  --cat-linkedlist: #14b8a6;
+  --cat-trees: #22c55e;
+  --cat-recursion: #3b82f6;
+  --cat-heap: #ef4444;
+  --cat-graphs: #06b6d4;
+  --cat-trie: #a78bfa;
+  --cat-dp: #10b981;
+  --cat-greedy: #eab308;
+  --cat-bits: #94a3b8;
+  --cat-sorting: #d946ef;
+  --cat-range: #0ea5e9;
+}
+
+/* ── Search bar ── */
+.pmap-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.pmap-global-progress {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ── Tree container ── */
+.pmap-tree {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── Category node ── */
+.pmap-cat {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.pmap-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background var(--transition);
+  user-select: none;
+}
+
+.pmap-cat-header:hover {
+  background: var(--bg-secondary);
+}
+
+/* Large colored circle dot */
+.pmap-cat-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--accent));
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat-color, var(--accent)) 20%, transparent);
+}
+
+.pmap-cat-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cat-color, var(--text-primary));
+  letter-spacing: -0.01em;
+}
+
+/* Circular count badge — matches Whimsical style */
+.pmap-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: var(--cat-color, var(--accent));
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pmap-cat-progress {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Sub-pattern list (children of a category) ── */
+.pmap-sub-list {
+  position: relative;
+  padding-left: 42px;
+  padding-top: 4px;
+  padding-bottom: 8px;
+  /* Vertical trunk line drawn by each sub-wrap's ::before */
+}
+
+/* ── Sub-pattern wrap ── */
+.pmap-sub-wrap {
+  position: relative;
+  margin-bottom: 2px;
+}
+
+/* L-shaped tree connector: vertical then curves right to the sub-pattern */
+.pmap-sub-wrap::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 0;
+  width: 20px;
+  height: 14px; /* reaches center of the sub-pattern label (≈ 28px / 2) */
+  border-left: 2px solid var(--cat-color, var(--border));
+  border-bottom: 2px solid var(--cat-color, var(--border));
+  border-bottom-left-radius: 8px;
+  opacity: 0.55;
+}
+
+/* Extend vertical line upward for non-last items */
+.pmap-sub-wrap:not(.last)::after {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 14px;
+  bottom: 0;
+  width: 2px;
+  background: var(--cat-color, var(--border));
+  opacity: 0.55;
+}
+
+.pmap-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+/* Medium filled dot for sub-pattern */
+.pmap-sub-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--accent));
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.pmap-sub-label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pmap-sub-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--cat-color, var(--accent)) 20%, transparent);
+  color: var(--cat-color, var(--accent));
+  flex-shrink: 0;
+}
+
+/* ── Technique list (children of a sub-pattern) ── */
+.pmap-tech-list {
+  position: relative;
+  margin-left: 16px;
+  padding-left: 20px;
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+/* ── Technique wrap ── */
+.pmap-tech-wrap {
+  position: relative;
+  margin-bottom: 1px;
+}
+
+/* Curved connector for technique */
+.pmap-tech-wrap::before {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 0;
+  width: 14px;
+  height: 11px;
+  border-left: 1.5px solid var(--cat-color, var(--border));
+  border-bottom: 1.5px solid var(--cat-color, var(--border));
+  border-bottom-left-radius: 6px;
+  opacity: 0.4;
+}
+
+.pmap-tech-wrap:not(.last)::after {
+  content: "";
+  position: absolute;
+  left: -20px;
+  top: 11px;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--cat-color, var(--border));
+  opacity: 0.4;
+}
+
+.pmap-tech-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+  max-width: 100%;
+}
+
+.pmap-tech-row:hover {
+  background: var(--bg-secondary);
+}
+
+/* Small hollow dot for technique */
+.pmap-tech-node {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cat-color, var(--border));
+  background: transparent;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.pmap-tech-label {
+  font-size: 0.79rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Add problem button — hidden until hover */
+.pmap-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px 7px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pmap-tech-row:hover .pmap-add-btn {
+  opacity: 1;
+}
+
+.pmap-add-btn:hover {
+  color: var(--cat-color, var(--accent));
+  border-color: var(--cat-color, var(--accent));
+  border-style: solid;
+}
+
+/* ── Linked problem rows ── */
+.pmap-problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 3px;
+  margin-left: 13px;
+}
+
+.pmap-problem-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  background: color-mix(in srgb, var(--cat-color, var(--accent)) 6%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--cat-color, var(--accent)) 30%, transparent);
+  max-width: 100%;
+}
+
+.pmap-problem-row:hover {
+  background: color-mix(in srgb, var(--cat-color, var(--accent)) 12%, transparent);
+}
+
+/* Green/gray solve dot */
+.pmap-solve-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.pmap-solve-dot.solved {
+  background: var(--success);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--success) 25%, transparent);
+}
+
+.pmap-problem-name {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.pmap-open-link {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  transition: color var(--transition);
+}
+
+.pmap-open-link:hover {
+  color: var(--cat-color, var(--accent));
+}
+
+/* ── Back chip in DetailPages ── */
+.pattern-back-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 3px 12px;
+  text-decoration: none;
+  transition: background var(--transition);
+}
+
+.pattern-back-chip:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ── Delete problem button ── */
+.pmap-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--transition), background var(--transition), color var(--transition);
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.pmap-problem-row:hover .pmap-delete-btn {
+  opacity: 1;
+}
+
+.pmap-delete-btn:hover {
+  background: color-mix(in srgb, var(--danger, #ef4444) 15%, transparent);
+  color: var(--danger, #ef4444);
+}
+
+/* ── Category mini progress bar ── */
+.pmap-cat-bar {
+  width: 60px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cat-color, var(--accent)) 20%, transparent);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.pmap-cat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cat-color, var(--accent));
+  transition: width 0.4s ease;
+}
+
+/* ── Global stats bar in search row ── */
+.pmap-stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  flex-shrink: 0;
+}
+
+.pmap-stats-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pmap-stats-solved {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.pmap-stats-sep {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pmap-stats-total {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pmap-stats-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.pmap-stats-track {
+  width: 80px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.pmap-stats-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--success);
+  transition: width 0.4s ease;
+}
+
+.pmap-stats-pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-width: 28px;
+}

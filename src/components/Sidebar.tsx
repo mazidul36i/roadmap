@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen,
+  BrainCircuit,
   Briefcase,
   CalendarDays,
   Code2,
@@ -28,6 +29,7 @@ const navItems = [
   { path: "/notes", icon: StickyNote, label: "Notes" },
   { path: "/stories", icon: BookOpen, label: "Story Bank" },
   { path: "/dsa", icon: Code2, label: "DSA Tracker" },
+  { path: "/dsa-patterns", icon: BrainCircuit, label: "DSA Patterns" },
   { path: "/sysdesign", icon: Server, label: "System Design" },
   { path: "/applications", icon: Briefcase, label: "Applications" },
   { path: "/mocks", icon: Mic2, label: "Mock Interviews" },

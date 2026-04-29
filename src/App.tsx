@@ -10,6 +10,7 @@ import DailyPlanner from "@pages/DailyPlanner";
 import Notes from "@pages/Notes";
 import StoryBank from "@pages/StoryBank";
 import DSATracker from "@pages/DSATracker";
+import DSAPatterns from "@pages/DSAPatterns";
 import SystemDesign from "@pages/SystemDesign";
 import Applications from "@pages/Applications";
 import MockInterviews from "@pages/MockInterviews";
@@ -36,6 +37,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/notes": { title: "Notes", subtitle: "Searchable, taggable knowledge base" },
   "/stories": { title: "Story Bank", subtitle: "STAR format interview stories from Prospecta" },
   "/dsa": { title: "DSA Tracker", subtitle: "Problem log · stats · weak areas" },
+  "/dsa-patterns": { title: "DSA Patterns", subtitle: "Visual pattern reference · all 17 categories" },
   "/sysdesign": { title: "System Design", subtitle: "Topics, exercises, and architecture notes" },
   "/applications": { title: "Job Applications", subtitle: "Pipeline tracker · kanban board" },
   "/mocks": { title: "Mock Interviews", subtitle: "Track performance and recurring weak points" },
@@ -113,6 +115,7 @@ function Shell() {
                 <Route path="/stories/:id" element={<StoryDetail />} />
                 <Route path="/dsa" element={<DSATracker />} />
                 <Route path="/dsa/:id" element={<DSAProblemDetail />} />
+                <Route path="/dsa-patterns" element={<DSAPatterns />} />
                 <Route path="/sysdesign" element={<SystemDesign />} />
                 <Route path="/sysdesign/:id" element={<SystemDesignDetail />} />
                 <Route path="/applications" element={<Applications />} />

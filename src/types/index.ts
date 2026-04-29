@@ -67,6 +67,7 @@ export interface DSAProblem {
   url: string;
   notes?: string;
   linkedNoteIds?: string[];
+  patternNodeId?: string;
 }
 
 export type SDStatus = "not-started" | "in-progress" | "done";

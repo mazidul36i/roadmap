@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpen,
+  BrainCircuit,
   ExternalLink,
   FileText,
   Link as LinkIcon,
@@ -14,6 +15,7 @@ import {
   Wand2,
   X
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import { generateJSON, generateText } from "@lib/gemini";
@@ -324,6 +326,13 @@ export function DSAProblemDetail() {
     >
       <div className="detail-grid">
         <div className="card detail-section">
+          {form.patternNodeId && (
+            <div style={{ marginBottom: 16 }}>
+              <Link to={`/dsa-patterns`} className="pattern-back-chip">
+                <BrainCircuit size={12} /> View in DSA Patterns
+              </Link>
+            </div>
+          )}
           <Field label="Problem URL">
             <div className="flex gap-8">
               <input className="form-input" value={form.url} onChange={e => set("url", e.target.value)} placeholder="https://leetcode.com/problems/..." />
