@@ -25,9 +25,11 @@ import {
   SystemDesignDetail
 } from "@pages/DetailPages";
 import LoginPage from "@pages/LoginPage";
+import Settings from "@pages/Settings";
 import SetupChoice from "@components/SetupChoice";
 import { AuthProvider, useAuth } from "@context/AuthContext";
 import { ThemeProvider } from "@context/ThemeContext";
+import { ToastProvider } from "@context/ToastContext";
 import InterviewTimer from "@components/InterviewTimer";
 
 const pageMeta: Record<string, { title: string; subtitle: string }> = {
@@ -43,6 +45,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
   "/mocks": { title: "Mock Interviews", subtitle: "Track performance and recurring weak points" },
   "/resources": { title: "Resources", subtitle: "Curated learning materials and documentation" },
   "/focus": { title: "Focus Mode", subtitle: "Today only · no distractions" },
+  "/settings": { title: "Settings", subtitle: "Account, appearance, AI, and data" },
 };
 
 function Shell() {
@@ -124,6 +127,7 @@ function Shell() {
                 <Route path="/mocks/:id" element={<MockInterviewDetail />} />
                 <Route path="/resources" element={<ResourceLibrary />} />
                 <Route path="/resources/:id" element={<ResourceDetail />} />
+                <Route path="/settings" element={<Settings />} />
               </Routes>
             </motion.div>
           </AnimatePresence>
@@ -141,10 +145,12 @@ export default function App() {
       <AppProvider>
         <ThemeProvider>
           <ConfirmationProvider>
-            <BrowserRouter>
-              <Shell />
-              <InterviewTimer />
-            </BrowserRouter>
+            <ToastProvider>
+              <BrowserRouter>
+                <Shell />
+                <InterviewTimer />
+              </BrowserRouter>
+            </ToastProvider>
           </ConfirmationProvider>
         </ThemeProvider>
       </AppProvider>

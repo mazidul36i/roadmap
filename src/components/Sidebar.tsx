@@ -13,6 +13,7 @@ import {
   Mic2,
   Library,
   Server,
+  Settings,
   StickyNote,
   Upload,
   User as UserIcon,
@@ -21,6 +22,7 @@ import {
 import { computeProgress, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import { useAuth } from "@context/AuthContext";
+import { useToast } from "@context/ToastContext";
 
 const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -35,6 +37,7 @@ const navItems = [
   { path: "/mocks", icon: Mic2, label: "Mock Interviews" },
   { path: "/resources", icon: Library, label: "Resource Library" },
   { path: "/focus", icon: Zap, label: "Focus Mode" },
+  { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
 export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -43,6 +46,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
   const { user, logout } = useAuth();
+  const { toast } = useToast();
 
   const overallPct = computeProgress(state.weeks);
 
@@ -51,9 +55,10 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "roadmap-data.json";
+    a.download = `roadmap-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    toast("Data exported successfully", "success");
   }
 
   function importData() {
@@ -74,8 +79,9 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
             try {
               const data = JSON.parse(ev.target?.result as string);
               dispatch({ type: "IMPORT_STATE", state: data });
+              toast("Data imported successfully", "success");
             } catch {
-              alert("Invalid JSON file");
+              toast("Invalid JSON file — import failed", "error");
             }
           };
           reader.readAsText(file);
