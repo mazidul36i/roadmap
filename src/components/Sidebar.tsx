@@ -107,7 +107,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
             </div>
             <div>
               <h2>Roadmap Tracker</h2>
-              <span>Track Your Custom Roadmap</span>
+              <span>Track Your Roadmap</span>
             </div>
           </div>
           <div className="sidebar-progress">
