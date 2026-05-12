@@ -48,7 +48,7 @@ const pageMeta: Record<string, { title: string; subtitle: string }> = {
 function Shell() {
   const { user, loading } = useAuth();
   const { needsOnboarding, isLoadingData } = useApp();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 900);
   const location = useLocation();
 
   if (loading) return null; // Or a splash screen
@@ -90,7 +90,7 @@ function Shell() {
     <div className="app-shell">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="main-content">
+      <div className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}>
         <TopBar
           title={dynamicMeta.title}
           subtitle={dynamicMeta.subtitle}

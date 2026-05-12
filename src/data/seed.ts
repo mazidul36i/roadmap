@@ -673,6 +673,7 @@ export const seedState: AppState = {
   resources,
   studyStreak: [yesterday, today],
   startDate: today,
+  leetcodeUsername: "shohel75",
 };
 
 export const emptyState: AppState = {

@@ -58,7 +58,8 @@ type Action =
   | { type: "DELETE_WEEK"; weekId: string }
   | { type: "ADD_TASK"; weekId: string }
   | { type: "UPDATE_TASK"; weekId: string; taskId: string; updates: Partial<Task> }
-  | { type: "DELETE_TASK"; weekId: string; taskId: string };
+  | { type: "DELETE_TASK"; weekId: string; taskId: string }
+  | { type: "SET_LEETCODE_USERNAME"; username: string };
 
 // ─── REDUCER ────────────────────────────────────────────────────────────────────
 function reducer(state: AppState, action: Action): AppState {
@@ -202,6 +203,8 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case "SET_THEME":
       return { ...state, theme: action.theme };
+    case "SET_LEETCODE_USERNAME":
+      return { ...state, leetcodeUsername: action.username };
     default:
       return state;
   }
