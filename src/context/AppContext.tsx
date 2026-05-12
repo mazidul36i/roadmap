@@ -59,6 +59,7 @@ type Action =
   | { type: "ADD_TASK"; weekId: string }
   | { type: "UPDATE_TASK"; weekId: string; taskId: string; updates: Partial<Task> }
   | { type: "DELETE_TASK"; weekId: string; taskId: string }
+  | { type: "SET_LEETCODE_USERNAME"; username: string }
   | { type: "SET_AI_ENABLED"; enabled: boolean };
 
 // ─── REDUCER ────────────────────────────────────────────────────────────────────
@@ -203,6 +204,8 @@ function reducer(state: AppState, action: Action): AppState {
       };
     case "SET_THEME":
       return { ...state, theme: action.theme };
+    case "SET_LEETCODE_USERNAME":
+      return { ...state, leetcodeUsername: action.username };
     case "SET_AI_ENABLED":
       return { ...state, aiEnabled: action.enabled };
     default:
