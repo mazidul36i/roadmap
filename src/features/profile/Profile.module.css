@@ -1,0 +1,187 @@
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 26px;
+  background: linear-gradient(145deg, var(--xp), var(--brand));
+  color: var(--text-inverse);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  box-shadow: 0 16px 40px -14px var(--brand-glow);
+  flex-shrink: 0;
+}
+
+.headerMain {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.name {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+@media (max-width: 1023px) {
+  .twoCol {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.section {
+  margin-top: var(--space-8);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  font-size: var(--fs-xl);
+}
+
+.sectionTitle span {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.achievements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.achievement {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+}
+
+.achievement.unlocked {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--border));
+  background: linear-gradient(150deg, color-mix(in srgb, var(--brand) 8%, var(--surface-1)), var(--surface-1) 60%);
+}
+
+.achievement.rare.unlocked {
+  border-color: color-mix(in srgb, var(--xp) 55%, var(--border));
+  background: linear-gradient(150deg, color-mix(in srgb, var(--xp) 14%, var(--surface-1)), var(--surface-1) 65%);
+}
+
+.achIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--surface-3);
+  color: var(--text-3);
+}
+
+.unlocked .achIcon {
+  background: var(--brand-soft);
+  color: var(--brand-text);
+}
+
+.rare.unlocked .achIcon {
+  background: var(--xp-soft);
+  color: var(--xp);
+}
+
+.achTitle {
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+
+.locked .achTitle {
+  color: var(--text-2);
+}
+
+.achDesc {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.achDate {
+  margin-top: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--brand-text);
+}
+
+.ladder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.rung {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+.rung.current {
+  background: var(--brand-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.rung.reached {
+  color: var(--text);
+}
+
+.kindRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--fs-sm);
+}
+
+.kindValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}

@@ -13,6 +13,7 @@ import { LoadErrorScreen, LoadingScreen } from "./Splash";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { TutorProvider } from "@features/copilot/TutorContext";
 import { CopilotBridge, TutorButton } from "@features/copilot/CopilotBridge";
+import { GameDirector } from "@features/game/GameDirector";
 
 const TutorDrawer = lazy(() => import("@features/copilot/TutorDrawer").then(m => ({ default: m.TutorDrawer })));
 
@@ -60,6 +61,7 @@ function Gate() {
           <InterviewTimer />
           <TutorDrawer />
         </Suspense>
+        <GameDirector />
       </CopilotBridge>
     </TutorProvider>
   );

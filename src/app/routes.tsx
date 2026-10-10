@@ -8,7 +8,8 @@ const page = <T extends Record<string, ComponentType>>(loader: () => Promise<T>,
   lazy(async () => ({ default: (await loader())[name] }));
 
 // Legacy pages (rebuilt phase by phase).
-const Dashboard = lazy(() => import("@pages/Dashboard"));
+const TodayPage = lazy(() => import("@features/today/TodayPage"));
+const ProfilePage = lazy(() => import("@features/profile/ProfilePage"));
 const Roadmap = lazy(() => import("@pages/Roadmap"));
 const DailyPlanner = lazy(() => import("@pages/DailyPlanner"));
 const Notes = lazy(() => import("@pages/Notes"));
@@ -40,7 +41,7 @@ function Redirect({ to }: { to: string }) {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<TodayPage />} />
 
       <Route path="/learn" element={<ComingSoon feature="tracks" />} />
       <Route path="/learn/dsa" element={<DSAPatterns />} />
@@ -69,7 +70,7 @@ export function AppRoutes() {
       <Route path="/resources" element={<ResourceLibrary />} />
       <Route path="/resources/:id" element={<ResourceDetail />} />
 
-      <Route path="/profile" element={<ComingSoon feature="profile" />} />
+      <Route path="/profile" element={<ProfilePage />} />
       <Route path="/settings" element={<Settings />} />
 
       {LEGACY_REDIRECTS.map(r => (

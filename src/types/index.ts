@@ -199,6 +199,7 @@ export type ActivityKind =
   | "quest"
   | "note"
   | "application"
+  | "create"
   | "legacy";
 
 export interface ActivityDay {

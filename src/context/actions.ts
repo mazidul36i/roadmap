@@ -81,6 +81,8 @@ export type Action =
   | { type: "AWARD"; key: string; kind: ActivityKind; xp: number }
   | { type: "LOG_MINUTES"; minutes: number }
   | { type: "UNLOCK_ACHIEVEMENTS"; ids: string[] }
+  /** Day boundary bookkeeping: spend streak freezes, deal today's quests. */
+  | { type: "ROLLOVER" }
   // ── Whole-state & settings ──────────────────────────────────────────────────
   | { type: "HYDRATE"; state: AppState }
   /** @deprecated alias of HYDRATE kept for older call sites. */

@@ -208,3 +208,10 @@ code, kbd, pre, samp {
     scroll-behavior: auto !important;
   }
 }
+
+/* Programmatic focus targets (route changes, dialogs) don't need a ring. */
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  box-shadow: none;
+  outline: none;
+}

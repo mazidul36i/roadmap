@@ -1,11 +1,8 @@
-import type { AppState } from "@app-types/index";
-import type { Action } from "./actions";
+import { withGamification } from "@lib/gamify";
 import { domainReducer } from "./reducer";
 
 /**
- * The store's reducer. Later layers (gamification) wrap the domain reducer here
- * so pages only ever dispatch plain domain actions.
+ * The store's reducer: domain slices wrapped by the game layer, so pages only
+ * ever dispatch plain domain actions and XP/quests/achievements follow.
  */
-export function rootReducer(state: AppState, action: Action): AppState {
-  return domainReducer(state, action);
-}
+export const rootReducer = withGamification(domainReducer);
