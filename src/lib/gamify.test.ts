@@ -56,6 +56,15 @@ describe("XP awards", () => {
     expect(s.xp - before).toBeLessThan(XP.problem.Hard);
   });
 
+  it("never invents a solve date for problems solved before dates were tracked", () => {
+    const s0 = createEmptyState("2026-10-01");
+    s0.dsaProblems = [problem("legacy", { solved: true })];
+    let s = rootReducer(s0, { type: "HYDRATE", state: s0 });
+    s = rootReducer(s, { type: "UPDATE_DSA", problem: { ...s.dsaProblems[0], notes: "edited" } });
+    expect(s.dsaProblems[0].solvedAt).toBeUndefined();
+    expect(s.activity[TODAY]?.awarded ?? []).not.toContain("problem:legacy");
+  });
+
   it("does not reward deleting things", () => {
     let s = base();
     s = rootReducer(s, { type: "ADD_DSA", problem: problem("p1", { solved: true }) });

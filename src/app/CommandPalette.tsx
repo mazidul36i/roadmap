@@ -22,6 +22,8 @@ import { useTheme } from "@context/ThemeContext";
 import { Kbd } from "@ui/index";
 import overlay from "@ui/Overlay.module.css";
 import { ALL_NAV_ITEMS } from "./nav";
+import { LESSONS, lessonPath } from "@content/catalog";
+import { GraduationCap } from "lucide-react";
 import { usePaletteExtensions } from "./paletteRegistry";
 import s from "./CommandPalette.module.css";
 
@@ -110,6 +112,17 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     return [
       ...extensions.groups,
       {
+        heading: "Lessons",
+        items: LESSONS.map(l => ({
+          id: `lesson-${l.id}`,
+          label: l.title,
+          hint: state.lessonProgress[l.id]?.doneAt ? "Done" : `${l.minutes} min`,
+          icon: <GraduationCap size={16} />,
+          keywords: [l.track, l.skill, "learn", "lesson"],
+          run: go(lessonPath(l)),
+        })),
+      },
+      {
         heading: "Notes",
         items: state.notes.map(n => ({ id: `note-${n.id}`, label: n.title || "Untitled note", hint: n.tags.slice(0, 2).join(", "), icon: <StickyNote size={16} />, keywords: n.tags, run: go(`/notes/${n.id}`) })),
       },
@@ -140,7 +153,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       { heading: "Campaign tasks", items: tasks },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.notes, state.dsaProblems, state.storyCards, state.sdTopics, state.applications, state.mockInterviews, state.resources, state.weeks, extensions]);
+  }, [state.notes, state.dsaProblems, state.storyCards, state.sdTopics, state.applications, state.mockInterviews, state.resources, state.weeks, state.lessonProgress, extensions]);
 
   const renderItem = (item: PaletteItem) => (
     <Command.Item key={item.id} value={`${item.label} ${item.id}`} keywords={item.keywords} onSelect={item.run} className={s.item}>

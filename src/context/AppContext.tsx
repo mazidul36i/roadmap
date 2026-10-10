@@ -155,6 +155,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const retryLoad = useCallback(() => setLoadNonce(n => n + 1), []);
 
+  // Dev-only maintenance hook for scripted data fixes during development.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    (window as unknown as { __forge?: unknown }).__forge = { dispatch, getState: () => stateRef.current };
+  }, []);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,

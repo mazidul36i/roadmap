@@ -10,13 +10,15 @@ const page = <T extends Record<string, ComponentType>>(loader: () => Promise<T>,
 // Legacy pages (rebuilt phase by phase).
 const TodayPage = lazy(() => import("@features/today/TodayPage"));
 const ProfilePage = lazy(() => import("@features/profile/ProfilePage"));
+const LearnHub = lazy(() => import("@features/learn/LearnHub"));
+const TrackPage = lazy(() => import("@features/learn/TrackPage"));
+const LessonPage = lazy(() => import("@features/learn/LessonPage"));
 const Roadmap = lazy(() => import("@pages/Roadmap"));
 const DailyPlanner = lazy(() => import("@pages/DailyPlanner"));
 const Notes = lazy(() => import("@pages/Notes"));
 const StoryBank = lazy(() => import("@pages/StoryBank"));
-const DSATracker = lazy(() => import("@pages/DSATracker"));
-const DSAPatterns = lazy(() => import("@pages/DSAPatterns"));
-const SystemDesign = lazy(() => import("@pages/SystemDesign"));
+const ProblemsPage = lazy(() => import("@features/practice/problems/ProblemsPage"));
+const ProblemWorkspace = lazy(() => import("@features/practice/problems/ProblemWorkspace"));
 const Applications = lazy(() => import("@pages/Applications"));
 const MockInterviews = lazy(() => import("@pages/MockInterviews"));
 const ResourceLibrary = lazy(() => import("@pages/ResourceLibrary"));
@@ -24,7 +26,6 @@ const Settings = lazy(() => import("@features/settings/SettingsPage"));
 
 const details = () => import("@pages/DetailPages");
 const StoryDetail = page(details, "StoryDetail");
-const DSAProblemDetail = page(details, "DSAProblemDetail");
 const SystemDesignDetail = page(details, "SystemDesignDetail");
 const ApplicationDetail = page(details, "ApplicationDetail");
 const MockInterviewDetail = page(details, "MockInterviewDetail");
@@ -43,17 +44,17 @@ export function AppRoutes() {
     <Routes>
       <Route path="/" element={<TodayPage />} />
 
-      <Route path="/learn" element={<ComingSoon feature="tracks" />} />
-      <Route path="/learn/dsa" element={<DSAPatterns />} />
-      <Route path="/learn/system-design" element={<SystemDesign />} />
+      <Route path="/learn" element={<LearnHub />} />
       <Route path="/learn/system-design/topics/:id" element={<SystemDesignDetail />} />
+      <Route path="/learn/:track" element={<TrackPage />} />
+      <Route path="/learn/:track/:lesson" element={<LessonPage />} />
 
       <Route path="/review" element={<ComingSoon feature="review" />} />
       <Route path="/arcade" element={<ComingSoon feature="arcade" />} />
 
       <Route path="/practice" element={<Navigate to="/practice/problems" replace />} />
-      <Route path="/practice/problems" element={<DSATracker />} />
-      <Route path="/practice/problems/:id" element={<DSAProblemDetail />} />
+      <Route path="/practice/problems" element={<ProblemsPage />} />
+      <Route path="/practice/problems/:id" element={<ProblemWorkspace />} />
       <Route path="/practice/mocks" element={<MockInterviews />} />
       <Route path="/practice/mocks/:id" element={<MockInterviewDetail />} />
       <Route path="/practice/stories" element={<StoryBank />} />

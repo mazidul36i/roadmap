@@ -2,10 +2,14 @@ import type { DSAProblem } from "@app-types/index";
 import { localDateKey } from "@lib/dates";
 import type { Slice } from "./types";
 
-/** Stamps solvedAt the first time a problem becomes solved. */
+/**
+ * Stamps solvedAt when a problem *becomes* solved (or is added already solved).
+ * Problems that were solved before Forge tracked dates keep an unknown date.
+ */
 function stampSolved(next: DSAProblem, prev?: DSAProblem): DSAProblem {
   if (!next.solved || next.solvedAt) return next;
-  return { ...next, solvedAt: prev?.solvedAt ?? localDateKey() };
+  if (prev?.solved) return prev.solvedAt ? { ...next, solvedAt: prev.solvedAt } : next;
+  return { ...next, solvedAt: localDateKey() };
 }
 
 export const practiceSlice: Slice = (state, action) => {
