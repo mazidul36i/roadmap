@@ -246,6 +246,10 @@ export interface CardState {
   lapses: number;
   state: number;
   last_review?: string;
+  /** Local day the card first entered the deck (for the daily new-card cap). */
+  added?: string;
+  /** Local day of the first real review. */
+  started?: string;
 }
 
 export type CardSourceType = "lesson" | "note" | "problem" | "mock" | "story" | "manual" | "ai";

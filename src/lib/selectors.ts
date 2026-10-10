@@ -2,13 +2,11 @@
 
 import type { AppState, Week } from "@app-types/index";
 import { diffDays, localDateKey } from "@lib/dates";
+import { reviewCounts } from "@lib/deck";
 
-/** Cards whose FSRS due date has passed. New built-in cards are counted by the review queue itself. */
+/** Cards to review right now: due reviews plus today's allowance of new cards. */
 export function dueCardCount(state: AppState, now: Date = new Date()): number {
-  const t = now.getTime();
-  let n = 0;
-  for (const card of Object.values(state.srs)) if (new Date(card.due).getTime() <= t) n++;
-  return n;
+  return reviewCounts(state, now).total;
 }
 
 /** The sprint that covers today, based on the campaign start date (never clamped to 8). */

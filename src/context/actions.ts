@@ -68,7 +68,8 @@ export type Action =
   | { type: "DELETE_APPLICATION"; id: string }
   // ── Learning ────────────────────────────────────────────────────────────────
   | { type: "SET_LESSON_PROGRESS"; lessonId: string; progress: Partial<LessonProgress> }
-  | { type: "COMPLETE_LESSON"; lessonId: string }
+  /** cardKeys: the lesson's built-in cards, which enter the review deck. */
+  | { type: "COMPLETE_LESSON"; lessonId: string; cardKeys?: string[] }
   | { type: "RECORD_QUIZ"; lessonId: string; score: number }
   | { type: "REVIEW_CARD"; cardId: string; card: CardState; rating: 1 | 2 | 3 | 4 }
   | { type: "RESET_CARD"; cardId: string }

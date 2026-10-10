@@ -86,7 +86,8 @@ export default function LessonPage() {
     }
   };
 
-  const complete = () => dispatch({ type: "COMPLETE_LESSON", lessonId: meta.id });
+  const complete = () =>
+    dispatch({ type: "COMPLETE_LESSON", lessonId: meta.id, cardKeys: (body?.cards ?? []).map(c => `lesson:${meta.id}:${c.id}`) });
 
   return (
     <div className={s.lessonLayout} style={{ "--accent": accent } as CSSProperties}>

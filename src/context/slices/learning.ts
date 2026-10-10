@@ -1,6 +1,16 @@
 import { localDateKey } from "@lib/dates";
 import { addMinutes, applyAward } from "@lib/award";
+import { newCardState } from "@lib/srs";
+import type { CardState } from "@app-types/index";
 import type { Slice } from "./types";
+
+/** Adds brand-new scheduling entries for keys that aren't in the deck yet. */
+function enterDeck(srs: Record<string, CardState>, keys: string[]): Record<string, CardState> {
+  const fresh = keys.filter(k => !srs[k]);
+  if (!fresh.length) return srs;
+  const now = new Date();
+  return { ...srs, ...Object.fromEntries(fresh.map(k => [k, newCardState(now)])) };
+}
 
 export const learningSlice: Slice = (state, action) => {
   switch (action.type) {
@@ -14,9 +24,11 @@ export const learningSlice: Slice = (state, action) => {
       };
     case "COMPLETE_LESSON": {
       const prev = state.lessonProgress[action.lessonId];
-      if (prev?.doneAt) return state;
+      const srs = enterDeck(state.srs, action.cardKeys ?? []);
+      if (prev?.doneAt) return srs === state.srs ? state : { ...state, srs };
       return {
         ...state,
+        srs,
         lessonProgress: { ...state.lessonProgress, [action.lessonId]: { ...prev, doneAt: localDateKey() } },
       };
     }
@@ -32,11 +44,15 @@ export const learningSlice: Slice = (state, action) => {
       return { ...state, srs: rest };
     }
     case "ADD_USER_CARDS":
-      return { ...state, userCards: [...action.cards, ...state.userCards] };
+      return {
+        ...state,
+        userCards: [...action.cards, ...state.userCards],
+        srs: enterDeck(state.srs, action.cards.map(c => `user:${c.id}`)),
+      };
     case "UPDATE_USER_CARD":
       return { ...state, userCards: state.userCards.map(c => (c.id === action.card.id ? action.card : c)) };
     case "DELETE_USER_CARD": {
-      const { [action.id]: _dropped, ...srs } = state.srs;
+      const { [`user:${action.id}`]: _dropped, ...srs } = state.srs;
       return { ...state, userCards: state.userCards.filter(c => c.id !== action.id), srs };
     }
     case "RECORD_ARCADE": {
