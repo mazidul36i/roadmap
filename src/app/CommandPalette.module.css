@@ -1,0 +1,131 @@
+.content {
+  position: fixed;
+  z-index: var(--z-palette);
+  top: 12vh;
+  left: 50%;
+  width: min(calc(100vw - 24px), 640px);
+  transform: translateX(-50%);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--elev-3);
+  overflow: hidden;
+  animation: palette-in var(--dur-base) var(--ease-out);
+}
+
+@keyframes palette-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.98); }
+}
+
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-3);
+}
+
+.input {
+  flex: 1;
+  height: 56px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--fs-lg);
+}
+
+.input:focus,
+.input:focus-visible {
+  box-shadow: none;
+}
+
+.input::placeholder {
+  color: var(--text-3);
+}
+
+.list {
+  max-height: min(60vh, 460px);
+  overflow-y: auto;
+  padding: var(--space-2);
+  scroll-padding: var(--space-2);
+}
+
+.group [cmdk-group-heading] {
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.item[data-selected="true"] {
+  background: var(--brand-soft);
+}
+
+.item[data-selected="true"] .itemIcon {
+  color: var(--brand-text);
+}
+
+.itemIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.itemHint {
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+.empty {
+  padding: var(--space-10) var(--space-4);
+  text-align: center;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+.footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

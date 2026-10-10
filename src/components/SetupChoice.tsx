@@ -1,15 +1,12 @@
-import React from "react";
 import { useApp } from "@context/AppContext";
 import { emptyState, seedState } from "@data/seed";
 import { CheckCircle2, ListFilter, Sparkles, Trash2 } from "lucide-react";
 
 export default function SetupChoice() {
-  const { dispatch, setNeedsOnboarding } = useApp();
+  const { completeOnboarding } = useApp();
 
   const handleChoice = (isSeeded: boolean) => {
-    const initialState = isSeeded ? seedState : emptyState;
-    dispatch({ type: "SET_STATE", state: initialState });
-    setNeedsOnboarding(false);
+    completeOnboarding(isSeeded ? seedState : emptyState);
   };
 
   return (
@@ -19,8 +16,8 @@ export default function SetupChoice() {
           <div className="setup-icon">
             <Sparkles size={32} className="text-accent-light" />
           </div>
-          <h1>Welcome to Roadmap!</h1>
-          <p>How would you like to start your 2-month job switch journey?</p>
+          <h1>Welcome to Forge</h1>
+          <p>How would you like to start your campaign?</p>
         </div>
 
         <div className="choice-grid">

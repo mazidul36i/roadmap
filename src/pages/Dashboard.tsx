@@ -42,7 +42,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { weeks, dsaProblems, storyCards, applications, mockInterviews, studyStreak, startDate } = state;
 
-  const currentWeek = getCurrentWeek(startDate);
+  const currentWeek = getCurrentWeek(startDate, weeks.length);
   const currentWeekData = weeks[currentWeek - 1];
   const overallPct = computeProgress(weeks);
 

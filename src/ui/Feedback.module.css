@@ -1,0 +1,157 @@
+/* ── Toasts ─────────────────────────────────────────────────── */
+.region {
+  position: fixed;
+  z-index: var(--z-toast);
+  right: var(--space-6);
+  bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .region {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: calc(var(--bottomnav-h) + var(--space-3) + env(safe-area-inset-bottom));
+    align-items: stretch;
+  }
+}
+
+.toast {
+  --tone: var(--info);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 280px;
+  max-width: 420px;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--elev-3);
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
+
+.toast.success { --tone: var(--success); }
+.toast.error { --tone: var(--danger); }
+.toast.info { --tone: var(--info); }
+.toast.xp {
+  --tone: var(--xp);
+  border-color: color-mix(in srgb, var(--xp) 40%, transparent);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--xp) 12%, var(--surface-2)), var(--surface-2) 60%);
+}
+
+.toastIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  color: var(--tone);
+}
+
+.toastBody {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.toastTitle {
+  font-weight: 600;
+}
+
+.toastDetail {
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  margin-top: 2px;
+}
+
+.toastAction {
+  flex-shrink: 0;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: 6px;
+  color: var(--brand-text);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+}
+
+.toastAction:hover {
+  background: var(--brand-soft);
+}
+
+.toastClose {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  color: var(--text-3);
+}
+
+.toastClose:hover {
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+/* ── Confirm dialog ─────────────────────────────────────────── */
+.confirmIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone, var(--warning)) 16%, transparent);
+  color: var(--tone, var(--warning));
+}
+
+.confirmRow {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.confirmTitle {
+  font-size: var(--fs-lg);
+}
+
+.confirmMessage {
+  margin-top: var(--space-1);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.confirmContent {
+  position: fixed;
+  z-index: var(--z-modal);
+  top: 50%;
+  left: 50%;
+  width: min(calc(100vw - 32px), 440px);
+  padding: var(--space-6);
+  transform: translate(-50%, -50%);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--elev-3);
+  animation: confirm-in var(--dur-base) var(--ease-out);
+}
+
+@keyframes confirm-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+}

@@ -12,7 +12,7 @@ function statusNext(s: TaskStatus): TaskStatus {
 export default function FocusMode() {
   const { state, dispatch, isTimerVisible, setIsTimerVisible } = useApp();
   const navigate = useNavigate();
-  const currentWeekIdx = getCurrentWeek(state.startDate) - 1;
+  const currentWeekIdx = getCurrentWeek(state.startDate, state.weeks.length) - 1;
   const week = state.weeks[currentWeekIdx];
   const today = state.dayLogs.find(d => d.date === new Date().toISOString().slice(0, 10));
 

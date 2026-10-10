@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Plus, Search, Tag, Trash2, X, Wand2 } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
@@ -55,7 +56,15 @@ export default function Notes() {
       setSelected(note.id);
       setCreating(false);
     } else if (selected) {
-      const orig = state.notes.find(n => n.id === selected)!;
+      const orig = state.notes.find(n => n.id === selected);
+      if (!orig) return;
+      // Opening a note must not count as editing it.
+      const unchanged =
+        orig.title === form.title &&
+        orig.content === form.content &&
+        orig.category === form.category &&
+        orig.tags.join("|") === form.tags.join("|");
+      if (unchanged) return;
       dispatch({ type: "UPDATE_NOTE", note: { ...orig, ...form, updatedAt: now } });
     }
   };
@@ -73,6 +82,15 @@ export default function Notes() {
     setCreating(false);
     setForm({ title: note.title, content: note.content, category: note.category, tags: note.tags });
   };
+
+  // Deep link: /notes/:id opens that note.
+  const { id: routeNoteId } = useParams<{ id: string }>();
+  useEffect(() => {
+    if (!routeNoteId || routeNoteId === selected) return;
+    const note = state.notes.find(n => n.id === routeNoteId);
+    if (note) openNote(note);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeNoteId, state.notes.length]);
 
   const addTag = () => {
     const t = tagInput.trim();

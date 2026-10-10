@@ -1,9 +1,10 @@
-import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, signOut as firebaseSignOut, User } from "firebase/auth";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { onAuthStateChanged, signOut as firebaseSignOut, type User } from "firebase/auth";
 import { auth } from "@lib/firebase";
 
 interface AuthContextType {
   user: User | null;
+  /** True until Firebase has told us whether someone is signed in. */
   loading: boolean;
   logout: () => Promise<void>;
 }
@@ -14,28 +15,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    return onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-  }, []);
-
-  const logout = async () => {
-    await firebaseSignOut(auth);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
-      {!loading && children}
-    </AuthContext.Provider>
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, next => {
+        setUser(next);
+        setLoading(false);
+      }),
+    [],
   );
+
+  const value = useMemo(() => ({ user, loading, logout: () => firebaseSignOut(auth) }), [user, loading]);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }

@@ -1,210 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+/*
+ * LEGACY STYLES — transitional.
+ * The pre-Forge stylesheet, kept only so pages that have not been rebuilt yet
+ * keep working. Its old variable names are aliased onto the Forge tokens so
+ * every legacy page already renders in the new palette. Each page drops its
+ * dependency on this file as it moves to CSS Modules; the file is deleted in
+ * the final polish phase.
+ */
 
-/* ─── DESIGN TOKENS ─────────────────────────────────────── */
-:root {
-  --bg-primary: #090d13;
-  --bg-secondary: #101722;
-  --bg-card: #151d2b;
-  --bg-card-hover: #1d2838;
-  --bg-glass: rgba(16, 23, 34, 0.82);
-  --border: rgba(226, 232, 240, 0.08);
-  --border-accent: rgba(99, 102, 241, 0.3);
+:root,
+[data-theme="light"] {
+  --bg-primary: var(--bg);
+  --bg-secondary: var(--surface-1);
+  --bg-card: var(--surface-1);
+  --bg-card-hover: var(--surface-hover);
+  --bg-glass: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  --border-accent: color-mix(in srgb, var(--brand) 35%, transparent);
 
-  --accent: #6366f1;
-  --accent-light: #818cf8;
-  --accent-dim: rgba(99, 102, 241, 0.15);
-  --accent-glow: rgba(99, 102, 241, 0.25);
+  --accent: var(--brand);
+  --accent-light: var(--brand-text);
+  --accent-dim: var(--brand-soft);
+  --accent-glow: var(--brand-glow);
 
-  --success: #10b981;
-  --success-dim: rgba(16, 185, 129, 0.15);
-  --warning: #f59e0b;
-  --warning-dim: rgba(245, 158, 11, 0.15);
-  --danger: #ef4444;
-  --danger-dim: rgba(239, 68, 68, 0.15);
-  --info: #3b82f6;
-  --info-dim: rgba(59, 130, 246, 0.15);
+  --success-dim: var(--success-soft);
+  --warning-dim: var(--warning-soft);
+  --danger-dim: var(--danger-soft);
+  --info-dim: var(--info-soft);
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #b5c1d3;
-  --text-muted: #718096;
-  --text-accent: #818cf8;
+  --text-primary: var(--text);
+  --text-secondary: var(--text-2);
+  --text-muted: var(--text-3);
+  --text-accent: var(--brand-text);
 
   --radius-sm: 6px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 18px;
+  --radius: var(--r-sm);
+  --radius-lg: var(--r-md);
+  --radius-xl: var(--r-lg);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-  --shadow-accent: 0 4px 20px rgba(99, 102, 241, 0.2);
+  --shadow-sm: var(--elev-1);
+  --shadow: var(--elev-2);
+  --shadow-lg: var(--elev-3);
+  --shadow-accent: 0 6px 24px -8px var(--brand-glow);
 
-  --sidebar-width: 240px;
-  --topbar-height: 60px;
-  --transition: 0.2s ease;
+  --sidebar-width: var(--sidebar-w);
+  --topbar-height: var(--topbar-h);
+  --transition: var(--dur-base) var(--ease-out);
+
 }
 
-[data-theme="light"] {
-  --bg-primary: #f1f5f9;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f8fafc;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  --border: rgba(15, 23, 42, 0.15);
-  --border-accent: rgba(99, 102, 241, 0.25);
-
-  --success-dim: rgba(16, 185, 129, 0.1);
-  --warning-dim: rgba(245, 158, 11, 0.1);
-  --danger-dim: rgba(239, 68, 68, 0.1);
-  --info-dim: rgba(59, 130, 246, 0.1);
-  --accent: #4f46e5;
-  --accent-light: #6366f1;
-  --accent-dim: rgba(79, 70, 229, 0.08);
-  --accent-glow: rgba(79, 70, 229, 0.12);
-
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --text-accent: #4f46e5;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="light"] .sidebar {
-  background: #f8fafc;
-  border-right: 1px solid rgba(15, 23, 42, 0.15);
-}
-
-[data-theme="light"] .sidebar-brand-mark,
-[data-theme="light"] .sidebar-logo h2,
-[data-theme="light"] .sidebar-logo span,
-[data-theme="light"] .nav-item,
-[data-theme="light"] .nav-section-label,
-[data-theme="light"] .sidebar-footer {
-  color: #0f172a;
-}
-
-[data-theme="light"] .nav-item.active {
-  background: rgba(79, 70, 229, 0.1);
-  color: #4f46e5;
-}
-
-[data-theme="light"] .nav-item:hover:not(.active) {
-  background: rgba(15, 23, 42, 0.05);
-  color: #0f172a;
-}
-
-[data-theme="light"] .dashboard-hero {
-  background:
-    linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(59, 130, 246, 0.08) 48%, rgba(16, 185, 129, 0.06)),
-    #ffffff;
-}
-
-/* ─── RESET ─────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 15px;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.5), transparent 320px),
-    var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-#root {
-  display: flex;
-  min-height: 100vh;
-}
-
-a {
-  color: var(--accent-light);
-  text-decoration: none;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--accent-light);
-  outline-offset: 2px;
-}
-
-input, textarea, select {
-  font-family: inherit;
-}
-
-ul {
-  list-style: none;
-}
-
-/* ─── LAYOUT ─────────────────────────────────────────────── */
-.app-shell {
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: var(--sidebar-width);
-  background: rgba(16, 23, 34, 0.96);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 100;
-  transition: transform var(--transition);
-  overflow-y: auto;
-  transform: translateX(-100%);
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.main-content {
-  margin-left: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  transition: margin-left var(--transition), width var(--transition);
-}
-
-@media (min-width: 901px) {
-  .main-content.sidebar-open {
-    margin-left: var(--sidebar-width);
-    width: calc(100% - var(--sidebar-width));
-  }
-}
-
-.page-area {
-  flex: 1;
-  padding: 28px 32px;
-  width: 100%;
-  max-width: 1680px;
+/* Buttons painted with the brand need the brand's own foreground colour. */
+.btn-primary,
+.btn-primary:hover {
+  color: var(--on-brand) !important;
 }
 
 /* ─── SIDEBAR ────────────────────────────────────────────── */
@@ -435,7 +281,7 @@ ul {
 
 .btn-primary {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
   border-color: var(--accent);
 }
 
@@ -552,7 +398,7 @@ ul {
 
 .tag:hover, .tag.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .tag-cloud {
@@ -1382,7 +1228,7 @@ tbody td {
 
 .tab-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1644,7 +1490,7 @@ tbody td {
 
 .login-button {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
   border: none;
   border-radius: var(--radius);
   padding: 14px;
@@ -1799,7 +1645,7 @@ tbody td {
   top: 16px;
   right: 16px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 4px 10px;
@@ -1873,7 +1719,7 @@ tbody td {
 
 .choice-card:hover .choice-action {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .choice-card.secondary:hover .choice-action {

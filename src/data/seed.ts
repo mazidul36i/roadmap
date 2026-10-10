@@ -9,6 +9,8 @@ import type {
   SystemDesignTopic,
   Week
 } from "@app-types/index";
+import { addDays, localDateKey } from "@lib/dates";
+import { createEmptyState, SCHEMA_VERSION } from "@lib/migrate";
 
 const uid = () => crypto.randomUUID();
 
@@ -648,10 +650,12 @@ const resources: Resource[] = [
 ];
 
 // ─── FULL SEED STATE ───────────────────────────────────────────────────────────
-const today = new Date().toISOString().slice(0, 10);
-const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+const today = localDateKey();
+const yesterday = addDays(today, -1);
 
 export const seedState: AppState = {
+  ...createEmptyState(today),
+  schemaVersion: SCHEMA_VERSION,
   weeks,
   dayLogs: [
     {
@@ -671,12 +675,12 @@ export const seedState: AppState = {
   applications,
   mockInterviews,
   resources,
-  studyStreak: [yesterday, today],
+  studyStreak: [],
   startDate: today,
-  leetcodeUsername: "shohel75",
 };
 
 export const emptyState: AppState = {
+  ...createEmptyState(today),
   weeks,
   dayLogs: [],
   notes: [],

@@ -1,16 +1,30 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Forge: interview prep you'll actually enjoy</title>
   <meta name="description"
-        content="Personal job-switch preparation tracker — track DSA, system design, applications, stories, and mock interviews in one place." />
-  <title>Roadmap Tracker — 2-Month Job Switch Prep</title>
+        content="Forge is a personal interview-prep portal: interactive DSA and system design lessons, spaced-repetition review, an AI tutor and mock interviewer, and a game layer that keeps you consistent." />
+  <meta name="theme-color" content="#0a0b10" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/svg+xml" href="/forge.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" />
+  <script>
+    // Apply the cached theme before first paint so there is no flash while Firestore loads.
+    (function () {
+      try {
+        var pref = localStorage.getItem("forge:theme") || "dark";
+        var resolved = pref === "system"
+          ? (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")
+          : pref;
+        document.documentElement.setAttribute("data-theme", resolved);
+      } catch (e) { /* storage unavailable: keep the dark default */ }
+    })();
+  </script>
 </head>
 <body>
   <div id="root"></div>

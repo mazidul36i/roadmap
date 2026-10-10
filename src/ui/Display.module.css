@@ -1,0 +1,335 @@
+/* ── Card ───────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+}
+
+.card.flush { padding: 0; gap: 0; }
+.card.compact { padding: var(--space-4); gap: var(--space-3); }
+.card.roomy { padding: var(--space-6); gap: var(--space-5); }
+
+.card.raised {
+  background: var(--surface-2);
+}
+
+.card.interactive {
+  cursor: pointer;
+  transition:
+    border-color var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+  text-decoration: none;
+  color: inherit;
+}
+
+.card.interactive:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--elev-2);
+  text-decoration: none;
+}
+
+.card.interactive:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Accent edge in a track or brand colour, set via --accent on the element. */
+.card.accent {
+  border-color: color-mix(in srgb, var(--accent, var(--brand)) 30%, var(--border));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent, var(--brand)) 40%, transparent);
+}
+
+.card.glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, color-mix(in srgb, var(--accent, var(--brand)) 70%, transparent), transparent 45%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.blueprint {
+  background-image: var(--dot-grid);
+  background-size: 18px 18px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.cardTitle svg {
+  color: var(--accent, var(--text-2));
+}
+
+.cardSubtitle {
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+/* ── Badge ──────────────────────────────────────────────────── */
+.badge {
+  --tone: var(--text-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  color: var(--tone);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.badge.outline {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--tone) 40%, transparent);
+}
+
+.tone-neutral { --tone: var(--text-2); }
+.tone-brand { --tone: var(--brand-text); }
+.tone-success { --tone: var(--success); }
+.tone-warning { --tone: var(--warning); }
+.tone-danger { --tone: var(--danger); }
+.tone-info { --tone: var(--info); }
+.tone-xp { --tone: var(--xp); }
+.tone-custom { --tone: var(--accent); }
+
+/* ── Progress bar ───────────────────────────────────────────── */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--fs-sm);
+}
+
+.progressLabel { color: var(--text); font-weight: 500; }
+.progressValue { color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+.track {
+  position: relative;
+  height: var(--bar-h, 8px);
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--bar-color, var(--brand));
+  transition: width var(--dur-slow) var(--ease-out);
+}
+
+/* ── Ring ───────────────────────────────────────────────────── */
+.ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.ring svg {
+  transform: rotate(-90deg);
+}
+
+.ringTrack {
+  stroke: var(--surface-3);
+}
+
+.ringFill {
+  stroke: var(--ring-color, var(--brand));
+  transition: stroke-dashoffset var(--dur-slow) var(--ease-out);
+}
+
+.ringCenter {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--surface-1) 60%, transparent);
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-md);
+  background: var(--brand-soft);
+  color: var(--brand-text);
+}
+
+.emptyTitle {
+  font-size: var(--fs-lg);
+}
+
+.emptyBody {
+  max-width: 46ch;
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* ── Skeleton ───────────────────────────────────────────────── */
+.skeleton {
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: forge-shimmer 1.4s ease infinite;
+}
+
+/* ── Page header ────────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.pageTitle {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  margin-top: var(--space-1);
+  color: var(--text-2);
+  max-width: 64ch;
+}
+
+.pageActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 767px) {
+  .pageTitle { font-size: var(--fs-2xl); }
+  .pageHeader { margin-bottom: var(--space-5); }
+}
+
+/* ── Kbd ────────────────────────────────────────────────────── */
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* ── Stat tile ──────────────────────────────────────────────── */
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.statTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.statIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent, var(--brand)) 16%, transparent);
+  color: var(--accent, var(--brand-text));
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.statHint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+/* ── Gem ────────────────────────────────────────────────────── */
+.gem {
+  display: inline-block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--gem) 45%, transparent));
+}
