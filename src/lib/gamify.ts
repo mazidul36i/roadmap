@@ -28,6 +28,7 @@ export const XP = {
   rehearsal: 10,
   mock: 40,
   aiMockBonus: 20,
+  designExercise: 40,
   journal: 5,
   application: 10,
   applicationMove: 5,
@@ -88,6 +89,13 @@ export function detectAwards(prev: AppState, next: AppState, action: Action, tod
       const awards: Award[] = [{ key: `mock:${action.mock.id}`, kind: "mock", xp: XP.mock }];
       if (action.mock.ai && action.mock.score >= 8) awards.push({ key: `mock-ai:${action.mock.id}`, kind: "mock", xp: XP.aiMockBonus });
       return awards;
+    }
+    case "UPDATE_SD_TOPIC": {
+      const before = prev.sdTopics.find(t => t.id === action.topic.id);
+      const after = next.sdTopics.find(t => t.id === action.topic.id);
+      return after?.exerciseId && after.completedAt && !before?.completedAt
+        ? [{ key: `design:${after.id}`, kind: "design", xp: XP.designExercise }]
+        : [];
     }
     case "ADD_DAY_LOG":
       return toDateKey(action.log.date) === today ? [{ key: `journal:${today}`, kind: "journal", xp: XP.journal }] : [];
@@ -234,6 +242,8 @@ export function describeAward(key: string, state: AppState): string {
       return "Mock interview logged";
     case "mock-ai":
       return "Strong AI mock score";
+    case "design":
+      return `Design exercise: ${state.sdTopics.find(t => t.id === id)?.title ?? "complete"}`;
     case "journal":
       return "Journal entry";
     case "note":

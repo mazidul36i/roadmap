@@ -26,6 +26,7 @@ const COUNTER: Record<QuestKind, ActivityKind> = {
   journal: "journal",
   pipeline: "application",
   mock: "mock",
+  design: "design",
 };
 
 function hash(text: string): number {
@@ -76,6 +77,7 @@ export function generateQuests(state: AppState, date: string, ctx: QuestContext)
   if (state.storyCards.length) rotation.push(["story", "Rehearse a STAR story out loud", "/practice/stories"]);
   if (ctx.arcade) rotation.push(["arcade", "Play one arcade round", "/arcade"]);
   if (activeApps) rotation.push(["pipeline", "Move an application forward", "/career"]);
+  if (state.lessonProgress["sd-framework"]?.doneAt) rotation.push(["design", "Finish a system design exercise", "/learn/system-design?tab=exercises"]);
   rotation.push(["journal", "Log what you studied today", "/journal"]);
   rotation.push(["mock", "Do a mock interview", "/practice/mocks"]);
   const options = rotation.filter(([kind]) => !used.has(kind));

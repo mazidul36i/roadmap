@@ -107,6 +107,25 @@ export interface SystemDesignTopic {
   diagramRef: string;
   category: "core" | "exercise";
   linkedNoteIds?: string[];
+  /** Set when this topic is an attempt at a built-in design exercise. */
+  exerciseId?: string;
+  /** Answers per exercise step. */
+  answers?: Record<string, string>;
+  /** Self-rubric scores (1..5) per criterion. */
+  selfScore?: Record<string, number>;
+  review?: SDReview;
+  elapsedSec?: number;
+  startedAt?: string; // YYYY-MM-DD
+  completedAt?: string; // YYYY-MM-DD
+}
+
+export interface SDReview {
+  score: number; // 0..100
+  rubric: { criterion: string; score: number; comment: string }[];
+  strengths: string[];
+  gaps: string[];
+  nextSteps: string[];
+  at: string; // ISO
 }
 
 export type AppStatus =
@@ -194,6 +213,7 @@ export type ActivityKind =
   | "quiz"
   | "story"
   | "mock"
+  | "design"
   | "journal"
   | "arcade"
   | "quest"
@@ -212,7 +232,7 @@ export interface ActivityDay {
   frozen?: boolean;
 }
 
-export type QuestKind = "review" | "lesson" | "problem" | "story" | "arcade" | "journal" | "pipeline" | "mock";
+export type QuestKind = "review" | "lesson" | "problem" | "story" | "arcade" | "journal" | "pipeline" | "mock" | "design";
 
 export interface Quest {
   id: string;

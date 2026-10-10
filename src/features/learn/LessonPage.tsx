@@ -166,14 +166,7 @@ export default function LessonPage() {
               subtitle={`${GEM_LABEL[gemTier(mastery.total)]} · ${mastery.total}/100`}
             />
             <div className="u-stack" style={{ ["--stack-gap" as string]: "8px" }}>
-              {(
-                [
-                  ["Lesson", mastery.lesson, 20],
-                  ["Quiz", mastery.quiz, 20],
-                  ["Problems", mastery.problems, 40],
-                  ["Memory", mastery.retention, 20],
-                ] as const
-              ).map(([label, value, max]) => (
+              {mastery.parts.map(({ label, value, max }) => (
                 <div key={label} className={s.masteryRow}>
                   <span>{label}</span>
                   <ProgressBar value={value} max={max} valueLabel={false} height={6} color={accent} ariaLabel={`${label}: ${value} of ${max}`} />

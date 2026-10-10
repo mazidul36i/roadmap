@@ -30,6 +30,7 @@ const KIND_LABEL: Partial<Record<ActivityKind, string>> = {
   task: "Tasks",
   story: "Rehearsals",
   mock: "Mocks",
+  design: "Design",
   quest: "Quests",
   journal: "Journal",
   application: "Career",

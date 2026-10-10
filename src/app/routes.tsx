@@ -13,6 +13,7 @@ const ProfilePage = lazy(() => import("@features/profile/ProfilePage"));
 const LearnHub = lazy(() => import("@features/learn/LearnHub"));
 const TrackPage = lazy(() => import("@features/learn/TrackPage"));
 const LessonPage = lazy(() => import("@features/learn/LessonPage"));
+const ExerciseRunner = lazy(() => import("@features/learn/design/ExerciseRunner"));
 const ReviewPage = lazy(() => import("@features/review/ReviewPage"));
 const Roadmap = lazy(() => import("@pages/Roadmap"));
 const DailyPlanner = lazy(() => import("@pages/DailyPlanner"));
@@ -47,6 +48,7 @@ export function AppRoutes() {
 
       <Route path="/learn" element={<LearnHub />} />
       <Route path="/learn/system-design/topics/:id" element={<SystemDesignDetail />} />
+      <Route path="/learn/system-design/exercises/:id" element={<ExerciseRunner />} />
       <Route path="/learn/:track" element={<TrackPage />} />
       <Route path="/learn/:track/:lesson" element={<LessonPage />} />
 

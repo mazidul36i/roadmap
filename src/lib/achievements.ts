@@ -43,6 +43,7 @@ export interface GameStats {
   questsDone: number;
   perfectDays: number;
   arcadePlays: number;
+  designExercises: number;
 }
 
 const INTERVIEW_STAGES = new Set(["interview-scheduled", "technical-round", "system-design-round", "offer"]);
@@ -86,6 +87,7 @@ export function computeStats(state: AppState, bestMastery = 0): GameStats {
     questsDone,
     perfectDays,
     arcadePlays: Object.values(state.arcade).reduce((n, a) => n + a.plays, 0),
+    designExercises: new Set(state.sdTopics.filter(t => t.exerciseId && t.completedAt).map(t => t.exerciseId)).size,
   };
 }
 
@@ -109,6 +111,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: "polymath", title: "Polymath", description: "Finish a lesson in every track.", category: "learning", icon: "Orbit", rare: true, test: s => s.tracksWithLesson >= 6 },
   { id: "polished-gem", title: "Polished Gem", description: "Bring any skill to Polished mastery.", category: "learning", icon: "Gem", test: s => s.bestMastery >= 55 },
   { id: "brilliant", title: "Brilliant", description: "Bring any skill to Brilliant mastery.", category: "learning", icon: "Diamond", rare: true, test: s => s.bestMastery >= 80 },
+  { id: "blueprint", title: "Blueprint", description: "Finish a system design exercise.", category: "learning", icon: "DraftingCompass", test: s => s.designExercises >= 1 },
+  { id: "architect", title: "Architect", description: "Finish all eight system design exercises.", category: "learning", icon: "Building2", rare: true, test: s => s.designExercises >= 8 },
   // Review
   { id: "memory-palace", title: "Memory Palace", description: "Review 100 cards.", category: "review", icon: "Layers", test: s => s.reviews >= 100 },
   { id: "total-recall", title: "Total Recall", description: "Review 1,000 cards.", category: "review", icon: "Brain", rare: true, test: s => s.reviews >= 1000 },

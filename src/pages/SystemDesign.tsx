@@ -4,6 +4,7 @@ import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { SDStatus, SystemDesignTopic } from "@app-types/index";
 import { useNavigate } from "react-router-dom";
+import { exercisePath } from "@content/system-design/exerciseMeta";
 
 const STATUS_LABELS: Record<SDStatus, string> = {
   "not-started": "Not Started",
@@ -179,11 +180,11 @@ export default function SystemDesign() {
           return (
           <div key={t.id} className="card"
             style={{ display: "flex", flexDirection: "column", gap: 12, cursor: "pointer", borderLeft: `3px solid ${borderColors[t.status]}` }}
-            onClick={() => navigate(`/sysdesign/${t.id}`)}>
+            onClick={() => navigate(t.exerciseId ? exercisePath(t.exerciseId) : `/sysdesign/${t.id}`)}>
             <div className="flex justify-between items-start">
               <h3 style={{ fontSize: "0.9rem", fontWeight: 700, flex: 1, lineHeight: 1.4 }}>{t.title}</h3>
               <div className="flex gap-4">
-                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(`/sysdesign/${t.id}`); }}><Edit3 size={13} /></button>
+                <button className="btn btn-ghost btn-icon" onClick={(e) => { e.stopPropagation(); navigate(t.exerciseId ? exercisePath(t.exerciseId) : `/sysdesign/${t.id}`); }}><Edit3 size={13} /></button>
                 <button 
                   className="btn btn-ghost btn-icon"
                   onClick={(e) => { e.stopPropagation(); confirm({

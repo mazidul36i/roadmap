@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { AudioLines, Briefcase, Check, Code2, Gamepad2, GraduationCap, Layers, Mic, NotebookPen, Target } from "lucide-react";
+import { AudioLines, Briefcase, Check, Code2, DraftingCompass, Gamepad2, GraduationCap, Layers, Mic, NotebookPen, Target } from "lucide-react";
 import type { QuestKind } from "@app-types/index";
 import { useApp } from "@context/AppContext";
 import { Card, CardHeader, ProgressBar, cx } from "@ui/index";
@@ -16,6 +16,7 @@ const ICONS: Record<QuestKind, typeof Layers> = {
   journal: NotebookPen,
   pipeline: Briefcase,
   mock: Mic,
+  design: DraftingCompass,
 };
 
 export function QuestsCard({ className }: { className?: string }) {
