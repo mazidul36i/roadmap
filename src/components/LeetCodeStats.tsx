@@ -160,16 +160,17 @@ export default function LeetCodeStats({ username }: LeetCodeStatsProps) {
 
   if (loadingStats) {
     return (
-      <div className="card" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 120 }}>
-        <Loader2 className="animate-spin" size={24} style={{ color: "var(--accent)" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem", color: "var(--text-muted)" }}>
+        <Loader2 className="animate-spin" size={14} style={{ color: "var(--accent)" }} />
+        Loading LeetCode stats...
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="card" style={{ border: "1px solid var(--danger)" }}>
-        <div style={{ color: "var(--danger)" }}>{error}</div>
+      <div style={{ fontSize: "0.85rem", color: "var(--danger)" }}>
+        {error}
       </div>
     );
   }
@@ -177,47 +178,27 @@ export default function LeetCodeStats({ username }: LeetCodeStatsProps) {
   if (!stats) return null;
 
   return (
-    <div className="card" style={{ borderTop: "3px solid var(--accent)" }}>
-      <div className="flex items-center" style={{ justifyContent: "space-between", marginBottom: 16 }}>
-        <div>
-          <div className="section-title" style={{ marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-            LeetCode Stats
-            <a href={`https://leetcode.com/${username}`} target="_blank" rel="noreferrer" style={{ color: "var(--text-muted)", display: "flex" }}>
-              <ExternalLink size={14} />
-            </a>
-          </div>
-          <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-            Ranking: <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{stats.ranking ? stats.ranking.toLocaleString() : 'N/A'}</span>
-          </div>
+    <div className="flex items-center" style={{ justifyContent: "space-between", width: "100%", background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: 8, border: "1px solid var(--border)" }}>
+      <div>
+        <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 8, marginBottom: 4, fontSize: "0.9rem" }}>
+          LeetCode Linked
+          <a href={`https://leetcode.com/${username}`} target="_blank" rel="noreferrer" style={{ color: "var(--text-muted)", display: "flex" }}>
+            <ExternalLink size={14} />
+          </a>
         </div>
-        <button 
-          className="btn btn-primary" 
-          onClick={handleSync} 
-          disabled={syncing}
-        >
-          {syncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-          {syncing ? "Syncing..." : "Sync Recent"}
-        </button>
-      </div>
-
-      <div style={{ display: "flex", gap: 12 }}>
-        <div className="stat-card" style={{ flex: 1, borderTop: "2px solid var(--success)" }}>
-          <div className="stat-card-value" style={{ color: "var(--success)", fontSize: "1.2rem" }}>{stats.easySolved || 0}</div>
-          <div className="stat-card-label">Easy</div>
-        </div>
-        <div className="stat-card" style={{ flex: 1, borderTop: "2px solid var(--warning)" }}>
-          <div className="stat-card-value" style={{ color: "var(--warning)", fontSize: "1.2rem" }}>{stats.mediumSolved || 0}</div>
-          <div className="stat-card-label">Medium</div>
-        </div>
-        <div className="stat-card" style={{ flex: 1, borderTop: "2px solid var(--danger)" }}>
-          <div className="stat-card-value" style={{ color: "var(--danger)", fontSize: "1.2rem" }}>{stats.hardSolved || 0}</div>
-          <div className="stat-card-label">Hard</div>
-        </div>
-        <div className="stat-card" style={{ flex: 1, borderTop: "2px solid var(--accent)" }}>
-          <div className="stat-card-value" style={{ color: "var(--accent)", fontSize: "1.2rem" }}>{stats.totalSolved || 0}</div>
-          <div className="stat-card-label">Total</div>
+        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+          Ranking: <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>{stats.ranking ? stats.ranking.toLocaleString() : 'N/A'}</span>
         </div>
       </div>
+      <button 
+        className="btn btn-secondary btn-sm" 
+        onClick={handleSync} 
+        disabled={syncing}
+        style={{ padding: "6px 12px", fontSize: "0.8rem" }}
+      >
+        {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+        {syncing ? "Syncing..." : "Sync Recent"}
+      </button>
     </div>
   );
 }

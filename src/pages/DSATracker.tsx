@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X, Sparkles, BrainCircuit, Lightbulb, BookOpen } from "lucide-react";
+import { AlertTriangle, Edit3, ExternalLink, Loader2, Plus, Trash2, Wand2, X, Sparkles, BrainCircuit, Lightbulb, BookOpen, Target, Zap, GraduationCap } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -176,22 +176,6 @@ function ProblemModal({ problem, onClose, onSave }: {
 
 import { useConfirm } from "@context/ConfirmationContext";
 
-const RECOMMENDATIONS: Record<string, string[]> = {
-  "Arrays": ["Spiral Matrix", "Rotate Image", "Subarray Sum Equals K", "Merge Intervals"],
-  "Strings": ["Longest Substring Without Repeating Characters", "Valid Palindrome", "String to Integer (atoi)"],
-  "Hashmaps": ["Group Anagrams", "Top K Frequent Elements", "LRU Cache"],
-  "Linked List": ["Reverse Linked List", "Merge Two Sorted Lists", "Linked List Cycle"],
-  "Trees": ["Invert Binary Tree", "Binary Tree Level Order Traversal", "Lowest Common Ancestor"],
-  "Graphs": ["Number of Islands", "Course Schedule", "Clone Graph"],
-  "Dynamic Programming": ["Coin Change", "Climbing Stairs", "Longest Common Subsequence", "Word Break"],
-  "Binary Search": ["Search in Rotated Sorted Array", "Find Minimum in Rotated Sorted Array"],
-  "Two Pointer": ["3Sum", "Container With Most Water", "Trapping Rain Water"],
-  "Sliding Window": ["Longest Repeating Character Replacement", "Minimum Window Substring"],
-  "Backtracking": ["Permutations", "Subsets", "Combination Sum"],
-  "Greedy": ["Gas Station", "Jump Game", "Partition Labels"],
-  "Heap": ["Kth Largest Element in an Array", "Merge k Sorted Lists"],
-};
-
 export default function DSATracker() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
@@ -201,9 +185,10 @@ export default function DSATracker() {
   const [filterDiff, setFilterDiff] = useState("");
   const [filterSolved, setFilterSolved] = useState("");
   const [search, setSearch] = useState("");
-  const [recommendation, setRecommendation] = useState<any>(null);
-
-  const [aiAction, setAiAction] = useState<{ type: 'hint' | 'explain', problem: DSAProblem } | null>(null);
+  
+  const [isAiCollapsed, setIsAiCollapsed] = useState(false);
+  const [aiPanel, setAiPanel] = useState<'none' | 'analyze' | 'plan' | 'pattern'>('none');
+  const [aiAction, setAiAction] = useState<{ type: 'hint' | 'explain' | 'insights', problem?: DSAProblem } | null>(null);
   const [aiResult, setAiResult] = useState<any>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const leetcodeUsername = state.leetcodeUsername || "";
@@ -213,12 +198,12 @@ export default function DSATracker() {
     dispatch({ type: "SET_LEETCODE_USERNAME", username: tempUsername });
   };
 
-  const handleAiAction = async (type: 'hint' | 'explain', p: DSAProblem) => {
+  const handleAiAction = async (type: 'hint' | 'explain' | 'insights', p?: DSAProblem) => {
     setAiAction({ type, problem: p });
     setAiResult(null);
     setIsAiLoading(true);
     try {
-      if (type === 'hint') {
+      if (type === 'hint' && p) {
         const prompt = `Provide 3 progressively revealing hints for the algorithmic problem "${p.name}".
 Return a JSON array of exactly 3 strings.
 Hint 1: Very subtle, just points in the right direction.
@@ -226,15 +211,57 @@ Hint 2: Mentions the data structure or algorithm pattern.
 Hint 3: Almost describes the solution steps without writing code.`;
         const hints = await generateJSON(prompt);
         setAiResult({ hints, currentHint: 0 });
-      } else if (type === 'explain') {
+      } else if (type === 'explain' && p) {
         const prompt = `Provide a concise, easy-to-understand explanation of the optimal solution for the algorithmic problem "${p.name}".
 Do not write the full code, just explain the intuition, the time complexity, and the space complexity. Use markdown.`;
         const explanation = await generateText(prompt);
         setAiResult({ explanation });
+      } else if (type === 'insights') {
+        const solved = state.dsaProblems.filter(x => x.solved);
+        const data = solved.map(s => ({ name: s.name, topics: s.topics, difficulty: s.difficulty, mistakes: s.mistakes }));
+        const prompt = `Analyze my DSA progress based on these solved problems: ${JSON.stringify(data)}.
+1. Identify my top 2 weak topics.
+2. Suggest 2 specific LeetCode problems to tackle next.
+3. Give one "pro-tip" for my coding style based on my mistakes.
+Keep it concise and use markdown.`;
+        const insights = await generateText(prompt);
+        setAiResult({ insights });
       }
     } catch (e) {
       console.error(e);
       setAiResult({ error: "Failed to generate response." });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const generateStudyPlan = async () => {
+    setAiPanel('plan');
+    setIsAiLoading(true);
+    setAiResult(null);
+    try {
+      const prompt = `Create a 3-problem daily study plan. Focus on topics I haven't mastered yet.
+Return a JSON array of objects with { name: string, reason: string, difficulty: string }.`;
+      const plan = await generateJSON(prompt);
+      setAiResult({ plan });
+    } catch (e) {
+      setAiResult({ error: "Failed to generate plan." });
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const getPatternDeepDive = async (topic: string) => {
+    setAiPanel('pattern');
+    setIsAiLoading(true);
+    setAiResult(null);
+    try {
+      const prompt = `Explain the most common patterns and mental models for solving "${topic}" problems. 
+Provide a "standard template" or pseudo-code approach if applicable. Use markdown.`;
+      const explanation = await generateText(prompt);
+      setAiResult({ explanation, topic });
+    } catch (e) {
+      setAiResult({ error: "Failed to fetch deep-dive." });
     } finally {
       setIsAiLoading(false);
     }
@@ -267,8 +294,6 @@ Do not write the full code, just explain the intuition, the time complexity, and
     total: state.dsaProblems.filter(p => p.difficulty === d).length,
   }));
 
-  const weakTopics = byTopic.filter(t => t.total > 0 && (t.solved / t.total) < 0.5);
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -281,38 +306,7 @@ Do not write the full code, just explain the intuition, the time complexity, and
         </button>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
-        {!leetcodeUsername ? (
-          <div className="card" style={{ display: "flex", gap: 12, alignItems: "center" }}>
-            <div style={{ fontWeight: 600 }}>Link LeetCode Account:</div>
-            <input 
-              className="form-input" 
-              placeholder="Username" 
-              value={tempUsername} 
-              onChange={e => setTempUsername(e.target.value)} 
-              style={{ maxWidth: 200 }}
-            />
-            <button className="btn btn-primary" onClick={saveUsername}>Save</button>
-          </div>
-        ) : (
-          <div style={{ position: "relative" }}>
-            <button 
-              className="btn btn-ghost btn-icon" 
-              style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}
-              onClick={() => {
-                setTempUsername("");
-                dispatch({ type: "SET_LEETCODE_USERNAME", username: "" });
-              }}
-              title="Unlink LeetCode Account"
-            >
-              <X size={14} />
-            </button>
-            <LeetCodeStats username={leetcodeUsername} />
-          </div>
-        )}
-      </div>
-
-      <motion.div layout className="grid-2" style={{ gap: 20, marginBottom: 24 }}>
+      <motion.div layout style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, marginBottom: 24 }}>
         <div className="card">
           <div className="section-title">Problems by Topic</div>
           {byTopic.length === 0 ? (
@@ -341,9 +335,41 @@ Do not write the full code, just explain the intuition, the time complexity, and
             </ResponsiveContainer>
           )}
         </div>
-        <div className="card">
-          <div className="section-title">By Difficulty</div>
-          <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+        
+        <div className="card" style={{ display: "flex", flexDirection: "column" }}>
+          <div className="flex items-center" style={{ justifyContent: "space-between", marginBottom: 16 }}>
+            <div className="section-title" style={{ marginBottom: 0 }}>LeetCode Progress</div>
+            {!leetcodeUsername ? (
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input 
+                  className="form-input" 
+                  placeholder="LeetCode Username" 
+                  value={tempUsername} 
+                  onChange={e => setTempUsername(e.target.value)} 
+                  style={{ width: 140, padding: "4px 8px", fontSize: "0.8rem", minHeight: 28 }}
+                />
+                <button className="btn btn-primary btn-sm" style={{ padding: "4px 8px", fontSize: "0.8rem", minHeight: 28 }} onClick={saveUsername}>Link</button>
+              </div>
+            ) : (
+              <button 
+                className="btn btn-ghost btn-sm" 
+                onClick={() => {
+                  setTempUsername("");
+                  dispatch({ type: "SET_LEETCODE_USERNAME", username: "" });
+                }}
+                title="Unlink LeetCode Account"
+                style={{ fontSize: "0.75rem", padding: "4px 8px", height: "auto", minHeight: 0 }}
+              >
+                Unlink
+              </button>
+            )}
+          </div>
+          {leetcodeUsername && (
+            <div style={{ marginBottom: 20 }}>
+              <LeetCodeStats username={leetcodeUsername} />
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 12 }}>
             {byDiff.map(d => (
               <div key={d.diff} className="stat-card"
                    style={{ flex: 1, borderTop: `2px solid ${DIFF_COLORS[d.diff]}` }}>
@@ -353,38 +379,58 @@ Do not write the full code, just explain the intuition, the time complexity, and
               </div>
             ))}
           </div>
-          {weakTopics.length > 0 && (
-            <div style={{
-              background: "var(--warning-dim)",
-              border: "1px solid var(--warning)",
-              borderRadius: 8,
-              padding: 12
-            }}>
-              <div className="flex items-center gap-8 mb-8"
-                   style={{ color: "var(--warning)", fontWeight: 600, fontSize: "0.82rem" }}>
-                <AlertTriangle size={14} /> Weak Areas (solve rate &lt;50%)
-              </div>
-              <div className="flex gap-8" style={{ flexWrap: "wrap" }}>
-                {weakTopics.map(t => (
-                  <button 
-                    key={t.fullTopic} 
-                    className="badge badge-warning"
-                    style={{ cursor: "pointer", border: "none" }}
-                    onClick={() => {
-                      const recs = RECOMMENDATIONS[t.fullTopic] || ["Practice more problems in this category"];
-                      const picked = recs[Math.floor(Math.random() * recs.length)];
-                      setRecommendation({ topic: t.fullTopic, problem: picked });
-                    }}
-                  >
-                    {t.fullTopic} ({t.solved}/{t.total})
-                  </button>
-                ))}
-              </div>
-              <div style={{ marginTop: 12, fontSize: "0.75rem", color: "var(--warning)", opacity: 0.8 }}>
-                Click a topic for an AI suggestion
-              </div>
+        </div>
+
+        <div className="card" style={{ border: "1px solid var(--accent-dim)", background: "linear-gradient(to bottom right, var(--bg-secondary), var(--bg-primary))", alignSelf: "start" }}>
+          <div className="section-title" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: isAiCollapsed ? 0 : 16 }}>
+            <div className="flex items-center gap-8">
+              <Sparkles size={16} style={{ color: "var(--accent)" }} /> AI Assistant
             </div>
-          )}
+            <button className="btn btn-ghost btn-icon btn-sm" onClick={() => setIsAiCollapsed(!isAiCollapsed)}>
+              <motion.div animate={{ rotate: isAiCollapsed ? 180 : 0 }}>
+                <X size={14} style={{ transform: isAiCollapsed ? 'none' : 'rotate(45deg)' }} />
+              </motion.div>
+            </button>
+          </div>
+          
+          <AnimatePresence>
+            {!isAiCollapsed && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                style={{ overflow: "hidden" }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  <button className="btn btn-secondary btn-sm" style={{ justifyContent: "flex-start", gap: 12 }} onClick={() => handleAiAction('insights')}>
+                    <Target size={14} style={{ color: "var(--accent)" }} />
+                    <div style={{ textAlign: "left" }}>
+                      <div style={{ fontWeight: 600, fontSize: "0.8rem" }}>Analyze Progress</div>
+                      <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>Identify weaknesses & get tips</div>
+                    </div>
+                  </button>
+                  <button className="btn btn-secondary btn-sm" style={{ justifyContent: "flex-start", gap: 12 }} onClick={generateStudyPlan}>
+                    <Zap size={14} style={{ color: "var(--warning)" }} />
+                    <div style={{ textAlign: "left" }}>
+                      <div style={{ fontWeight: 600, fontSize: "0.8rem" }}>Daily Study Plan</div>
+                      <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>3 tailored problems for today</div>
+                    </div>
+                  </button>
+                  <div className="flex gap-8" style={{ marginTop: 4 }}>
+                    <select 
+                      className="form-select" 
+                      style={{ flex: 1, fontSize: "0.75rem", height: 32, padding: "0 8px" }}
+                      onChange={(e) => e.target.value && getPatternDeepDive(e.target.value)}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Pattern Deep-Dive...</option>
+                      {TOPICS.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
@@ -497,62 +543,8 @@ Do not write the full code, just explain the intuition, the time complexity, and
       </div>
 
       <AnimatePresence>
-        {recommendation && (
-          <div className="modal-overlay" onClick={() => setRecommendation(null)}>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="modal ai-modal"
-              onClick={e => e.stopPropagation()}
-              style={{ maxWidth: 400, background: "linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%)", border: "1px solid var(--accent-dim)" }}
-            >
-              <div className="modal-header">
-                <div className="flex items-center gap-8">
-                  <Sparkles size={18} style={{ color: "var(--accent)" }} />
-                  <h2 className="modal-title">AI Suggestion</h2>
-                </div>
-                <button className="btn btn-ghost btn-icon" onClick={() => setRecommendation(null)}><X size={16} /></button>
-              </div>
-
-              <div style={{ padding: "16px 0", textAlign: "center" }}>
-                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: 4 }}>Based on your {recommendation.topic} progress, you should try:</div>
-                <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--accent)", marginBottom: 20 }}>{recommendation.problem}</div>
-                
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={() => {
-                      window.open(`https://www.google.com/search?q=leetcode+${encodeURIComponent(recommendation.problem)}`, "_blank");
-                    }}
-                    style={{ width: "100%" }}
-                  >
-                    <ExternalLink size={14} /> Search on LeetCode
-                  </button>
-                  <button 
-                    className="btn btn-secondary" 
-                    onClick={() => {
-                      setModal({ name: recommendation.problem, topics: [recommendation.topic], platform: "LeetCode" });
-                      setRecommendation(null);
-                    }}
-                    style={{ width: "100%" }}
-                  >
-                    <Plus size={14} /> Add to Tracker
-                  </button>
-                </div>
-              </div>
-
-              <div style={{ marginTop: 16, fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
-                This problem covers patterns you haven't mastered yet.
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {aiAction && (
-          <div className="modal-overlay" onClick={() => setAiAction(null)}>
+        {(aiAction || aiPanel !== 'none') && (
+          <div className="modal-overlay" onClick={() => { setAiAction(null); setAiPanel('none'); }}>
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -565,10 +557,14 @@ Do not write the full code, just explain the intuition, the time complexity, and
                 <div className="flex items-center gap-8">
                   <BrainCircuit size={18} style={{ color: "var(--accent)" }} />
                   <h2 className="modal-title">
-                    {aiAction.type === 'hint' ? `Hints: ${aiAction.problem.name}` : `Explanation: ${aiAction.problem.name}`}
+                    {aiAction?.type === 'hint' ? `Hints: ${aiAction.problem?.name}` : 
+                     aiAction?.type === 'explain' ? `Explanation: ${aiAction.problem?.name}` :
+                     aiAction?.type === 'insights' ? 'AI Progress Insights' :
+                     aiPanel === 'plan' ? 'Daily Study Plan' :
+                     aiPanel === 'pattern' ? `Deep Dive: ${aiResult?.topic}` : 'AI Assistant'}
                   </h2>
                 </div>
-                <button className="btn btn-ghost btn-icon" onClick={() => setAiAction(null)}><X size={16} /></button>
+                <button className="btn btn-ghost btn-icon" onClick={() => { setAiAction(null); setAiPanel('none'); }}><X size={16} /></button>
               </div>
 
               <div style={{ padding: "16px 0", minHeight: 150 }}>
@@ -576,12 +572,12 @@ Do not write the full code, just explain the intuition, the time complexity, and
                   <div className="flex items-center justify-center" style={{ height: "100%", flexDirection: "column", gap: 12 }}>
                     <Loader2 size={24} className="animate-spin" style={{ color: "var(--accent)" }} />
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                      {aiAction.type === 'hint' ? "Generating progressive hints..." : "Analyzing optimal solution..."}
+                      Thinking...
                     </div>
                   </div>
                 ) : aiResult?.error ? (
                   <div style={{ color: "var(--danger)", textAlign: "center" }}>{aiResult.error}</div>
-                ) : aiAction.type === 'hint' && aiResult?.hints ? (
+                ) : aiAction?.type === 'hint' && aiResult?.hints ? (
                   <div className="flex" style={{ flexDirection: "column", gap: 16 }}>
                     {aiResult.hints.slice(0, aiResult.currentHint + 1).map((hint: string, i: number) => (
                       <motion.div
@@ -602,7 +598,27 @@ Do not write the full code, just explain the intuition, the time complexity, and
                       </button>
                     )}
                   </div>
-                ) : aiAction.type === 'explain' && aiResult?.explanation ? (
+                ) : aiAction?.type === 'explain' && aiResult?.explanation ? (
+                  <div style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+                    {aiResult.explanation}
+                  </div>
+                ) : aiAction?.type === 'insights' && aiResult?.insights ? (
+                  <div style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
+                    {aiResult.insights}
+                  </div>
+                ) : aiPanel === 'plan' && aiResult?.plan ? (
+                  <div className="flex" style={{ flexDirection: "column", gap: 12 }}>
+                    {aiResult.plan.map((p: any, i: number) => (
+                      <div key={i} className="card" style={{ padding: 12, borderLeft: `4px solid var(--accent)` }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                          <span style={{ fontWeight: 700 }}>{p.name}</span>
+                          <span className="badge badge-muted">{p.difficulty}</span>
+                        </div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{p.reason}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : aiPanel === 'pattern' && aiResult?.explanation ? (
                   <div style={{ fontSize: "0.9rem", color: "var(--text-primary)", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
                     {aiResult.explanation}
                   </div>
