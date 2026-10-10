@@ -3,7 +3,7 @@ import { Plus, X, Sparkles, Wand2, CheckCircle2, AlertCircle, Info } from "lucid
 import { motion, AnimatePresence } from "framer-motion";
 import { uid, useApp } from "@context/AppContext";
 import type { StoryCard } from "@app-types/index";
-import { generateJSON, generateText } from "@lib/gemini";
+import { aiStoryReview, aiStorySummary, aiTags } from "@lib/legacyAi";
 import { useNavigate } from "react-router-dom";
 
 const ALL_TAGS = ["performance", "search", "async processing", "data pipeline", "architecture", "reliability", "optimization"];
@@ -37,10 +37,11 @@ Result: ${form.result}
 
 Pick up to 3 relevant tags from this exact list: [${ALL_TAGS.join(', ')}].
 Return a JSON array of strings.`;
-      const tags = await generateJSON(prompt);
-      if (Array.isArray(tags)) {
-        setForm(f => ({ ...f, tags: tags.filter(t => ALL_TAGS.includes(t)) }));
-      }
+      void prompt;
+      const tags = await aiTags(`${form.problem}
+${form.action}
+${form.result}`, ALL_TAGS, 3);
+      setForm(f => ({ ...f, tags }));
     } catch (e) {
       console.error(e);
       alert("Failed to generate tags.");
@@ -58,7 +59,8 @@ Return a JSON array of strings.`;
 Problem: ${form.problem}
 Action: ${form.action}
 Result: ${form.result}`;
-      const summary = await generateText(prompt);
+      void prompt;
+      const summary = await aiStorySummary(form);
       setForm(f => ({ ...f, shortVersion: summary.trim() }));
     } catch (e) {
       console.error(e);
@@ -198,8 +200,13 @@ Provide a JSON object with:
 1. "score": an integer out of 100 representing how well it follows the STAR method and impact.
 2. "tips": an array of objects, each with "type" (either "info" or "warning") and "text" (a short suggestion for improvement).`;
 
-      const response = await generateJSON(prompt);
-      setAiReview({ story: s, score: response.score || 70, tips: response.tips || [] });
+      void prompt;
+      const response = await aiStoryReview(s);
+      setAiReview({
+        story: s,
+        score: response.score,
+        tips: [{ type: "info", text: response.verdict }, ...response.tips.map(text => ({ type: "warning", text }))],
+      });
     } catch (e) {
       console.error(e);
       alert("Failed to analyze story with AI.");

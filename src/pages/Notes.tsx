@@ -4,7 +4,7 @@ import { Plus, Search, Tag, Trash2, X, Wand2 } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Note, NoteCategory } from "@app-types/index";
-import { generateJSON, generateText } from "@lib/gemini";
+import { aiSummarize, aiTags } from "@lib/legacyAi";
 
 const CATEGORIES: { key: NoteCategory; label: string; color: string }[] = [
   { key: "weekly", label: "Weekly", color: "var(--accent)" },
@@ -108,8 +108,9 @@ export default function Notes() {
       const prompt = `Extract 2-4 highly relevant, single-word or short-phrase keywords from this note content to use as tags. 
 Content: ${form.content.replace(/<[^>]+>/g, '')}
 Return a JSON array of strings.`;
-      const tags = await generateJSON(prompt);
-      if (Array.isArray(tags)) {
+      void prompt;
+      const tags = await aiTags(form.content.replace(/<[^>]+>/g, " "));
+      {
         setForm(f => {
           const newTags = tags.filter(t => !f.tags.includes(t.toLowerCase())).map(t => t.toLowerCase());
           return { ...f, tags: [...f.tags, ...newTags] };
@@ -132,7 +133,8 @@ Return a JSON array of strings.`;
     try {
       const prompt = `Summarize the following note into 3-4 concise bullet points. Return ONLY the bullet points, starting each with a dash (-).
 Note Content: ${form.content.replace(/<[^>]+>/g, '')}`;
-      const summary = await generateText(prompt);
+      void prompt;
+      const summary = await aiSummarize(form.content.replace(/<[^>]+>/g, " "), form.title);
       setAiSummary(summary);
     } catch (e) {
       console.error(e);

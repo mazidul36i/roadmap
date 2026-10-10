@@ -33,7 +33,8 @@
       "@data/*": ["./src/data/*"],
       "@lib/*": ["./src/lib/*"],
       "@pages/*": ["./src/pages/*"],
-      "@app-types/*": ["./src/types/*"]
+      "@app-types/*": ["./src/types/*"],
+      "@ai-contract": ["./functions/src/contract.ts"]
     }
   },
   "include": [

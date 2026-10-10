@@ -42,3 +42,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+@media (max-width: 1023px) {
+  .u-hide-sm { display: none; }
+}

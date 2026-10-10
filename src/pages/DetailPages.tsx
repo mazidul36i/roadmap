@@ -18,7 +18,8 @@ import {
 import { Link } from "react-router-dom";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
-import { generateJSON, generateText } from "@lib/gemini";
+import { useToast } from "@context/ToastContext";
+import { aiExplain, aiHints, aiStoryReview, aiStorySummary, aiTags } from "@lib/legacyAi";
 import type {
   Application,
   AppStatus,
@@ -290,13 +291,13 @@ export function DSAProblemDetail() {
     setAiOutput(null);
     try {
       if (type === "hint") {
-        const hints = await generateJSON(`Provide 3 progressively revealing hints for the algorithmic problem "${form.name}". Return a JSON array of exactly 3 strings.`);
-        setAiOutput(Array.isArray(hints) ? hints : ["No hints returned."]);
+        const hints = await aiHints(form.name, form.notes);
+        setAiOutput(hints.length ? hints : ["No hints returned."]);
       } else {
-        setAiOutput(await generateText(`Explain the optimal solution for "${form.name}" concisely, including intuition, time complexity, and space complexity.`));
+        setAiOutput(await aiExplain(form.name));
       }
-    } catch {
-      setAiOutput("Failed to generate response.");
+    } catch (e) {
+      setAiOutput(e instanceof Error ? e.message : "Failed to generate response.");
     } finally {
       setAiLoading(false);
     }
@@ -545,6 +546,7 @@ export function StoryDetail() {
   const isNew = id === "new";
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
+  const { toast } = useToast();
   const navigate = useNavigate();
   const existing = !isNew ? state.storyCards.find(s => s.id === id) : null;
   const [form, setForm] = useState<StoryCard>(() => ({ ...emptyStory(), ...(existing || {}), id: existing?.id || "" }));
@@ -566,15 +568,22 @@ export function StoryDetail() {
   const generateShort = async () => {
     setBusy("short");
     try {
-      const text = await generateText(`Summarize this STAR story into one concise sentence under 30 words. Problem: ${form.problem} Action: ${form.action} Result: ${form.result}`);
+      const text = await aiStorySummary(form);
       set("shortVersion", text.trim());
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Couldn't summarise the story", "error");
     } finally { setBusy(""); }
   };
   const generateTags = async () => {
     setBusy("tags");
     try {
-      const tags = await generateJSON(`Pick up to 3 relevant tags from this list [${STORY_TAGS.join(", ")}] for this STAR story. Return a JSON array. Problem: ${form.problem} Action: ${form.action} Result: ${form.result}`);
-      if (Array.isArray(tags)) set("tags", tags.filter(t => STORY_TAGS.includes(t)));
+      const tags = await aiTags(`${form.title}
+${form.problem}
+${form.action}
+${form.result}`, STORY_TAGS, 3);
+      set("tags", tags);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Couldn't suggest tags", "error");
     } finally { setBusy(""); }
   };
   const review = async () => {
@@ -583,9 +592,11 @@ export function StoryDetail() {
       if (!state.aiEnabled) {
         setAiReview({ score: 70, tips: ["Add specific metrics and make the action clearly about your contribution."] });
       } else {
-        const r = await generateJSON(`Review this STAR story and return JSON with score number and tips string array. Problem:${form.problem} Action:${form.action} Result:${form.result} Metrics:${form.metrics}`);
-        setAiReview(r);
+        const r = await aiStoryReview(form);
+        setAiReview({ score: r.score, tips: [r.verdict, ...r.tips] });
       }
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Couldn't review the story", "error");
     } finally { setBusy(""); }
   };
   return (

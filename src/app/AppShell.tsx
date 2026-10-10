@@ -9,6 +9,7 @@ import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
 import { CommandPalette } from "./CommandPalette";
 import { PageSkeleton } from "./Splash";
+import { ErrorBoundary } from "./ErrorBoundary";
 import s from "./AppShell.module.css";
 
 interface AppShellProps {
@@ -60,6 +61,7 @@ export function AppShell({ children, topbarActions }: AppShellProps) {
       <div className={s.main}>
         <TopBar onOpenPalette={() => setPaletteOpen(true)} extraActions={topbarActions} />
         <main id="main" ref={mainRef} tabIndex={-1} className={s.content}>
+          <ErrorBoundary inline resetKey={pathname}>
           <Suspense fallback={<PageSkeleton />}>
             <motion.div
               key={pathname}
@@ -70,6 +72,7 @@ export function AppShell({ children, topbarActions }: AppShellProps) {
               {children}
             </motion.div>
           </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
 

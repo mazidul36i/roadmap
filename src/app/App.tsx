@@ -10,6 +10,11 @@ import { TooltipProvider } from "@ui/index";
 import { AppShell } from "./AppShell";
 import { AppRoutes, FullscreenSession } from "./routes";
 import { LoadErrorScreen, LoadingScreen } from "./Splash";
+import { ErrorBoundary } from "./ErrorBoundary";
+import { TutorProvider } from "@features/copilot/TutorContext";
+import { CopilotBridge, TutorButton } from "@features/copilot/CopilotBridge";
+
+const TutorDrawer = lazy(() => import("@features/copilot/TutorDrawer").then(m => ({ default: m.TutorDrawer })));
 
 const LoginPage = lazy(() => import("@pages/LoginPage"));
 const SetupChoice = lazy(() => import("@components/SetupChoice"));
@@ -40,20 +45,23 @@ function Gate() {
   }
 
   return (
-    <>
-      {pathname === "/session" ? (
-        <Suspense fallback={<LoadingScreen label="Preparing your session…" />}>
-          <FullscreenSession />
+    <TutorProvider>
+      <CopilotBridge>
+        {pathname === "/session" ? (
+          <Suspense fallback={<LoadingScreen label="Preparing your session…" />}>
+            <FullscreenSession />
+          </Suspense>
+        ) : (
+          <AppShell topbarActions={<TutorButton />}>
+            <AppRoutes />
+          </AppShell>
+        )}
+        <Suspense fallback={null}>
+          <InterviewTimer />
+          <TutorDrawer />
         </Suspense>
-      ) : (
-        <AppShell>
-          <AppRoutes />
-        </AppShell>
-      )}
-      <Suspense fallback={null}>
-        <InterviewTimer />
-      </Suspense>
-    </>
+      </CopilotBridge>
+    </TutorProvider>
   );
 }
 
@@ -67,7 +75,9 @@ export default function App() {
               <ConfirmationProvider>
                 <ToastProvider>
                   <BrowserRouter>
-                    <Gate />
+                    <ErrorBoundary>
+                      <Gate />
+                    </ErrorBoundary>
                   </BrowserRouter>
                 </ToastProvider>
               </ConfirmationProvider>

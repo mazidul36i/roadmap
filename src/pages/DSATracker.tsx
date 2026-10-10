@@ -4,7 +4,7 @@ import { uid, useApp } from "@context/AppContext";
 import type { DSADifficulty, DSAPlatform, DSAProblem } from "@app-types/index";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
-import { generateJSON, generateText } from "@lib/gemini";
+import { aiExplain, aiHints, aiPatternDeepDive, aiProgressInsights } from "@lib/legacyAi";
 import { useNavigate } from "react-router-dom";
 import LeetCodeStats from "@components/LeetCodeStats";
 
@@ -209,12 +209,14 @@ Return a JSON array of exactly 3 strings.
 Hint 1: Very subtle, just points in the right direction.
 Hint 2: Mentions the data structure or algorithm pattern.
 Hint 3: Almost describes the solution steps without writing code.`;
-        const hints = await generateJSON(prompt);
+        void prompt;
+        const hints = await aiHints(p.name, p.notes);
         setAiResult({ hints, currentHint: 0 });
       } else if (type === 'explain' && p) {
         const prompt = `Provide a concise, easy-to-understand explanation of the optimal solution for the algorithmic problem "${p.name}".
 Do not write the full code, just explain the intuition, the time complexity, and the space complexity. Use markdown.`;
-        const explanation = await generateText(prompt);
+        void prompt;
+        const explanation = await aiExplain(p.name);
         setAiResult({ explanation });
       } else if (type === 'insights') {
         const solved = state.dsaProblems.filter(x => x.solved);
@@ -224,32 +226,20 @@ Do not write the full code, just explain the intuition, the time complexity, and
 2. Suggest 2 specific LeetCode problems to tackle next.
 3. Give one "pro-tip" for my coding style based on my mistakes.
 Keep it concise and use markdown.`;
-        const insights = await generateText(prompt);
+        void prompt;
+        const insights = await aiProgressInsights(state.dsaProblems.map(x => ({ name: x.name, topics: x.topics, difficulty: x.difficulty, mistakes: x.mistakes, solved: x.solved })));
         setAiResult({ insights });
       }
     } catch (e) {
-      console.error(e);
-      setAiResult({ error: "Failed to generate response." });
+      setAiResult({ error: e instanceof Error ? e.message : "Failed to generate response." });
     } finally {
       setIsAiLoading(false);
     }
   };
 
-  const generateStudyPlan = async () => {
-    setAiPanel('plan');
-    setIsAiLoading(true);
-    setAiResult(null);
-    try {
-      const prompt = `Create a 3-problem daily study plan. Focus on topics I haven't mastered yet.
-Return a JSON array of objects with { name: string, reason: string, difficulty: string }.`;
-      const plan = await generateJSON(prompt);
-      setAiResult({ plan });
-    } catch (e) {
-      setAiResult({ error: "Failed to generate plan." });
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
+  // The context-free "daily plan" prompt is replaced by insights from the real log;
+  // Forge's daily quests now decide what to practise each day.
+  const generateStudyPlan = () => handleAiAction('insights');
 
   const getPatternDeepDive = async (topic: string) => {
     setAiPanel('pattern');
@@ -258,10 +248,11 @@ Return a JSON array of objects with { name: string, reason: string, difficulty: 
     try {
       const prompt = `Explain the most common patterns and mental models for solving "${topic}" problems. 
 Provide a "standard template" or pseudo-code approach if applicable. Use markdown.`;
-      const explanation = await generateText(prompt);
+      void prompt;
+      const explanation = await aiPatternDeepDive(topic);
       setAiResult({ explanation, topic });
     } catch (e) {
-      setAiResult({ error: "Failed to fetch deep-dive." });
+      setAiResult({ error: e instanceof Error ? e.message : "Failed to fetch deep-dive." });
     } finally {
       setIsAiLoading(false);
     }

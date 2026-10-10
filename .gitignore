@@ -32,3 +32,6 @@ dist-ssr
 # Claude
 .claude
 .claude/worktrees
+functions/lib
+functions/.secret.local
+.env.local
