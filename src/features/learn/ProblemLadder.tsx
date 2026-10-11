@@ -6,14 +6,10 @@ import { Badge, Button, Card, CardHeader } from "@ui/index";
 import type { ProblemRef } from "@content/types";
 import { TOPIC_TO_SKILL } from "@content/dsa/meta";
 import { DIFFICULTY_TONE } from "@content/taxonomy";
+import { findTracked } from "@features/practice/problems/problemUtils";
 import s from "./Learn.module.css";
 
 const leetUrl = (slug: string) => `https://leetcode.com/problems/${slug}/`;
-
-export function findTracked(problems: DSAProblem[], ref: ProblemRef): DSAProblem | undefined {
-  const title = ref.title.toLowerCase();
-  return problems.find(p => p.url?.includes(`/problems/${ref.slug}`) || p.name.trim().toLowerCase() === title);
-}
 
 /** Practice ladder for a lesson: track problems, mark them solved, open on LeetCode. */
 export function ProblemLadder({ problems, skill }: { problems: ProblemRef[]; skill: string }) {

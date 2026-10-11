@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Check, ExternalLink, GraduationCap, Lightbulb, MessageSquareCode, MoreHorizontal, Plus, Sparkles, Trash2, Wand2 } from "lucide-react";
+import { ArrowLeft, Check, ExternalLink, FileText, GraduationCap, Lightbulb, MessageSquareCode, MoreHorizontal, Plus, Sparkles, Trash2, Wand2 } from "lucide-react";
 import type { DSADifficulty, DSAProblem } from "@app-types/index";
 import { uid, useApp } from "@context/AppContext";
 import { useToast } from "@context/ToastContext";
@@ -15,6 +15,8 @@ import { AIResponse, AiGate } from "@features/copilot/AIResponse";
 import { useAiJson, useAiText } from "@features/copilot/useAi";
 import { useTutorContext } from "@features/copilot/TutorContext";
 import NotFound from "@app/NotFound";
+import { BriefDetails, BriefMeta, BriefSummary } from "./ProblemBrief";
+import { useBriefWriter } from "./useBriefWriter";
 import s from "./Workspace.module.css";
 
 const blank = (): DSAProblem => ({
@@ -56,7 +58,8 @@ function Workspace({ initial, isNew }: { initial: DSAProblem; isNew: boolean }) 
   // Existing problems autosave (only real edits); new ones are created explicitly.
   useEffect(() => {
     if (isNew || !live) return;
-    const merged = { ...form, solved: live.solved, solvedAt: live.solvedAt };
+    // The brief is written elsewhere (here, review, batches); never overwrite it with the form's copy.
+    const merged = { ...form, solved: live.solved, solvedAt: live.solvedAt, brief: live.brief };
     if (JSON.stringify(merged) === JSON.stringify(live)) return;
     const t = setTimeout(() => {
       dispatch({ type: "UPDATE_DSA", problem: merged });
@@ -115,7 +118,7 @@ function Workspace({ initial, isNew }: { initial: DSAProblem; isNew: boolean }) 
       return;
     }
     const base = live ?? form;
-    dispatch({ type: "UPDATE_DSA", problem: { ...base, ...form, solved, solvedAt: solved ? base.solvedAt : undefined } });
+    dispatch({ type: "UPDATE_DSA", problem: { ...base, ...form, solved, solvedAt: solved ? base.solvedAt : undefined, brief: base.brief } });
     setForm(f => ({ ...f, solved }));
   };
 
@@ -276,10 +279,51 @@ function Workspace({ initial, isNew }: { initial: DSAProblem; isNew: boolean }) 
               </div>
             </Card>
           )}
+          {!isNew && live && <BriefPanel problem={live} />}
           <CoachPanel problem={form} />
         </div>
       </div>
     </>
+  );
+}
+
+function BriefPanel({ problem }: { problem: DSAProblem }) {
+  const writer = useBriefWriter();
+  const busy = writer.pending.has(problem.id);
+  const error = writer.errors[problem.id];
+  const write = () => void writer.writeOne(problem);
+
+  return (
+    <Card>
+      <CardHeader
+        title="Brief"
+        icon={<FileText size={18} />}
+        subtitle="What it asks, the pattern, the key insight and the trap. Its review card shows this too."
+        action={
+          problem.brief || !writer.enabled ? undefined : (
+            <Button size="sm" variant="soft" icon={<Sparkles size={14} />} onClick={write} loading={busy} disabled={!problem.name.trim()}>
+              Write
+            </Button>
+          )
+        }
+      />
+      {error && (
+        <p className="u-sm" role="alert" style={{ color: "var(--danger)", marginBottom: 12 }}>
+          {error}
+        </p>
+      )}
+      {problem.brief ? (
+        <div className="u-stack" style={{ ["--stack-gap" as string]: "20px" }}>
+          <BriefSummary problem={problem} />
+          <BriefDetails problem={problem} />
+          <BriefMeta problem={problem} onRewrite={writer.enabled ? write : undefined} busy={busy} />
+        </div>
+      ) : !writer.enabled ? (
+        <AiGate>Turn on the AI co-pilot to get a short brief for each problem.</AiGate>
+      ) : (
+        <p className="u-sm u-muted">{busy ? "Writing the brief…" : "No brief yet. It takes a few seconds and is saved with the problem."}</p>
+      )}
+    </Card>
   );
 }
 

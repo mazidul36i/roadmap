@@ -45,6 +45,15 @@ export const ModeInputs = {
   }),
   hints: z.object({ problem: text(300), notes: text(4000).optional() }),
   explain: z.object({ problem: text(300) }),
+  problem_brief: z.object({
+    problem: text(300),
+    difficulty: z.enum(["Easy", "Medium", "Hard"]).optional(),
+    url: text(400).optional(),
+    tags: z.array(text(60)).max(12).optional(),
+    notes: text(3000).optional(),
+    /** The pattern ids the learner's lessons use, so the brief can link to them. */
+    patterns: z.array(z.object({ id: text(60), title: text(120) })).max(40),
+  }),
   approach_review: z.object({
     problem: text(300),
     approach: text(6000),
@@ -104,6 +113,17 @@ const RubricItem = z.object({ criterion: z.string(), score: z.number(), comment:
 
 export const ModeOutputs = {
   hints: z.object({ hints: z.array(z.string()) }),
+  problem_brief: z.object({
+    recognised: z.boolean(),
+    summary: z.string(),
+    patternIds: z.array(z.string()),
+    technique: z.string(),
+    insight: z.string(),
+    steps: z.array(z.string()),
+    trap: z.string(),
+    time: z.string(),
+    space: z.string(),
+  }),
   tags: z.object({ tags: z.array(z.string()) }),
   story_review: z.object({
     score: z.number(),

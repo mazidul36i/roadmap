@@ -120,6 +120,29 @@ Include at most one short Java snippet showing only the core loop, not a full so
     build: (input, learner) => [user(`${learnerPreamble(learner)}Explain the optimal solution to: ${input.problem}`)],
   },
 
+  problem_brief: {
+    system: `${VOICE}
+
+Write a compact study brief for a coding interview problem, identified by its title (and link, if given). It appears on the learner's spaced-repetition card, so every field must be short and exact.
+- recognised: true only if you know this exact problem. If not, set it to false, say in the summary that you could not identify it, and keep the other fields generic.
+- summary: what the problem asks in your own words: the input, the output, and the constraints that shape the solution. One or two sentences. Never quote the official statement.
+- patternIds: one or two ids from the provided pattern list that the optimal solution uses, most important first. Use only ids from the list; leave it empty if none fit.
+- technique: a short name for the specific technique, such as "Floyd's cycle detection on index links".
+- insight: the single observation that unlocks the optimal solution, in one or two sentences.
+- steps: two to five short steps of the optimal algorithm in plain words. No code.
+- trap: the mistake or constraint people most often miss, in one or two sentences.
+- time and space: Big-O only, such as "O(n log n)".`,
+    effort: "low",
+    maxTokens: 2500,
+    build: input => [
+      user(
+        `Problem: ${input.problem}${input.difficulty ? ` (${input.difficulty})` : ""}${input.url ? `\nLink: ${input.url}` : ""}${
+          input.tags?.length ? `\nTags: ${input.tags.join(", ")}` : ""
+        }${input.notes ? `\nMy notes:\n${input.notes}` : ""}\n\nPattern list (id: name):\n${input.patterns.map(p => `${p.id}: ${p.title}`).join("\n")}`,
+      ),
+    ],
+  },
+
   approach_review: {
     system: `${VOICE}
 

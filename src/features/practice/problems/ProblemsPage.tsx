@@ -13,7 +13,9 @@ import { formatRelative, lastNDays, localDateKey } from "@lib/dates";
 import { LeetCodeError, syncAccepted } from "@lib/leetcode";
 import { AIResponse, AiGate } from "@features/copilot/AIResponse";
 import { useAiText } from "@features/copilot/useAi";
+import { problemsNeedingBriefs } from "@lib/problemBrief";
 import { DIFF_ORDER, resolveQueue } from "./problemUtils";
+import { useBriefWriter } from "./useBriefWriter";
 import s from "./Problems.module.css";
 
 type SortKey = "added" | "name" | "difficulty" | "solved";
@@ -27,6 +29,8 @@ export default function ProblemsPage() {
   const [params, setParams] = useSearchParams();
   const [syncing, setSyncing] = useState<string | null>(null);
   const insights = useAiText("progress_insights");
+  const writer = useBriefWriter();
+  const needBriefs = useMemo(() => problemsNeedingBriefs(state.dsaProblems), [state.dsaProblems]);
 
   const q = params.get("q") ?? "";
   const status = params.get("status") ?? "all";
@@ -111,6 +115,15 @@ export default function ProblemsPage() {
     }
   };
 
+  const writeBriefs = async () => {
+    const res = await writer.writeMany(needBriefs);
+    if (res.stoppedBy && res.stoppedBy !== "Stopped.") toast(res.stoppedBy, "error");
+    else if (res.written)
+      toast(`Wrote ${res.written} brief${res.written === 1 ? "" : "s"}`, "success", {
+        detail: res.failed ? `${res.failed} failed. Try those again later.` : "Each problem's review card now shows what it asks, the pattern and the trap.",
+      });
+  };
+
   const sortHeader = (key: SortKey, label: string) => {
     const active = sort === key;
     return (
@@ -148,6 +161,11 @@ export default function ProblemsPage() {
               <ButtonLink to="/settings#integrations" variant="ghost">
                 Link LeetCode
               </ButtonLink>
+            )}
+            {writer.enabled && (writer.batch || needBriefs.length > 0) && (
+              <Button icon={<Sparkles size={16} className={writer.batch ? "spin" : undefined} />} onClick={writer.batch ? writer.cancel : () => void writeBriefs()} aria-live="polite">
+                {writer.batch ? `Stop writing briefs (${writer.batch.done}/${writer.batch.total})` : `Write ${needBriefs.length} brief${needBriefs.length === 1 ? "" : "s"}`}
+              </Button>
             )}
             <ButtonLink to="/practice/problems/new" variant="primary" icon={<Plus size={16} />}>
               Log a problem

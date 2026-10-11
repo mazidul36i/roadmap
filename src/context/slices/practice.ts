@@ -41,6 +41,8 @@ export const practiceSlice: Slice = (state, action) => {
         ...state,
         dsaProblems: state.dsaProblems.map(p => (p.id === action.problem.id ? stampSolved(action.problem, p) : p)),
       };
+    case "SET_DSA_BRIEF":
+      return { ...state, dsaProblems: state.dsaProblems.map(p => (p.id === action.id ? { ...p, brief: action.brief } : p)) };
     case "DELETE_DSA":
       return { ...state, dsaProblems: state.dsaProblems.filter(p => p.id !== action.id) };
     case "ADD_SD_TOPIC":

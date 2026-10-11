@@ -88,6 +88,26 @@ export interface DSAProblem {
   solvedAt?: string;
   addedAt?: string;
   attempts?: ProblemAttempt[];
+  /** AI-written study brief, shown on the problem's review card and workspace. */
+  brief?: ProblemBrief;
+}
+
+export interface ProblemBrief {
+  /** What the problem asks, in original words. */
+  summary: string;
+  /** DSA skill ids (lesson ids) the optimal solution uses, most important first. */
+  patterns: string[];
+  /** Short name for the specific technique, e.g. "Floyd's cycle detection". */
+  technique: string;
+  insight: string;
+  steps: string[];
+  trap: string;
+  time: string;
+  space: string;
+  /** False when the AI wasn't sure which problem the title refers to. */
+  recognised: boolean;
+  /** ISO timestamp of when it was written. */
+  at: string;
 }
 
 export interface ProblemAttempt {

@@ -6,6 +6,7 @@ import type {
   CardState,
   DayLog,
   DSAProblem,
+  ProblemBrief,
   Flashcard,
   LessonProgress,
   MockInterview,
@@ -54,6 +55,7 @@ export type Action =
   | { type: "ADD_DSA"; problem: DSAProblem }
   | { type: "ADD_DSA_BULK"; problems: DSAProblem[] }
   | { type: "UPDATE_DSA"; problem: DSAProblem }
+  | { type: "SET_DSA_BRIEF"; id: string; brief: ProblemBrief | undefined }
   | { type: "DELETE_DSA"; id: string }
   | { type: "ADD_SD_TOPIC"; topic: SystemDesignTopic }
   | { type: "UPDATE_SD_TOPIC"; topic: SystemDesignTopic }

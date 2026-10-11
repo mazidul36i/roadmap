@@ -12,7 +12,7 @@
 import type { AppState, CardState, TrackId } from "@app-types/index";
 import { LESSON_BY_ID, loadLesson } from "@content/catalog";
 import { addDays, localDateKey } from "@lib/dates";
-import { problemSkills } from "@lib/mastery";
+import { cardSkills } from "@lib/problemBrief";
 import { isDue, isNew, NEW_CARDS_PER_DAY } from "@lib/srs";
 
 export type DeckSource = "lesson" | "problem" | "story" | "mock" | "user";
@@ -27,6 +27,8 @@ export interface DeckCard {
   source: DeckSource;
   sourceLabel: string;
   link?: string;
+  /** Problem cards: the logged problem, read live so a new brief shows up straight away. */
+  problemId?: string;
 }
 
 export function sourceOf(key: string): DeckSource {
@@ -45,12 +47,15 @@ export function autoCards(state: AppState, today: string = localDateKey()): Deck
 
   for (const p of state.dsaProblems) {
     if (!p.solved) continue;
-    const skills = problemSkills(p);
-    if (!skills.length && !p.mistakes?.trim()) continue;
+    const brief = p.brief;
+    const skills = cardSkills(p);
+    if (!skills.length && !p.mistakes?.trim() && !brief) continue;
     const patterns = skills.map(s => LESSON_BY_ID[s]?.title ?? s);
     const back = [
-      patterns.length ? `**Pattern:** ${patterns.join(", ")}` : "",
-      skills[0] && LESSON_BY_ID[skills[0]] ? LESSON_BY_ID[skills[0]].summary : "",
+      brief?.technique ? `**Pattern:** ${brief.technique}${patterns.length ? ` (${patterns.join(", ")})` : ""}` : patterns.length ? `**Pattern:** ${patterns.join(", ")}` : "",
+      brief ? `**Key insight:** ${brief.insight}` : skills[0] && LESSON_BY_ID[skills[0]] ? LESSON_BY_ID[skills[0]].summary : "",
+      brief?.trap ? `**Trap:** ${brief.trap}` : "",
+      brief?.time ? `**Complexity:** ${brief.time} time, ${brief.space} space` : "",
       p.mistakes?.trim() ? `**Your trap last time:** ${p.mistakes.trim()}` : "",
       p.notes?.trim() ? `**Your note:** ${p.notes.trim().slice(0, 280)}` : "",
     ]
@@ -58,13 +63,14 @@ export function autoCards(state: AppState, today: string = localDateKey()): Deck
       .join("\n\n");
     cards.push({
       key: `auto:problem:${p.id}`,
-      front: `**${p.name}** (${p.difficulty})\n\nWhich pattern solves it, and what's the trap?`,
+      front: `**${p.name}** (${p.difficulty})${brief?.summary ? `\n\n${brief.summary}` : ""}\n\nWhich pattern solves it, and what's the trap?`,
       back,
       type: "basic",
       track: "dsa",
       source: "problem",
       sourceLabel: "Your problem",
       link: `/practice/problems/${p.id}`,
+      problemId: p.id,
     });
   }
 

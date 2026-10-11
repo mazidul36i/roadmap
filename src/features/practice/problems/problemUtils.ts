@@ -1,4 +1,5 @@
 import type { DSAProblem } from "@app-types/index";
+import type { ProblemRef } from "@content/types";
 import { diffDays, localDateKey } from "@lib/dates";
 
 export const RESOLVE_AFTER_DAYS = 14;
@@ -16,3 +17,9 @@ export function resolveQueue(problems: DSAProblem[], today: string = localDateKe
 }
 
 export const DIFF_ORDER = { Easy: 0, Medium: 1, Hard: 2 } as const;
+
+/** The logged problem matching a built-in ladder entry, by LeetCode slug or title. */
+export function findTracked(problems: DSAProblem[], ref: ProblemRef): DSAProblem | undefined {
+  const title = ref.title.toLowerCase();
+  return problems.find(p => p.url?.includes(`/problems/${ref.slug}`) || p.name.trim().toLowerCase() === title);
+}
