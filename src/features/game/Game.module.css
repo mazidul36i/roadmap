@@ -34,14 +34,29 @@
   gap: var(--space-3);
 }
 
+/* One block per month, separated by --month-gap; scrolls sideways only when it can't fit. */
+.heatMonths {
+  display: flex;
+  gap: var(--month-gap, 9px);
+  overflow-x: auto;
+  /* Room for the "today" outline, which sits outside its cell. */
+  padding: 3px;
+  margin: -3px;
+}
+
+.heatMonth {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 .heatGrid {
   display: grid;
   grid-auto-flow: column;
   grid-template-rows: repeat(7, var(--cell, 12px));
   grid-auto-columns: var(--cell, 12px);
   gap: 3px;
-  overflow-x: auto;
-  padding-bottom: 2px;
 }
 
 .cell {
@@ -58,6 +73,7 @@
 .cell[data-frozen="true"] { background: color-mix(in srgb, var(--info) 55%, var(--surface-3)); }
 .cell[data-today="true"] { outline: 2px solid var(--text); outline-offset: 1px; }
 .cell[data-future="true"] { opacity: 0; }
+.cell[data-pad="true"] { visibility: hidden; }
 
 .heatFooter {
   display: flex;
@@ -79,16 +95,9 @@
   --cell: 10px;
 }
 
-.months {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: var(--cell, 12px);
-  gap: 3px;
-  font-size: 10px;
-  color: var(--text-3);
-  height: 14px;
-}
-
 .month {
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--text-3);
   white-space: nowrap;
 }
