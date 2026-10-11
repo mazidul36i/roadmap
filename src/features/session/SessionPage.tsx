@@ -6,7 +6,7 @@ import { Button, Card, Segmented, Textarea, cx } from "@ui/index";
 import { celebrate } from "@lib/celebrate";
 import { localDateKey } from "@lib/dates";
 import { useSession } from "./SessionContext";
-import { STAGE_LABEL, buildPlan, type SessionLength, type StageKind } from "./session";
+import { STAGE_LABEL, activeMinutes, buildPlan, type SessionLength, type StageKind } from "./session";
 import s from "./Session.module.css";
 
 const ICON: Record<StageKind, typeof Brain> = {
@@ -19,7 +19,7 @@ const ICON: Record<StageKind, typeof Brain> = {
 /** Full-screen start, reflect and summary screens for a study session. */
 export default function SessionPage() {
   const { state, dispatch } = useApp();
-  const { session, start, finish, end } = useSession();
+  const { session, start, resume, finish, end } = useSession();
   const navigate = useNavigate();
   const [length, setLength] = useState<SessionLength>(45);
   const [reflection, setReflection] = useState("");
@@ -45,7 +45,7 @@ export default function SessionPage() {
 
   const saveReflection = () => {
     if (!session) return;
-    const minutes = Math.round((Date.now() - session.startedAt) / 60000);
+    const minutes = activeMinutes(session);
     const learn = session.stages.find(st => st.kind === "learn");
     dispatch({
       type: "ADD_DAY_LOG",
@@ -69,7 +69,7 @@ export default function SessionPage() {
   // ─── Summary ─────────────────────────────────────────────────────────────────
   if (session?.finishedAt) {
     const xp = Math.max(0, state.xp - session.xpAtStart);
-    const minutes = Math.round((session.finishedAt - session.startedAt) / 60000);
+    const minutes = activeMinutes(session);
     const done = session.stages.filter(st => st.doneAt).length;
     return (
       <div className={s.screen}>
@@ -148,12 +148,22 @@ export default function SessionPage() {
     return (
       <div className={s.screen}>
         <Card padding="roomy" className={s.panel}>
-          <div className="u-eyebrow">Session in progress · {session.length} min</div>
+          <div className="u-eyebrow">
+            Session {session.pausedAt ? "paused" : "in progress"} · {session.length} min
+          </div>
           <h1 className={s.title}>{stage.title}</h1>
           <PlanList stages={session.stages} current={session.current} />
           <div className="u-row" style={{ justifyContent: "center", flexWrap: "wrap" }}>
-            <Button variant="primary" iconRight={<ArrowRight size={16} />} onClick={() => navigate(stage.target)} autoFocus>
-              Continue
+            <Button
+              variant="primary"
+              iconRight={<ArrowRight size={16} />}
+              onClick={() => {
+                resume();
+                navigate(stage.target);
+              }}
+              autoFocus
+            >
+              {session.pausedAt ? "Resume" : "Continue"}
             </Button>
             <Button variant="ghost" icon={<X size={16} />} onClick={() => close("/")}>
               End session

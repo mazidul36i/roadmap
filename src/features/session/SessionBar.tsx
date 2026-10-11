@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Check, Code2, NotebookPen, X } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Check, Code2, NotebookPen, Pause, Play, X } from "lucide-react";
 import { useConfirm } from "@context/ConfirmationContext";
 import { Button, IconButton, cx } from "@ui/index";
 import { useSession } from "./SessionContext";
-import { STAGE_LABEL, type StageKind } from "./session";
+import { STAGE_LABEL, stageElapsed, type StageKind } from "./session";
 import s from "./Session.module.css";
 
 const ICON: Record<StageKind, typeof Brain> = {
@@ -21,28 +21,36 @@ function fmt(ms: number) {
 
 /** Floating guide shown across the app while a session runs. */
 export function SessionBar() {
-  const { session, advance, end } = useSession();
+  const { session, advance, pause, resume, end } = useSession();
   const { confirm } = useConfirm();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [now, setNow] = useState(() => Date.now());
 
   const active = !!session && !session.finishedAt;
+  const paused = !!session?.pausedAt;
+
+  // Leave room under the page content so the bar never hides the last row.
   useEffect(() => {
     if (!active) return;
-    const id = window.setInterval(() => setNow(Date.now()), 1000);
-    // Leave room under the page content so the bar never hides the last row.
     document.documentElement.style.setProperty("--session-bar-space", "88px");
     return () => {
-      window.clearInterval(id);
       document.documentElement.style.removeProperty("--session-bar-space");
     };
   }, [active]);
 
+  // Tick once a second while the clock runs; a paused clock doesn't need to.
+  useEffect(() => {
+    if (!active || paused) return;
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [active, paused]);
+
   if (!session || session.finishedAt) return null;
   const stage = session.stages[session.current];
   const Icon = ICON[stage.kind];
-  const elapsed = now - (stage.startedAt ?? session.startedAt);
+  const elapsed = stageElapsed(session, now);
   const over = elapsed > stage.minutes * 60_000;
   const targetPath = stage.target.split(/[?#]/)[0];
   const here =
@@ -67,20 +75,30 @@ export function SessionBar() {
   };
 
   return (
-    <div className={s.bar} role="region" aria-label="Study session">
+    <div className={s.bar} role="region" aria-label="Study session" data-paused={paused || undefined}>
       <div className={s.barStage}>
         <span className={cx(s.barIcon, !!stage.doneAt && s.barIconDone)}>{stage.doneAt ? <Check size={16} aria-hidden /> : <Icon size={16} aria-hidden />}</span>
         <span className={s.barText}>
           <span className={s.barLabel}>
+            {paused && <span className={s.pausedTag}>Paused</span>}
             {STAGE_LABEL[stage.kind]} · {session.current + 1}/{session.stages.length}
           </span>
           <span className={s.barTitle}>{stage.title}</span>
         </span>
       </div>
-      <span className={cx(s.barTime, over && s.barTimeOver)} aria-label={`${fmt(elapsed)} of ${stage.minutes} minutes`}>
-        {fmt(elapsed)}
-        <span className="u-faint">/{stage.minutes}m</span>
-      </span>
+      <div className={s.barTimer}>
+        <IconButton
+          size="sm"
+          variant={paused ? "soft" : "ghost"}
+          label={paused ? "Resume the timer" : "Pause the timer"}
+          icon={paused ? <Play size={16} /> : <Pause size={16} />}
+          onClick={paused ? resume : pause}
+        />
+        <span className={cx(s.barTime, over && s.barTimeOver)} aria-label={`${fmt(elapsed)} of ${stage.minutes} minutes${paused ? ", paused" : ""}`}>
+          {fmt(elapsed)}
+          <span className="u-faint">/{stage.minutes}m</span>
+        </span>
+      </div>
       <div className={s.dots} aria-hidden>
         {session.stages.map((st, i) => (
           <i key={i} className={cx(s.dot, !!st.doneAt && s.dotDone, i === session.current && s.dotNow)} />
@@ -100,7 +118,7 @@ export function SessionBar() {
         <IconButton size="sm" variant="ghost" label="End session" icon={<X size={16} />} onClick={stop} />
       </div>
       <span className="sr-only" aria-live="polite">
-        {stage.doneAt ? `${STAGE_LABEL[stage.kind]} complete` : ""}
+        {stage.doneAt ? `${STAGE_LABEL[stage.kind]} complete` : paused ? "Session timer paused" : ""}
       </span>
     </div>
   );

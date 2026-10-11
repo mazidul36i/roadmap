@@ -2,13 +2,27 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { useApp } from "@context/AppContext";
 import { useToast } from "@context/ToastContext";
 import { localDateKey } from "@lib/dates";
-import { STAGE_LABEL, buildPlan, countsToday, loadSession, stageGoalMet, storeSession, type Session, type SessionLength } from "./session";
+import {
+  STAGE_LABEL,
+  buildPlan,
+  countsToday,
+  loadSession,
+  pauseSession,
+  resumeSession,
+  stageGoalMet,
+  storeSession,
+  type Session,
+  type SessionLength,
+} from "./session";
 
 interface SessionApi {
   session: Session | null;
   start: (length: SessionLength) => Session;
-  /** Marks the current stage done and moves on. */
+  /** Marks the current stage done and moves on (ending any pause). */
   advance: () => void;
+  /** Stops the clock until resume (or moving on). */
+  pause: () => void;
+  resume: () => void;
   finish: (reflection: string) => void;
   end: () => void;
 }
@@ -42,9 +56,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   );
 
   const advance = useCallback(() => {
-    setSession(s => {
-      if (!s) return s;
+    setSession(prev => {
+      if (!prev) return prev;
       const now = Date.now();
+      // Moving on means you're back: close any pause first so it isn't counted.
+      const s = resumeSession(prev, now);
       const stages = s.stages.map((st, i) => {
         if (i === s.current) return { ...st, doneAt: st.doneAt ?? now };
         if (i === s.current + 1) return { ...st, startedAt: now, startCounts: countsToday(state) };
@@ -58,10 +74,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     });
   }, [state]);
 
+  const pause = useCallback(() => setSession(s => (s ? pauseSession(s) : s)), []);
+  const resume = useCallback(() => setSession(s => (s ? resumeSession(s) : s)), []);
+
   const finish = useCallback((reflection: string) => {
-    setSession(s => {
-      if (!s) return s;
+    setSession(prev => {
+      if (!prev) return prev;
       const now = Date.now();
+      const s = resumeSession(prev, now);
       return {
         ...s,
         reflection,
@@ -91,7 +111,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     });
   }, [met, current, toast]);
 
-  const value = useMemo(() => ({ session, start, advance, finish, end }), [session, start, advance, finish, end]);
+  const value = useMemo(() => ({ session, start, advance, pause, resume, finish, end }), [session, start, advance, pause, resume, finish, end]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

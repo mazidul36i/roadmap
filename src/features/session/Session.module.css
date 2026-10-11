@@ -211,8 +211,20 @@
 }
 
 .barLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: var(--fs-xs);
   color: var(--text-3);
+}
+
+.pausedTag {
+  padding: 0 6px;
+  border-radius: var(--r-full);
+  background: var(--info-soft);
+  color: var(--info);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .barTitle {
@@ -231,6 +243,35 @@
 
 .barTimeOver {
   color: var(--warning);
+}
+
+.barTimer {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* A paused clock is frozen and dimmed, so it reads as stopped at a glance. */
+.bar[data-paused] .barTime {
+  color: var(--text-3);
+  animation: pausedBlink 1.6s steps(2, jump-none) infinite;
+}
+
+.bar[data-paused] .barIcon {
+  color: var(--text-3);
+  background: var(--surface-2);
+}
+
+@keyframes pausedBlink {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar[data-paused] .barTime {
+    animation: none;
+  }
 }
 
 .dots {

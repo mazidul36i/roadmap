@@ -31,6 +31,8 @@ export interface Stage {
   startCounts?: Partial<Record<ActivityKind, number>>;
   startedAt?: number;
   doneAt?: number;
+  /** Time this stage spent paused, excluded from its timer. */
+  pausedMs?: number;
 }
 
 export interface Session {
@@ -43,6 +45,10 @@ export interface Session {
   current: number;
   reflection?: string;
   finishedAt?: number;
+  /** Set while the timer is paused. */
+  pausedAt?: number;
+  /** Total time spent paused (finished pauses only). */
+  pausedMs?: number;
 }
 
 const SPLITS: Record<SessionLength, Record<StageKind, number>> = {
@@ -134,6 +140,35 @@ export function stageGoalMet(stage: Stage, state: AppState, today: string = loca
 
 export function countsToday(state: AppState, today: string = localDateKey()): Partial<Record<ActivityKind, number>> {
   return { ...(state.activity[today]?.counts ?? {}) };
+}
+
+/** Active time in the current stage, in ms: frozen while paused, pauses excluded. */
+export function stageElapsed(session: Session, now: number = Date.now()): number {
+  const stage = session.stages[session.current];
+  const end = session.pausedAt ?? now;
+  return Math.max(0, end - (stage?.startedAt ?? session.startedAt) - (stage?.pausedMs ?? 0));
+}
+
+/** Active minutes in the whole session, pauses excluded. */
+export function activeMinutes(session: Session, now: number = Date.now()): number {
+  const end = session.finishedAt ?? session.pausedAt ?? now;
+  return Math.max(0, Math.round((end - session.startedAt - (session.pausedMs ?? 0)) / 60_000));
+}
+
+export function pauseSession(s: Session, now: number = Date.now()): Session {
+  return s.pausedAt || s.finishedAt ? s : { ...s, pausedAt: now };
+}
+
+/** Ends a pause, crediting the paused time to the session and to the current stage. */
+export function resumeSession(s: Session, now: number = Date.now()): Session {
+  if (!s.pausedAt) return s;
+  const paused = Math.max(0, now - s.pausedAt);
+  return {
+    ...s,
+    pausedAt: undefined,
+    pausedMs: (s.pausedMs ?? 0) + paused,
+    stages: s.stages.map((st, i) => (i === s.current ? { ...st, pausedMs: (st.pausedMs ?? 0) + paused } : st)),
+  };
 }
 
 const KEY = "forge:session:v1";
