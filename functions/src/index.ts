@@ -60,6 +60,32 @@ function toHttpsError(error: unknown): HttpsError {
   return new HttpsError("internal", "Something went wrong talking to the AI.");
 }
 
+/**
+ * The Firebase callable SDK serialises `undefined` as `null`; treat null as "absent"
+ * so optional fields validate even from clients that don't strip them.
+ */
+function dropNulls(value: unknown): unknown {
+  if (Array.isArray(value)) return value.filter(v => v !== null).map(dropNulls);
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, v]) => v !== null)
+        .map(([k, v]) => [k, dropNulls(v)]),
+    );
+  }
+  return value;
+}
+
+/** Records spend, but never loses an answer the user already paid for because of a write failure. */
+async function recordUsageSafely(uid: string, mode: string, usage: Parameters<typeof recordUsage>[2]): Promise<number> {
+  try {
+    return await recordUsage(uid, mode, usage);
+  } catch (error) {
+    logger.error("Couldn't record AI usage", error);
+    return 0;
+  }
+}
+
 export const ai = onCall(
   {
     secrets: [ANTHROPIC_API_KEY],
@@ -72,15 +98,24 @@ export const ai = onCall(
     const uid = request.auth?.uid;
     if (!uid) throw new HttpsError("unauthenticated", "Sign in to use the AI co-pilot.");
 
-    const envelope = AiRequest.safeParse(request.data);
+    const envelope = AiRequest.safeParse(dropNulls(request.data));
     if (!envelope.success) throw new HttpsError("invalid-argument", "Malformed AI request.");
     const mode = envelope.data.mode as AiMode;
     const parsedInput = ModeInputs[mode].safeParse(envelope.data.input);
     if (!parsedInput.success) {
-      throw new HttpsError("invalid-argument", `Invalid input for ${mode}: ${parsedInput.error.issues[0]?.message ?? "unknown"}`);
+      const issue = parsedInput.error.issues[0];
+      const where = issue?.path.length ? `${issue.path.join(".")}: ` : "";
+      throw new HttpsError("invalid-argument", `Invalid input for ${mode}: ${where}${issue?.message ?? "unknown"}`);
     }
 
-    const spent = await spentToday(uid);
+    let spent: number;
+    try {
+      spent = await spentToday(uid);
+    } catch (error) {
+      // Usually missing/expired credentials (e.g. the emulator without application-default login).
+      logger.error("Couldn't read today's AI usage", error);
+      throw new HttpsError("unavailable", "Couldn't check today's AI budget. Try again shortly.");
+    }
     if (spent >= DAILY_CAP_USD) {
       throw new HttpsError("resource-exhausted", `You've used today's AI budget ($${DAILY_CAP_USD.toFixed(2)}). It resets at midnight UTC.`);
     }
@@ -111,7 +146,7 @@ export const ai = onCall(
         if (!message.parsed_output) {
           throw new HttpsError("internal", "The AI returned an unexpected format. Try again.");
         }
-        const costUsd = await recordUsage(uid, mode, message.usage);
+        const costUsd = await recordUsageSafely(uid, mode, message.usage);
         return { kind: "json", data: message.parsed_output, usage: { costUsd, capUsd: DAILY_CAP_USD } };
       }
 
@@ -136,7 +171,7 @@ export const ai = onCall(
         .filter((b): b is Anthropic.Beta.BetaTextBlock => b.type === "text")
         .map(b => b.text)
         .join("");
-      const costUsd = await recordUsage(uid, mode, final.usage);
+      const costUsd = await recordUsageSafely(uid, mode, final.usage);
       return {
         kind: "text",
         text,

@@ -3,6 +3,7 @@
 
 import { connectFunctionsEmulator, getFunctions, httpsCallable, type FunctionsError } from "firebase/functions";
 import app from "@lib/firebase";
+import { withoutUndefined } from "@lib/aiPayload";
 import type { AiChunk, AiInput, AiOutput, AiResponse, JsonMode, TextMode } from "@ai-contract";
 
 export type { AiMode, AiInput, AiOutput, JsonMode, TextMode } from "@ai-contract";
@@ -75,7 +76,7 @@ function toAiError(error: unknown): AiError {
 /** Structured call: resolves with schema-validated JSON. */
 export async function aiJson<M extends JsonMode>(mode: M, input: AiInput<M>, learner?: Learner): Promise<AiOutput<M>> {
   try {
-    const res = await callable({ mode, input, learner });
+    const res = await callable(withoutUndefined({ mode, input, learner }));
     if (res.data.kind !== "json") throw new AiError("Unexpected AI response.", "bad-shape");
     noteUsage(res.data.usage);
     return res.data.data as AiOutput<M>;
@@ -95,7 +96,7 @@ interface StreamOptions {
 export async function aiStream<M extends TextMode>(mode: M, input: AiInput<M>, options: StreamOptions = {}): Promise<{ text: string; truncated: boolean }> {
   let text = "";
   try {
-    const { stream, data } = await callable.stream({ mode, input, learner: options.learner }, { signal: options.signal });
+    const { stream, data } = await callable.stream(withoutUndefined({ mode, input, learner: options.learner }), { signal: options.signal });
     for await (const chunk of stream) {
       text += chunk.delta;
       options.onText?.(text);
