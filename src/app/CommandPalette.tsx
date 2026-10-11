@@ -2,21 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { Command } from "cmdk";
 import { Dialog as RDialog, VisuallyHidden } from "radix-ui";
-import {
-  BookOpenText,
-  Briefcase,
-  CheckSquare,
-  Code2,
-  Library,
-  Mic,
-  Moon,
-  Network,
-  Plus,
-  Search,
-  StickyNote,
-  Timer,
-  Zap,
-} from "lucide-react";
+import { BookOpenText, Briefcase, CheckSquare, Code2, Library, Mic, Moon, Network, Plus, Search, StickyNote, Timer, Zap } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useTheme } from "@context/ThemeContext";
 import { Kbd } from "@ui/index";
@@ -68,11 +54,12 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         },
       },
       { id: "log-problem", label: "Log a problem", icon: <Code2 size={16} />, keywords: ["dsa", "leetcode", "add"], run: go("/practice/problems/new") },
+      { id: "ai-mock", label: "Start an AI mock interview", icon: <Mic size={16} />, keywords: ["interview", "practice", "ai"], run: go("/practice/mocks/ai") },
       { id: "log-mock", label: "Log a mock interview", icon: <Mic size={16} />, keywords: ["add"], run: go("/practice/mocks/new") },
       { id: "new-story", label: "New STAR story", icon: <BookOpenText size={16} />, keywords: ["behavioral", "add"], run: go("/practice/stories/new") },
       { id: "new-app", label: "Add an application", icon: <Briefcase size={16} />, keywords: ["job", "company", "pipeline"], run: go("/career/new") },
       { id: "new-resource", label: "Save a resource", icon: <Library size={16} />, keywords: ["link", "bookmark"], run: go("/resources/new") },
-      { id: "session", label: "Start a focus session", icon: <Zap size={16} />, keywords: ["focus", "study"], run: go("/session") },
+      { id: "session", label: "Start a study session", icon: <Zap size={16} />, keywords: ["focus", "study"], run: go("/session") },
       {
         id: "timer",
         label: isTimerVisible ? "Hide interview timer" : "Show interview timer",
@@ -93,7 +80,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           onOpenChange(false);
         },
       },
-      ...extensions.actions.map(a => ({ ...a, run: () => { a.run(); onOpenChange(false); } })),
+      ...extensions.actions.map(a => ({
+        ...a,
+        run: () => {
+          a.run();
+          onOpenChange(false);
+        },
+      })),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme, isTimerVisible, extensions],
@@ -124,36 +117,92 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
       },
       {
         heading: "Notes",
-        items: state.notes.map(n => ({ id: `note-${n.id}`, label: n.title || "Untitled note", hint: n.tags.slice(0, 2).join(", "), icon: <StickyNote size={16} />, keywords: n.tags, run: go(`/notes/${n.id}`) })),
+        items: state.notes.map(n => ({
+          id: `note-${n.id}`,
+          label: n.title || "Untitled note",
+          hint: n.tags.slice(0, 2).join(", "),
+          icon: <StickyNote size={16} />,
+          keywords: n.tags,
+          run: go(`/notes/${n.id}`),
+        })),
       },
       {
         heading: "Problems",
-        items: state.dsaProblems.map(p => ({ id: `dsa-${p.id}`, label: p.name, hint: p.difficulty, icon: <Code2 size={16} />, keywords: p.topics, run: go(`/practice/problems/${p.id}`) })),
+        items: state.dsaProblems.map(p => ({
+          id: `dsa-${p.id}`,
+          label: p.name,
+          hint: p.difficulty,
+          icon: <Code2 size={16} />,
+          keywords: p.topics,
+          run: go(`/practice/problems/${p.id}`),
+        })),
       },
       {
         heading: "Stories",
-        items: state.storyCards.map(st => ({ id: `story-${st.id}`, label: st.title, icon: <BookOpenText size={16} />, keywords: st.tags, run: go(`/practice/stories/${st.id}`) })),
+        items: state.storyCards.map(st => ({
+          id: `story-${st.id}`,
+          label: st.title,
+          icon: <BookOpenText size={16} />,
+          keywords: st.tags,
+          run: go(`/practice/stories/${st.id}`),
+        })),
       },
       {
         heading: "System design topics",
-        items: state.sdTopics.map(t => ({ id: `sd-${t.id}`, label: t.title, hint: t.category, icon: <Network size={16} />, run: go(`/learn/system-design/topics/${t.id}`) })),
+        items: state.sdTopics.map(t => ({
+          id: `sd-${t.id}`,
+          label: t.title,
+          hint: t.category,
+          icon: <Network size={16} />,
+          run: go(`/learn/system-design/topics/${t.id}`),
+        })),
       },
       {
         heading: "Applications",
-        items: state.applications.map(a => ({ id: `app-${a.id}`, label: `${a.company} · ${a.role}`, hint: a.status, icon: <Briefcase size={16} />, run: go(`/career/${a.id}`) })),
+        items: state.applications.map(a => ({
+          id: `app-${a.id}`,
+          label: `${a.company} · ${a.role}`,
+          hint: a.status,
+          icon: <Briefcase size={16} />,
+          run: go(`/career/${a.id}`),
+        })),
       },
       {
         heading: "Mock interviews",
-        items: state.mockInterviews.map(m => ({ id: `mock-${m.id}`, label: `${m.type} mock · ${m.date}`, hint: `${m.score}/10`, icon: <Mic size={16} />, run: go(`/practice/mocks/${m.id}`) })),
+        items: state.mockInterviews.map(m => ({
+          id: `mock-${m.id}`,
+          label: `${m.type} mock · ${m.date}`,
+          hint: `${m.score}/10`,
+          icon: <Mic size={16} />,
+          run: go(`/practice/mocks/${m.id}`),
+        })),
       },
       {
         heading: "Resources",
-        items: state.resources.map(r => ({ id: `res-${r.id}`, label: r.title, hint: r.type, icon: <Library size={16} />, keywords: r.tags, run: go(`/resources/${r.id}`) })),
+        items: state.resources.map(r => ({
+          id: `res-${r.id}`,
+          label: r.title,
+          hint: r.type,
+          icon: <Library size={16} />,
+          keywords: r.tags,
+          run: go(`/resources/${r.id}`),
+        })),
       },
       { heading: "Campaign tasks", items: tasks },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.notes, state.dsaProblems, state.storyCards, state.sdTopics, state.applications, state.mockInterviews, state.resources, state.weeks, state.lessonProgress, extensions]);
+  }, [
+    state.notes,
+    state.dsaProblems,
+    state.storyCards,
+    state.sdTopics,
+    state.applications,
+    state.mockInterviews,
+    state.resources,
+    state.weeks,
+    state.lessonProgress,
+    extensions,
+  ]);
 
   const renderItem = (item: PaletteItem) => (
     <Command.Item key={item.id} value={`${item.label} ${item.id}`} keywords={item.keywords} onSelect={item.run} className={s.item}>

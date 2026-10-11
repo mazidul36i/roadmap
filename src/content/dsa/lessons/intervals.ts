@@ -10,6 +10,7 @@ const lesson: LessonBody = {
 Two intervals \`[a, b]\` and \`[c, d]\` (sorted so \`a ≤ c\`) **overlap when \`c ≤ b\`**. Merging them gives \`[a, max(b, d)]\`. That one rule handles merge, insert, and "can a person attend all meetings". For "how many rooms do we need?", you track how many intervals are open at once, using a min-heap of end times or two sorted arrays of starts and ends.`,
     },
     { type: "signals", items: ["Meetings, bookings, time ranges, segments", "Merge or insert overlapping ranges", "Minimum number of rooms / platforms / resources", "Remove the fewest intervals to make the rest non-overlapping"] },
+    { type: "visualizer", id: "intervals", caption: "Merge intervals: sort by start, then extend the last block or open a new one." },
     {
       type: "code",
       lang: "java",

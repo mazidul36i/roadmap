@@ -13,4 +13,9 @@ export const IMPLEMENTED_VISUALIZERS: VisualizerId[] = [
   "topo-sort",
   "coin-change",
   "lcs",
+  "intervals",
+  "heap",
+  "trie",
+  "union-find",
+  "dijkstra",
 ];

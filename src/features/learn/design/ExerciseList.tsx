@@ -30,22 +30,17 @@ export default function ExerciseList() {
   const latest = useMemo(() => {
     const by: Record<string, SystemDesignTopic> = {};
     // sdTopics is newest-first, so the first attempt seen per exercise is the latest.
-    for (const t of state.sdTopics)
-      if (t.exerciseId && !by[t.exerciseId]) by[t.exerciseId] = t;
+    for (const t of state.sdTopics) if (t.exerciseId && !by[t.exerciseId]) by[t.exerciseId] = t;
     return by;
   }, [state.sdTopics]);
-  const finished = EXERCISES.filter((e) =>
-    state.sdTopics.some((t) => t.exerciseId === e.id && t.completedAt),
-  ).length;
+  const finished = EXERCISES.filter(e => state.sdTopics.some(t => t.exerciseId === e.id && t.completedAt)).length;
 
   return (
     <div className="u-stack" style={{ ["--stack-gap" as string]: "16px" }}>
       <div className={s.listIntro}>
         <p className="u-muted" style={{ maxWidth: 640 }}>
-          Timed walk-throughs of classic interview questions using the five-step
-          plan. Write your answer for each step, then compare it with a
-          reference outline. Finish with a self-score and, if you like, an AI
-          review.
+          Timed walk-throughs of classic interview questions using the five-step plan. Write your answer for each step, then compare it with a reference
+          outline. Finish with a self-score and, if you like, an AI review.
         </p>
         <div className={s.listStat}>
           <strong className="u-display">
@@ -56,39 +51,26 @@ export default function ExerciseList() {
       </div>
 
       <ul className={s.grid} role="list">
-        {EXERCISES.map((ex) => {
+        {EXERCISES.map(ex => {
           const attempt = latest[ex.id];
-          const answered = attempt
-            ? EXERCISE_STEPS.filter((st) => attempt.answers?.[st.id]?.trim())
-                .length
-            : 0;
+          const answered = attempt ? EXERCISE_STEPS.filter(st => attempt.answers?.[st.id]?.trim()).length : 0;
           const score = attempt?.completedAt ? attemptScore(attempt) : null;
           return (
             <li key={ex.id} className={s.exItem}>
-              <Card
-                to={exercisePath(ex.id)}
-                accent="var(--track-system-design)"
-                className={s.exCard}
-              >
+              <Card to={exercisePath(ex.id)} accent="var(--track-system-design)" className={s.exCard}>
                 <div className={s.exTop}>
-                  <Badge tone={DIFFICULTY_TONE[ex.difficulty]}>
-                    {ex.difficulty}
-                  </Badge>
-                  <span
-                    className="u-xs u-faint u-row"
-                    style={{ ["--row-gap" as string]: "4px" }}
-                  >
-                    <Clock size={14} aria-hidden /> {EXERCISE_TARGET_MINUTES}{" "}
-                    min
+                  <Badge tone={DIFFICULTY_TONE[ex.difficulty]}>{ex.difficulty}</Badge>
+                  <span className="u-xs u-faint u-row" style={{ ["--row-gap" as string]: "4px" }}>
+                    <Clock size={14} aria-hidden /> {EXERCISE_TARGET_MINUTES} min
                   </span>
                 </div>
                 <h3 className={s.exTitle}>{ex.title}</h3>
                 <p className={s.exBrief}>{ex.brief}</p>
                 <div className={s.exLessons}>
                   {ex.lessonIds
-                    .filter((id) => id !== "sd-framework")
+                    .filter(id => id !== "sd-framework")
                     .slice(0, 3)
-                    .map((id) => (
+                    .map(id => (
                       <span key={id} className={s.lessonTag}>
                         {LESSON_BY_ID[id]?.title ?? id}
                       </span>
@@ -96,18 +78,14 @@ export default function ExerciseList() {
                 </div>
                 <div className={s.exFoot}>
                   {attempt?.completedAt ? (
-                    <span
-                      className="u-row u-sm"
-                      style={{ color: "var(--success)" }}
-                    >
+                    <span className="u-row u-sm" style={{ color: "var(--success)" }}>
                       <CheckCircle2 size={16} aria-hidden /> Done
                       {score !== null ? ` · ${score}%` : ""}
                     </span>
                   ) : attempt ? (
                     <div style={{ flex: 1 }}>
                       <span className="u-row u-sm" style={{ marginBottom: 6 }}>
-                        <PenLine size={16} aria-hidden /> In progress ·{" "}
-                        {answered} of {EXERCISE_STEPS.length} steps
+                        <PenLine size={16} aria-hidden /> In progress · {answered} of {EXERCISE_STEPS.length} steps
                       </span>
                       <ProgressBar
                         value={answered}

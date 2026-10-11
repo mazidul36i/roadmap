@@ -10,6 +10,7 @@ const lesson: LessonBody = {
 Each node holds its children (an array of 26 for lowercase, or a map) and a flag saying "a word ends here". That's the whole data structure.`,
     },
     { type: "signals", items: ["Prefix queries: autocomplete, \"starts with\"", "Many words searched against the same text or board (Word Search II)", "Longest common prefix, replace words with their roots", "Wildcard search where `.` matches any letter"] },
+    { type: "visualizer", id: "trie", caption: "Insert car, cat, card, do and dog, then answer a startsWith query." },
     {
       type: "code",
       lang: "java",

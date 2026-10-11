@@ -1,38 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link, useParams } from "react-router-dom";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Clock,
-  Eye,
-  Lightbulb,
-  RotateCcw,
-  Sparkles,
-  Timer as TimerIcon,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Clock, Eye, Lightbulb, RotateCcw, Sparkles, Timer as TimerIcon } from "lucide-react";
 import type { SDReview, SystemDesignTopic } from "@app-types/index";
 import { useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
-import {
-  Badge,
-  Button,
-  ButtonLink,
-  Card,
-  CardHeader,
-  Kbd,
-  ProgressRing,
-  Skeleton,
-  Textarea,
-  cx,
-} from "@ui/index";
+import { Badge, Button, ButtonLink, Card, CardHeader, Kbd, ProgressRing, Skeleton, Textarea, cx } from "@ui/index";
 import { Markdown } from "@ui/markdown/Markdown";
 import { LESSON_BY_ID, lessonPath } from "@content/catalog";
 import {
@@ -71,15 +43,10 @@ function Clock45({ base, since }: { base: number; since: number | null }) {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, [since]);
-  const elapsed =
-    base + (since === null ? 0 : Math.max(0, (now - since) / 1000));
+  const elapsed = base + (since === null ? 0 : Math.max(0, (now - since) / 1000));
   const over = elapsed > EXERCISE_TARGET_MINUTES * 60;
   return (
-    <div
-      className={cx(s.clock, over && s.clockOver)}
-      role="timer"
-      aria-label={`Elapsed ${fmt(elapsed)} of ${EXERCISE_TARGET_MINUTES} minutes`}
-    >
+    <div className={cx(s.clock, over && s.clockOver)} role="timer" aria-label={`Elapsed ${fmt(elapsed)} of ${EXERCISE_TARGET_MINUTES} minutes`}>
       <TimerIcon size={18} aria-hidden />
       <span className={s.clockValue}>{fmt(elapsed)}</span>
       <span className="u-xs u-faint">/ {EXERCISE_TARGET_MINUTES}:00</span>
@@ -93,28 +60,18 @@ export default function ExerciseRunner() {
   const { state, dispatch } = useApp();
   const { confirm } = useConfirm();
   const { ask } = useTutor();
-  const topic = state.sdTopics.find((t) => t.exerciseId === id);
+  const topic = state.sdTopics.find(t => t.exerciseId === id);
 
   const [body, setBody] = useState<ExerciseBody | null>(null);
-  const [phase, setPhase] = useState<Phase>(() =>
-    !topic ? "intro" : topic.completedAt ? "summary" : "steps",
-  );
+  const [phase, setPhase] = useState<Phase>(() => (!topic ? "intro" : topic.completedAt ? "summary" : "steps"));
   const [step, setStep] = useState(() => {
     if (!topic || topic.completedAt) return 0;
-    const firstEmpty = EXERCISE_STEPS.findIndex(
-      (st) => !topic.answers?.[st.id]?.trim(),
-    );
+    const firstEmpty = EXERCISE_STEPS.findIndex(st => !topic.answers?.[st.id]?.trim());
     return firstEmpty === -1 ? EXERCISE_STEPS.length - 1 : firstEmpty;
   });
-  const [answers, setAnswers] = useState<Record<string, string>>(
-    () => topic?.answers ?? {},
-  );
-  const [revealed, setRevealed] = useState<Set<ExerciseStepId>>(
-    () => new Set(),
-  );
-  const [scores, setScores] = useState<Record<string, number>>(
-    () => topic?.selfScore ?? {},
-  );
+  const [answers, setAnswers] = useState<Record<string, string>>(() => topic?.answers ?? {});
+  const [revealed, setRevealed] = useState<Set<ExerciseStepId>>(() => new Set());
+  const [scores, setScores] = useState<Record<string, number>>(() => topic?.selfScore ?? {});
   const review = useAiJson("sd_review");
 
   // Clock bookkeeping: elapsed = stored base + time since this session started.
@@ -129,24 +86,13 @@ export default function ExerciseRunner() {
 
   useEffect(() => {
     let alive = true;
-    import("@content/system-design/exercises").then(
-      (m) => alive && setBody(m.default[id] ?? null),
-    );
+    import("@content/system-design/exercises").then(m => alive && setBody(m.default[id] ?? null));
     return () => {
       alive = false;
     };
   }, [id]);
 
-  const elapsedNow = useCallback(
-    () =>
-      Math.round(
-        baseElapsed.current +
-          (sessionStart.current === null
-            ? 0
-            : (Date.now() - sessionStart.current) / 1000),
-      ),
-    [],
-  );
+  const elapsedNow = useCallback(() => Math.round(baseElapsed.current + (sessionStart.current === null ? 0 : (Date.now() - sessionStart.current) / 1000)), []);
 
   const startClock = useCallback(() => {
     if (sessionStart.current !== null) return;
@@ -210,20 +156,12 @@ export default function ExerciseRunner() {
               : `The learner is on the ${phase} screen.`,
             "Coach like an interviewer: ask probing questions and nudge, don't hand over the reference answer.",
           ].join("\n\n"),
-          suggestions: [
-            "Give me a nudge for this step",
-            "What would an interviewer push back on here?",
-            "Which numbers matter most for this design?",
-          ],
+          suggestions: ["Give me a nudge for this step", "What would an interviewer push back on here?", "Which numbers matter most for this design?"],
         }
       : null,
   );
 
-  const lessons = useMemo(
-    () =>
-      meta ? meta.lessonIds.map((l) => LESSON_BY_ID[l]).filter(Boolean) : [],
-    [meta],
-  );
+  const lessons = useMemo(() => (meta ? meta.lessonIds.map(l => LESSON_BY_ID[l]).filter(Boolean) : []), [meta]);
 
   if (!meta) return <NotFound />;
 
@@ -266,7 +204,7 @@ export default function ExerciseRunner() {
 
   const setAnswer = (value: string) => {
     dirty.current = true;
-    setAnswers((a) => ({ ...a, [current.id]: value.slice(0, MAX_ANSWER) }));
+    setAnswers(a => ({ ...a, [current.id]: value.slice(0, MAX_ANSWER) }));
   };
 
   const go = (next: number) => {
@@ -294,9 +232,7 @@ export default function ExerciseRunner() {
   const requestReview = async () => {
     const t = topicRef.current;
     if (!t) return;
-    const labelled = Object.fromEntries(
-      EXERCISE_STEPS.map((st) => [st.title, answers[st.id] ?? ""]),
-    );
+    const labelled = Object.fromEntries(EXERCISE_STEPS.map(st => [st.title, answers[st.id] ?? ""]));
     const out = await review.run({
       exercise: `${meta.title}: ${meta.brief}`,
       answers: labelled,
@@ -311,19 +247,16 @@ export default function ExerciseRunner() {
     }
   };
 
-  const answered = EXERCISE_STEPS.filter((st) => answers[st.id]?.trim()).length;
+  const answered = EXERCISE_STEPS.filter(st => answers[st.id]?.trim()).length;
   const selfPct = selfScorePercent(scores);
-  const rubricDone = SELF_RUBRIC.every((c) => scores[c.id]);
+  const rubricDone = SELF_RUBRIC.every(c => scores[c.id]);
 
   const header = (
     <header className={s.runHead}>
       <Link to={EXERCISES_TAB} className={s.back}>
         <ArrowLeft size={16} aria-hidden /> System Design
       </Link>
-      <div
-        className="u-row"
-        style={{ ["--row-gap" as string]: "10px", flexWrap: "wrap" }}
-      >
+      <div className="u-row" style={{ ["--row-gap" as string]: "10px", flexWrap: "wrap" }}>
         <div className="u-eyebrow">Design exercise</div>
         <Badge tone={DIFFICULTY_TONE[meta.difficulty]}>{meta.difficulty}</Badge>
       </div>
@@ -344,32 +277,25 @@ export default function ExerciseRunner() {
               <li key={st.id} className={s.planItem}>
                 <span className={s.planNum}>{i + 1}</span>
                 <div>
-                  <strong>{st.title}</strong>{" "}
-                  <span className="u-xs u-faint">≈{st.minutes} min</span>
+                  <strong>{st.title}</strong> <span className="u-xs u-faint">≈{st.minutes} min</span>
                   <div className="u-sm u-muted">{st.goal}</div>
                 </div>
               </li>
             ))}
           </ol>
           <p className="u-sm u-muted" style={{ margin: "16px 0" }}>
-            Answer each step in your own words, the way you'd say it to an
-            interviewer. A reference outline unlocks per step so you can
-            compare. The clock is a guide, not a hard stop.
+            Answer each step in your own words, the way you'd say it to an interviewer. A reference outline unlocks per step so you can compare. The clock is a
+            guide, not a hard stop.
           </p>
           <div className="u-row" style={{ flexWrap: "wrap" }}>
-            <Button
-              variant="primary"
-              size="lg"
-              icon={<Clock size={18} />}
-              onClick={begin}
-            >
+            <Button variant="primary" size="lg" icon={<Clock size={18} />} onClick={begin}>
               Start the clock
             </Button>
             {lessons.length > 1 && (
               <span className="u-sm u-faint">
                 Refresher:{" "}
                 {lessons
-                  .filter((l) => l.id !== "sd-framework")
+                  .filter(l => l.id !== "sd-framework")
                   .slice(0, 3)
                   .map((l, i) => (
                     <span key={l.id}>
@@ -391,26 +317,20 @@ export default function ExerciseRunner() {
       <div className={s.page}>
         {header}
         <Card padding="roomy">
-          <CardHeader
-            title="Score yourself"
-            subtitle="Be honest: this is for you. Compare your answers with the references first."
-          />
+          <CardHeader title="Score yourself" subtitle="Be honest: this is for you. Compare your answers with the references first." />
           <div className={s.rubric}>
-            {SELF_RUBRIC.map((c) => (
+            {SELF_RUBRIC.map(c => (
               <fieldset key={c.id} className={s.criterion}>
                 <legend className={s.criterionLabel}>{c.label}</legend>
                 <div className={s.scale} role="radiogroup" aria-label={c.label}>
-                  {[1, 2, 3, 4, 5].map((n) => (
+                  {[1, 2, 3, 4, 5].map(n => (
                     <button
                       key={n}
                       type="button"
                       role="radio"
                       aria-checked={scores[c.id] === n}
-                      className={cx(
-                        s.scaleBtn,
-                        scores[c.id] === n && s.scaleOn,
-                      )}
-                      onClick={() => setScores((sc) => ({ ...sc, [c.id]: n }))}
+                      className={cx(s.scaleBtn, scores[c.id] === n && s.scaleOn)}
+                      onClick={() => setScores(sc => ({ ...sc, [c.id]: n }))}
                     >
                       {n}
                     </button>
@@ -425,24 +345,13 @@ export default function ExerciseRunner() {
             ))}
           </div>
           <div className="u-row" style={{ marginTop: 20, flexWrap: "wrap" }}>
-            <Button
-              variant="ghost"
-              icon={<ArrowLeft size={16} />}
-              onClick={() => setPhase("steps")}
-            >
+            <Button variant="ghost" icon={<ArrowLeft size={16} />} onClick={() => setPhase("steps")}>
               Back to answers
             </Button>
-            <Button
-              variant="primary"
-              icon={<Check size={16} />}
-              disabled={!rubricDone}
-              onClick={finish}
-            >
+            <Button variant="primary" icon={<Check size={16} />} disabled={!rubricDone} onClick={finish}>
               Finish exercise
             </Button>
-            {!rubricDone && (
-              <span className="u-sm u-faint">Score all six to finish.</span>
-            )}
+            {!rubricDone && <span className="u-sm u-faint">Score all six to finish.</span>}
           </div>
         </Card>
       </div>
@@ -452,71 +361,41 @@ export default function ExerciseRunner() {
   // ─── Summary ─────────────────────────────────────────────────────────────────
   if (phase === "summary") {
     const saved = topic?.review;
-    const ai = review.data
-      ? { ...review.data, score: Math.round(review.data.score) }
-      : saved;
+    const ai = review.data ? { ...review.data, score: Math.round(review.data.score) } : saved;
     return (
       <div className={s.page}>
         {header}
         <div className={s.summaryGrid}>
           <Card padding="roomy" blueprint accent={ACCENT} glow>
             <div className={s.scoreRow}>
-              <ProgressRing
-                value={selfPct ?? 0}
-                max={100}
-                size={96}
-                stroke={8}
-                color={ACCENT}
-                ariaLabel={`Self score ${selfPct ?? 0}%`}
-              >
+              <ProgressRing value={selfPct ?? 0} max={100} size={96} stroke={8} color={ACCENT} ariaLabel={`Self score ${selfPct ?? 0}%`}>
                 <strong className="u-display">{selfPct ?? "–"}%</strong>
               </ProgressRing>
               <div>
                 <div className="u-eyebrow">Exercise complete</div>
                 <h2 className={s.sectionTitle}>Self score {selfPct ?? "–"}%</h2>
-                <div
-                  className="u-sm u-muted u-row"
-                  style={{ ["--row-gap" as string]: "6px" }}
-                >
-                  <Clock size={14} aria-hidden /> {fmt(topic?.elapsedSec ?? 0)}{" "}
-                  · {answered} of {EXERCISE_STEPS.length} steps answered
+                <div className="u-sm u-muted u-row" style={{ ["--row-gap" as string]: "6px" }}>
+                  <Clock size={14} aria-hidden /> {fmt(topic?.elapsedSec ?? 0)} · {answered} of {EXERCISE_STEPS.length} steps answered
                 </div>
               </div>
             </div>
             <ul className={s.selfList}>
-              {SELF_RUBRIC.map((c) => (
+              {SELF_RUBRIC.map(c => (
                 <li key={c.id}>
                   <span>{c.label}</span>
-                  <span
-                    className={s.dots}
-                    aria-label={`${scores[c.id] ?? 0} of 5`}
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <i
-                        key={n}
-                        className={cx(
-                          s.dot,
-                          n <= (scores[c.id] ?? 0) && s.dotOn,
-                        )}
-                      />
+                  <span className={s.dots} aria-label={`${scores[c.id] ?? 0} of 5`}>
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <i key={n} className={cx(s.dot, n <= (scores[c.id] ?? 0) && s.dotOn)} />
                     ))}
                   </span>
                 </li>
               ))}
             </ul>
             <div className="u-row" style={{ flexWrap: "wrap", marginTop: 16 }}>
-              <ButtonLink
-                to={EXERCISES_TAB}
-                variant="primary"
-                iconRight={<ArrowRight size={16} />}
-              >
+              <ButtonLink to={EXERCISES_TAB} variant="primary" iconRight={<ArrowRight size={16} />}>
                 More exercises
               </ButtonLink>
-              <Button
-                variant="ghost"
-                icon={<RotateCcw size={16} />}
-                onClick={restart}
-              >
+              <Button variant="ghost" icon={<RotateCcw size={16} />} onClick={restart}>
                 New attempt
               </Button>
             </div>
@@ -529,9 +408,7 @@ export default function ExerciseRunner() {
               subtitle="A principal engineer's rubric: scope, numbers, design, failure modes, trade-offs."
             />
             {!review.enabled ? (
-              <AiGate>
-                Turn on the AI co-pilot to get a graded review of your answers.
-              </AiGate>
+              <AiGate>Turn on the AI co-pilot to get a graded review of your answers.</AiGate>
             ) : ai ? (
               <div className={s.review}>
                 <div className={s.reviewScore}>
@@ -539,16 +416,13 @@ export default function ExerciseRunner() {
                   <span className="u-faint">/ 100</span>
                 </div>
                 <ul className={s.rubricList}>
-                  {ai.rubric.map((r) => (
+                  {ai.rubric.map(r => (
                     <li key={r.criterion}>
                       <div className={s.rubricTop}>
                         <strong>{r.criterion}</strong>
                         <span className={s.dots} aria-label={`${r.score} of 5`}>
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <i
-                              key={n}
-                              className={cx(s.dot, n <= r.score && s.dotOn)}
-                            />
+                          {[1, 2, 3, 4, 5].map(n => (
+                            <i key={n} className={cx(s.dot, n <= r.score && s.dotOn)} />
                           ))}
                         </span>
                       </div>
@@ -567,41 +441,22 @@ export default function ExerciseRunner() {
                     <div key={title}>
                       <h3 className={s.reviewHead}>{title}</h3>
                       <ul className={s.bullets}>
-                        {items.map((item) => (
+                        {items.map(item => (
                           <li key={item}>{item}</li>
                         ))}
                       </ul>
                     </div>
                   ) : null,
                 )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  icon={<RotateCcw size={14} />}
-                  loading={review.status === "loading"}
-                  onClick={requestReview}
-                >
+                <Button variant="ghost" size="sm" icon={<RotateCcw size={14} />} loading={review.status === "loading"} onClick={requestReview}>
                   Review again
                 </Button>
               </div>
             ) : (
-              <div
-                className="u-stack"
-                style={{ ["--stack-gap" as string]: "12px" }}
-              >
-                <p className="u-sm u-muted">
-                  Sends your five answers for grading. Takes about 20 seconds.
-                </p>
-                {review.status === "error" && (
-                  <p className={s.error}>{review.error}</p>
-                )}
-                <Button
-                  variant="soft"
-                  icon={<Sparkles size={16} />}
-                  loading={review.status === "loading"}
-                  onClick={requestReview}
-                  disabled={!answered}
-                >
+              <div className="u-stack" style={{ ["--stack-gap" as string]: "12px" }}>
+                <p className="u-sm u-muted">Sends your five answers for grading. Takes about 20 seconds.</p>
+                {review.status === "error" && <p className={s.error}>{review.error}</p>}
+                <Button variant="soft" icon={<Sparkles size={16} />} loading={review.status === "loading"} onClick={requestReview} disabled={!answered}>
                   {review.status === "loading" ? "Reviewing…" : "Get AI review"}
                 </Button>
               </div>
@@ -610,17 +465,10 @@ export default function ExerciseRunner() {
         </div>
 
         <section aria-labelledby="answers-h">
-          <h2
-            id="answers-h"
-            className={s.sectionTitle}
-            style={{ margin: "8px 0 12px" }}
-          >
+          <h2 id="answers-h" className={s.sectionTitle} style={{ margin: "8px 0 12px" }}>
             Your answers vs the reference
           </h2>
-          <div
-            className="u-stack"
-            style={{ ["--stack-gap" as string]: "10px" }}
-          >
+          <div className="u-stack" style={{ ["--stack-gap" as string]: "10px" }}>
             {EXERCISE_STEPS.map((st, i) => (
               <details key={st.id} className={s.compareItem} open={i === 0}>
                 <summary>
@@ -629,19 +477,11 @@ export default function ExerciseRunner() {
                 <div className={s.compareBody}>
                   <div>
                     <div className="u-eyebrow">You</div>
-                    <div className={s.yourAnswer}>
-                      {answers[st.id]?.trim() || (
-                        <span className="u-faint">(left blank)</span>
-                      )}
-                    </div>
+                    <div className={s.yourAnswer}>{answers[st.id]?.trim() || <span className="u-faint">(left blank)</span>}</div>
                   </div>
                   <div>
                     <div className="u-eyebrow">Reference</div>
-                    {body ? (
-                      <Markdown>{body[st.id].reference}</Markdown>
-                    ) : (
-                      <Skeleton height={80} />
-                    )}
+                    {body ? <Markdown>{body[st.id].reference}</Markdown> : <Skeleton height={80} />}
                   </div>
                 </div>
               </details>
@@ -655,7 +495,7 @@ export default function ExerciseRunner() {
   // ─── Steps ───────────────────────────────────────────────────────────────────
   const text = answers[current.id] ?? "";
   const isRevealed = revealed.has(current.id);
-  const reveal = () => setRevealed((r) => new Set(r).add(current.id));
+  const reveal = () => setRevealed(r => new Set(r).add(current.id));
 
   return (
     <div className={s.page}>
@@ -669,17 +509,11 @@ export default function ExerciseRunner() {
                 <li key={st.id}>
                   <button
                     type="button"
-                    className={cx(
-                      s.stepBtn,
-                      i === step && s.stepOn,
-                      done && s.stepDone,
-                    )}
+                    className={cx(s.stepBtn, i === step && s.stepOn, done && s.stepDone)}
                     aria-current={i === step ? "step" : undefined}
                     onClick={() => go(i)}
                   >
-                    <span className={s.stepDot}>
-                      {done ? <Check size={14} aria-hidden /> : i + 1}
-                    </span>
+                    <span className={s.stepDot}>{done ? <Check size={14} aria-hidden /> : i + 1}</span>
                     <span className={s.stepText}>
                       <span>{st.title}</span>
                       <span className="u-xs u-faint">≈{st.minutes} min</span>
@@ -696,8 +530,7 @@ export default function ExerciseRunner() {
             <div className={s.stepHead}>
               <div>
                 <div className="u-eyebrow">
-                  Step {step + 1} of {EXERCISE_STEPS.length} · ≈
-                  {current.minutes} min
+                  Step {step + 1} of {EXERCISE_STEPS.length} · ≈{current.minutes} min
                 </div>
                 <h2 className={s.sectionTitle}>{current.title}</h2>
                 <p className="u-sm u-muted">{current.goal}</p>
@@ -706,7 +539,7 @@ export default function ExerciseRunner() {
 
             {stepBody ? (
               <ul className={s.prompts}>
-                {stepBody.prompts.map((p) => (
+                {stepBody.prompts.map(p => (
                   <li key={p}>{p}</li>
                 ))}
               </ul>
@@ -724,8 +557,8 @@ export default function ExerciseRunner() {
               rows={12}
               maxLength={MAX_ANSWER}
               placeholder="Write it the way you'd say it out loud. Bullets are fine."
-              onChange={(e) => setAnswer(e.target.value)}
-              onKeyDown={(e) => {
+              onChange={e => setAnswer(e.target.value)}
+              onKeyDown={e => {
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
                   e.preventDefault();
                   go(step + 1);
@@ -734,8 +567,7 @@ export default function ExerciseRunner() {
             />
             <div className={s.answerMeta}>
               <span className="u-xs u-faint">
-                {text.length.toLocaleString()} / {MAX_ANSWER.toLocaleString()} ·
-                saved automatically
+                {text.length.toLocaleString()} / {MAX_ANSWER.toLocaleString()} · saved automatically
               </span>
               <span className="u-xs u-faint">
                 <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd> next step
@@ -743,38 +575,17 @@ export default function ExerciseRunner() {
             </div>
 
             <div className={s.stepActions}>
-              <Button
-                variant="ghost"
-                icon={<ArrowLeft size={16} />}
-                disabled={step === 0}
-                onClick={() => go(step - 1)}
-              >
+              <Button variant="ghost" icon={<ArrowLeft size={16} />} disabled={step === 0} onClick={() => go(step - 1)}>
                 Back
               </Button>
-              <div
-                className="u-row"
-                style={{ flexWrap: "wrap", justifyContent: "flex-end" }}
-              >
+              <div className="u-row" style={{ flexWrap: "wrap", justifyContent: "flex-end" }}>
                 {!isRevealed && (
-                  <Button
-                    variant={text.trim().length >= 20 ? "soft" : "ghost"}
-                    icon={<Eye size={16} />}
-                    onClick={reveal}
-                    disabled={!stepBody}
-                  >
-                    {text.trim().length >= 20
-                      ? "Compare with reference"
-                      : "Peek at reference"}
+                  <Button variant={text.trim().length >= 20 ? "soft" : "ghost"} icon={<Eye size={16} />} onClick={reveal} disabled={!stepBody}>
+                    {text.trim().length >= 20 ? "Compare with reference" : "Peek at reference"}
                   </Button>
                 )}
-                <Button
-                  variant="primary"
-                  iconRight={<ArrowRight size={16} />}
-                  onClick={() => go(step + 1)}
-                >
-                  {step === EXERCISE_STEPS.length - 1
-                    ? "Score yourself"
-                    : "Next step"}
+                <Button variant="primary" iconRight={<ArrowRight size={16} />} onClick={() => go(step + 1)}>
+                  {step === EXERCISE_STEPS.length - 1 ? "Score yourself" : "Next step"}
                 </Button>
               </div>
             </div>
@@ -782,11 +593,7 @@ export default function ExerciseRunner() {
 
           {isRevealed && stepBody && (
             <Card padding="roomy" accent={ACCENT} className={s.reference}>
-              <CardHeader
-                title="Reference outline"
-                icon={<Lightbulb size={20} />}
-                subtitle="One strong answer, not the only one. Note what you missed."
-              />
+              <CardHeader title="Reference outline" icon={<Lightbulb size={20} />} subtitle="One strong answer, not the only one. Note what you missed." />
               <Markdown>{stepBody.reference}</Markdown>
             </Card>
           )}
@@ -810,32 +617,12 @@ export default function ExerciseRunner() {
             </div>
           </Card>
           <Card>
-            <CardHeader
-              title="Stuck?"
-              subtitle="Your tutor can see this step and your answer."
-            />
-            <div
-              className="u-stack"
-              style={{ ["--stack-gap" as string]: "8px" }}
-            >
-              <Button
-                variant="soft"
-                onClick={() =>
-                  ask(
-                    `Give me a nudge for the "${current.title}" step without giving the answer away.`,
-                  )
-                }
-              >
+            <CardHeader title="Stuck?" subtitle="Your tutor can see this step and your answer." />
+            <div className="u-stack" style={{ ["--stack-gap" as string]: "8px" }}>
+              <Button variant="soft" onClick={() => ask(`Give me a nudge for the "${current.title}" step without giving the answer away.`)}>
                 Give me a nudge
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  ask(
-                    "Act as my interviewer: push back on what I've written so far for this step.",
-                  )
-                }
-              >
+              <Button variant="ghost" onClick={() => ask("Act as my interviewer: push back on what I've written so far for this step.")}>
                 Push back on my answer
               </Button>
             </div>
@@ -845,7 +632,7 @@ export default function ExerciseRunner() {
               Practises
             </div>
             <div className={s.exLessons}>
-              {lessons.map((l) => (
+              {lessons.map(l => (
                 <Link key={l.id} to={lessonPath(l)} className={s.lessonTag}>
                   {l.title}
                 </Link>

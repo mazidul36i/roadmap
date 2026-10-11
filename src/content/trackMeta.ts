@@ -56,17 +56,30 @@ export const JAVA_TIERS: TierMeta[] = [
 ];
 
 export const JAVA_LESSONS: LessonMeta[] = [
-  java("java-collections", "Collections Internals: HashMap & Friends", 1, 1, 16, "How HashMap, ConcurrentHashMap, ArrayList and TreeMap really work, and what that costs."),
-  java("java-equals-hashcode", "equals, hashCode & Immutability", 1, 2, 12, "The contracts behind every map key and the bugs when you break them.", ["java-collections"]),
+  java(
+    "java-collections",
+    "Collections Internals: HashMap & Friends",
+    1,
+    1,
+    16,
+    "How HashMap, ConcurrentHashMap, ArrayList and TreeMap really work, and what that costs.",
+  ),
+  java("java-equals-hashcode", "equals, hashCode & Immutability", 1, 2, 12, "The contracts behind every map key and the bugs when you break them.", [
+    "java-collections",
+  ]),
   java("java-generics", "Generics & Type Erasure", 1, 3, 14, "Bounded types, wildcards, PECS, and what disappears at runtime."),
   java("java-streams", "Streams & Functional Java", 1, 4, 14, "Pipelines, collectors, laziness, and when a loop is better."),
   java("java-memory-model", "The Java Memory Model", 2, 5, 18, "Visibility, ordering, volatile, synchronized and happens-before.", ["java-collections"]),
-  java("java-executors", "Executors, CompletableFuture & Virtual Threads", 2, 6, 16, "Thread pools that don't fall over, async composition, and Loom.", ["java-memory-model"]),
+  java("java-executors", "Executors, CompletableFuture & Virtual Threads", 2, 6, 16, "Thread pools that don't fall over, async composition, and Loom.", [
+    "java-memory-model",
+  ]),
   java("java-jvm-gc", "JVM Memory & Garbage Collection", 2, 7, 16, "Heap regions, G1 vs ZGC, and reading a memory problem."),
   java("spring-ioc", "Spring IoC, Beans & Proxies", 3, 8, 16, "Dependency injection, bean lifecycle, scopes and the proxy behind @Transactional."),
   java("spring-boot", "Spring Boot Auto-Configuration", 3, 9, 12, "Starters, conditional beans, profiles, and Actuator.", ["spring-ioc"]),
   java("spring-transactions", "Transactions in Spring", 3, 10, 14, "Propagation, isolation, rollback rules, and the self-invocation trap.", ["spring-ioc"]),
-  java("spring-jpa", "JPA & Hibernate Pitfalls", 3, 11, 16, "N+1 queries, lazy loading, the persistence context and fetch strategies.", ["spring-transactions"]),
+  java("spring-jpa", "JPA & Hibernate Pitfalls", 3, 11, 16, "N+1 queries, lazy loading, the persistence context and fetch strategies.", [
+    "spring-transactions",
+  ]),
   java("java-solid", "SOLID & Design Patterns in Java", 4, 12, 14, "Principles you can defend and patterns you'll actually use."),
 ];
 
@@ -82,7 +95,9 @@ export const BEHAVIORAL_TIERS: TierMeta[] = [
 export const BEHAVIORAL_LESSONS: LessonMeta[] = [
   beh("beh-star", "The STAR Method, Done Right", 1, 1, 12, "Situation, task, action, result, in two minutes, with you as the protagonist."),
   beh("beh-intro", "Tell Me About Yourself", 1, 2, 10, "A 90-second pitch that sets up the rest of the interview.", ["beh-star"]),
-  beh("beh-competencies", "What Senior Interviews Probe", 2, 3, 14, "Ownership, conflict, failure, ambiguity, influence and impact: what good sounds like.", ["beh-star"]),
+  beh("beh-competencies", "What Senior Interviews Probe", 2, 3, 14, "Ownership, conflict, failure, ambiguity, influence and impact: what good sounds like.", [
+    "beh-star",
+  ]),
   beh("beh-closing", "Questions to Ask & Closing Strong", 2, 4, 10, "Reverse-interview questions, red flags, and the last five minutes.", ["beh-intro"]),
 ];
 

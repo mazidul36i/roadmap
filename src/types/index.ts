@@ -128,15 +128,7 @@ export interface SDReview {
   at: string; // ISO
 }
 
-export type AppStatus =
-  | "wishlist"
-  | "applied"
-  | "referred"
-  | "interview-scheduled"
-  | "technical-round"
-  | "system-design-round"
-  | "offer"
-  | "rejected";
+export type AppStatus = "wishlist" | "applied" | "referred" | "interview-scheduled" | "technical-round" | "system-design-round" | "offer" | "rejected";
 
 export interface InterviewDate {
   id: string;
@@ -174,7 +166,16 @@ export interface MockInterview {
   /** Set when the session was run by the AI interviewer. */
   ai?: boolean;
   rubric?: Record<string, number>;
+  /** One-line comment per rubric criterion (AI mocks). */
+  rubricNotes?: Record<string, string>;
   strengths?: string[];
+  summary?: string;
+  recommendedTopics?: string[];
+  difficulty?: "easy" | "medium" | "hard";
+  company?: string;
+  durationMinutes?: number;
+  /** The transcript lives in users/{uid}/mocks/{id} (and a local copy). */
+  hasTranscript?: boolean;
 }
 
 export type ResourceType = "article" | "video" | "pdf" | "course" | "tool" | "repo";
@@ -272,7 +273,7 @@ export interface CardState {
   started?: string;
 }
 
-export type CardSourceType = "lesson" | "note" | "problem" | "mock" | "story" | "manual" | "ai";
+export type CardSourceType = "lesson" | "note" | "problem" | "mock" | "story" | "manual" | "ai" | "arcade";
 
 export interface Flashcard {
   id: string;

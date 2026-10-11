@@ -586,6 +586,366 @@ export function lcsFrames(a = "ABCDE", b = "ACE"): Frame[] {
   return frames;
 }
 
+// ─── Intervals ─────────────────────────────────────────────────────────────────
+
+export function intervalsFrames(input: Array<[number, number]> = [[1, 3], [8, 10], [2, 6], [15, 18], [9, 12]]): Frame[] {
+  const frames: Frame[] = [];
+  const fmt = ([a, b]: [number, number]) => `${a}–${b}`;
+  const sorted = [...input].sort((a, b) => a[0] - b[0]);
+  const merged: Array<[number, number]> = [];
+  const st = (i: number | null, tone: (j: number) => Tone, label = "sorted", list = sorted) => ({
+    kind: "array" as const,
+    rows: [{ label, cells: cells(list.map(fmt), tone), pointers: i === null ? [] : [{ index: i, label: "i", tone: "brand" as const }] }],
+    stack: { label: "merged", items: merged.map(fmt), vertical: true },
+    vars: [["last end", merged.length ? merged[merged.length - 1][1] : "–"]] as Array<[string, string | number]>,
+  });
+
+  frames.push({ state: st(null, () => "default", "input", input), note: "Merge all overlapping intervals. They arrive in no particular order." });
+  frames.push({ state: st(null, () => "default"), note: "Sort by start time. Now any interval that overlaps the current block must come right after it." });
+
+  sorted.forEach((iv, i) => {
+    const last = merged[merged.length - 1];
+    const overlaps = !!last && iv[0] <= last[1];
+    if (last && i === 1) {
+      frames[frames.length - 1].predict = {
+        question: `${fmt(iv)} starts at ${iv[0]}; the last merged block ends at ${last[1]}. What happens?`,
+        choices: [`Extend the block to ${Math.min(last[0], iv[0])}–${Math.max(last[1], iv[1])}`, "Start a new block", "Drop it"],
+        answer: overlaps ? 0 : 1,
+      };
+    }
+    if (last && i === 2) {
+      frames[frames.length - 1].predict = {
+        question: `${fmt(iv)} starts at ${iv[0]}; the last block ends at ${last[1]}. Overlap?`,
+        choices: ["Yes: extend the block", "No: start a new block"],
+        answer: overlaps ? 0 : 1,
+      };
+    }
+    if (overlaps) {
+      const prevEnd = last[1];
+      last[1] = Math.max(last[1], iv[1]);
+      frames.push({
+        state: st(i, j => (j === i ? "active" : j < i ? "muted" : "default")),
+        note: `${fmt(iv)} starts at ${iv[0]}, before the last block ends (${prevEnd}), so extend the block to end at ${last[1]}.`,
+      });
+    } else {
+      merged.push([iv[0], iv[1]]);
+      frames.push({ state: st(i, j => (j === i ? "active" : j < i ? "muted" : "default")), note: last ? `${iv[0]} > ${last[1]}: no overlap, so ${fmt(iv)} starts a new block.` : `The first interval opens the first block.` });
+    }
+  });
+  frames.push({ state: st(null, () => "done"), note: `Done in one sweep after sorting: ${merged.map(fmt).join(", ")}. O(n log n) for the sort, O(n) to merge.` });
+  return frames;
+}
+
+// ─── Binary heap ───────────────────────────────────────────────────────────────
+
+const HEAP_POS: Array<[number, number]> = [
+  [50, 10],
+  [27, 40],
+  [73, 40],
+  [14, 72],
+  [40, 72],
+  [60, 72],
+  [86, 72],
+];
+
+export function heapFrames(values = [5, 3, 8, 1, 9, 2]): Frame[] {
+  const frames: Frame[] = [];
+  const heap: number[] = [];
+  const st = (hi: number[] = [], done: number[] = []) => ({
+    kind: "graph" as const,
+    nodes: heap.map<GraphNode>((v, i) => ({ id: String(i), label: String(v), x: HEAP_POS[i][0], y: HEAP_POS[i][1], tone: hi.includes(i) ? "active" : done.includes(i) ? "done" : "default" })),
+    edges: heap.slice(1).map((_, k) => ({ from: String(Math.floor(k / 2)), to: String(k + 1) })),
+    lists: [{ label: "array", items: heap.map(v => v) }],
+    vars: [["size", heap.length]] as Array<[string, string | number]>,
+  });
+  frames.push({ state: st(), note: "A min-heap is a complete binary tree stored in an array: parent of i is (i−1)/2, and every parent ≤ its children." });
+
+  let askedSwap = false;
+  for (const v of values) {
+    heap.push(v);
+    let i = heap.length - 1;
+    frames.push({ state: st([i]), note: `offer(${v}): append at index ${i}, the next free slot.` });
+    while (i > 0) {
+      const p = Math.floor((i - 1) / 2);
+      if (heap[p] <= heap[i]) {
+        frames.push({ state: st([i, p]), note: `${heap[i]} ≥ parent ${heap[p]}: the heap property holds, stop.` });
+        break;
+      }
+      if (!askedSwap) {
+        askedSwap = true;
+        frames[frames.length - 1].predict = { question: `${heap[i]} is smaller than its parent ${heap[p]}. What happens?`, choices: ["Swap them and keep sifting up", "Leave it", "Rebuild the whole heap"], answer: 0 };
+      }
+      [heap[p], heap[i]] = [heap[i], heap[p]];
+      frames.push({ state: st([p]), note: `Sift up: swap with parent, ${heap[p]} moves to index ${p}.` });
+      i = p;
+    }
+  }
+
+  // poll(): remove the minimum.
+  const min = heap[0];
+  frames[frames.length - 1].predict = { question: "poll() removes the minimum. Which element replaces the root before sifting down?", choices: ["The last element", "The smaller child", "The largest element"], answer: 0 };
+  heap[0] = heap[heap.length - 1];
+  heap.pop();
+  frames.push({ state: st([0]), note: `poll() returns ${min}. Move the last element (${heap[0]}) to the root, then sift it down.` });
+  let i = 0;
+  for (;;) {
+    const l = 2 * i + 1;
+    const r = l + 1;
+    let smallest = i;
+    if (l < heap.length && heap[l] < heap[smallest]) smallest = l;
+    if (r < heap.length && heap[r] < heap[smallest]) smallest = r;
+    if (smallest === i) {
+      frames.push({ state: st([], [i]), note: `${heap[i]} is ≤ both children: done. Every operation touched at most one root-to-leaf path: O(log n).` });
+      break;
+    }
+    [heap[i], heap[smallest]] = [heap[smallest], heap[i]];
+    frames.push({ state: st([smallest]), note: `Swap with the smaller child (${heap[i]}) so the parent stays ≤ both children.` });
+    i = smallest;
+  }
+  return frames;
+}
+
+// ─── Trie ──────────────────────────────────────────────────────────────────────
+
+export function trieFrames(words = ["car", "cat", "card", "do", "dog"], query = "ca"): Frame[] {
+  // Fixed layout of the final trie so nodes never jump around.
+  const layout: Record<string, [number, number]> = {
+    "": [50, 6],
+    c: [28, 27],
+    ca: [28, 48],
+    car: [14, 69],
+    card: [14, 92],
+    cat: [42, 69],
+    d: [74, 27],
+    do: [74, 48],
+    dog: [74, 69],
+  };
+  const present = new Set<string>([""]);
+  const ends = new Set<string>();
+  const frames: Frame[] = [];
+  const st = (active: string[] = [], shared: string[] = [], found: string[] = []) => ({
+    kind: "graph" as const,
+    nodes: [...present].map<GraphNode>(key => ({
+      id: key || "root",
+      label: key ? key[key.length - 1] : "root",
+      x: layout[key][0],
+      y: layout[key][1],
+      tone: found.includes(key) ? "done" : active.includes(key) ? "active" : shared.includes(key) ? "window" : "default",
+      badge: ends.has(key) ? "✓" : undefined,
+    })),
+    edges: [...present].filter(k => k).map(k => ({ from: k.slice(0, -1) || "root", to: k })),
+    lists: [{ label: "words", items: [...ends] }],
+  });
+  frames.push({ state: st(), note: "A trie stores words character by character. Words that share a prefix share a path." });
+
+  words.forEach((w, wi) => {
+    const shared: string[] = [];
+    const added: string[] = [];
+    for (let i = 1; i <= w.length; i++) {
+      const key = w.slice(0, i);
+      if (present.has(key)) shared.push(key);
+      else {
+        present.add(key);
+        added.push(key);
+      }
+    }
+    if (wi === 1) {
+      frames[frames.length - 1].predict = { question: `"car" is stored. How many new nodes does inserting "${w}" create?`, choices: ["1", "2", "3"], answer: added.length - 1 };
+    }
+    ends.add(w);
+    frames.push({
+      state: st(added, shared),
+      note: added.length === 0 ? `"${w}" already exists as a path: just mark its last node as a word end.` : `insert("${w}"): ${shared.length ? `reuse ${shared.map(k => `"${k}"`).join(", ")}, ` : ""}create ${added.length} node${added.length === 1 ? "" : "s"}, mark the end.`,
+    });
+  });
+
+  frames[frames.length - 1].predict = { question: `startsWith("${query}"): which words are below the "${query}" node?`, choices: ["car, cat, card", "car, cat", "cat only"], answer: 0 };
+  const path = query.split("").map((_, i) => query.slice(0, i + 1));
+  frames.push({ state: st(path), note: `startsWith("${query}"): walk ${path.map(k => `'${k[k.length - 1]}'`).join(" → ")}. Each step is O(1), so the whole check is O(length of the prefix).` });
+  const below = [...present].filter(k => k.startsWith(query) && k.length > query.length);
+  frames.push({ state: st(path, [], below), note: `Everything under that node completes the prefix: ${[...ends].filter(w => w.startsWith(query)).join(", ")}. That's how autocomplete works.` });
+  return frames;
+}
+
+// ─── Union-find ────────────────────────────────────────────────────────────────
+
+export function unionFindFrames(): Frame[] {
+  const names = ["A", "B", "C", "D", "E", "F"];
+  const parent = names.map((_, i) => i);
+  const size = names.map(() => 1);
+  const frames: Frame[] = [];
+
+  const rootOf = (i: number) => {
+    while (parent[i] !== i) i = parent[i];
+    return i;
+  };
+  const depthOf = (i: number) => {
+    let d = 0;
+    while (parent[i] !== i) {
+      i = parent[i];
+      d++;
+    }
+    return d;
+  };
+  // Lay out each tree in its own column band: roots on top, children below.
+  const layout = () => {
+    const roots = names.map((_, i) => i).filter(i => parent[i] === i);
+    const pos = new Map<number, [number, number]>();
+    const band = 100 / roots.length;
+    roots.forEach((r, ri) => {
+      const members = names.map((_, i) => i).filter(i => rootOf(i) === r);
+      const byDepth = new Map<number, number[]>();
+      for (const m of members) byDepth.set(depthOf(m), [...(byDepth.get(depthOf(m)) ?? []), m]);
+      for (const [d, ms] of byDepth) {
+        ms.forEach((m, k) => pos.set(m, [band * ri + (band * (k + 1)) / (ms.length + 1), 12 + d * 38]));
+      }
+    });
+    return pos;
+  };
+  const st = (active: number[] = [], found: number[] = []) => {
+    const pos = layout();
+    return {
+      kind: "graph" as const,
+      nodes: names.map<GraphNode>((label, i) => ({
+        id: String(i),
+        label,
+        x: pos.get(i)![0],
+        y: pos.get(i)![1],
+        tone: active.includes(i) ? "active" : found.includes(i) ? "done" : "default",
+        badge: parent[i] === i ? size[i] : undefined,
+      })),
+      edges: names.flatMap((_, i) => (parent[i] !== i ? [{ from: String(i), to: String(parent[i]), directed: true }] : [])),
+      lists: [{ label: "parent", items: names.map((n, i) => `${n}→${names[parent[i]]}`) }],
+    };
+  };
+  const union = (a: number, b: number) => {
+    let ra = rootOf(a);
+    let rb = rootOf(b);
+    if (ra === rb) return;
+    if (size[ra] < size[rb]) [ra, rb] = [rb, ra];
+    parent[rb] = ra;
+    size[ra] += size[rb];
+    return [ra, rb] as const;
+  };
+
+  frames.push({ state: st(), note: "Six elements, each its own set. Every node points to its parent; a root points to itself. Badges show set sizes." });
+  union(0, 1);
+  frames.push({ state: st([0, 1]), note: "union(A, B): both are roots of size 1, so B now points to A." });
+  union(2, 3);
+  frames.push({ state: st([2, 3]), note: "union(C, D): D now points to C." });
+  union(4, 5);
+  frames.push({
+    state: st([4, 5]),
+    note: "union(E, F): F now points to E. Three sets of two.",
+    predict: { question: "union(B, D): find(B) = A and find(D) = C, both size 2. What links?", choices: ["C's root points to A", "B points to D", "D points to B", "Nothing: already connected"], answer: 0 },
+  });
+  union(1, 3);
+  frames.push({
+    state: st([0, 2]),
+    note: "union(B, D) joins the roots, not B and D themselves: C now points to A, and A's set has size 4.",
+    predict: { question: "find(D) walks D → C → A. With path compression, where does D point afterwards?", choices: ["C", "A", "D"], answer: 1 },
+  });
+  // find(D) with path compression.
+  parent[3] = 0;
+  frames.push({
+    state: st([3, 0]),
+    note: "Path compression: after find(D), D points straight at the root A, so the next find is one hop.",
+    predict: { question: "Union by size: union(F, A) joins a size-2 tree and a size-4 tree. Which goes under which?", choices: ["E's tree goes under A", "A's tree goes under E"], answer: 0 },
+  });
+  union(5, 0);
+  frames.push({ state: st([], [0, 1, 2, 3, 4, 5]), note: "Smaller tree under the larger keeps trees shallow. One set of six; with both tricks, each operation is effectively O(1)." });
+  return frames;
+}
+
+// ─── Dijkstra ──────────────────────────────────────────────────────────────────
+
+export function dijkstraFrames(): Frame[] {
+  const names = ["A", "B", "C", "D", "E", "F"];
+  const pos: Array<[number, number]> = [
+    [6, 50],
+    [34, 14],
+    [34, 86],
+    [64, 14],
+    [64, 86],
+    [94, 50],
+  ];
+  const edges: Array<[number, number, number]> = [
+    [0, 1, 4],
+    [0, 2, 2],
+    [2, 1, 1],
+    [1, 3, 5],
+    [2, 3, 8],
+    [2, 4, 10],
+    [3, 4, 2],
+    [3, 5, 6],
+    [4, 5, 3],
+  ];
+  const INF = Infinity;
+  const dist = names.map((_, i) => (i === 0 ? 0 : INF));
+  const prev: Array<number | null> = names.map(() => null);
+  const done = new Set<number>();
+  let heap: Array<[number, number]> = [[0, 0]];
+  const frames: Frame[] = [];
+  const show = (d: number) => (d === INF ? "∞" : d);
+  const st = (current?: number, relaxing?: [number, number]) => ({
+    kind: "graph" as const,
+    nodes: names.map<GraphNode>((label, i) => ({
+      id: String(i),
+      label,
+      x: pos[i][0],
+      y: pos[i][1],
+      badge: show(dist[i]),
+      tone: i === current ? "active" : done.has(i) ? "done" : dist[i] < INF ? "window" : "default",
+    })),
+    edges: edges.map(([u, v, w]) => {
+      const inTree = prev[v] === u || prev[u] === v;
+      const isRelax = relaxing && ((relaxing[0] === u && relaxing[1] === v) || (relaxing[0] === v && relaxing[1] === u));
+      return { from: String(u), to: String(v), label: String(w), tone: (isRelax ? "active" : inTree ? "done" : "default") as Tone };
+    }),
+    lists: [{ label: "min-heap", items: [...heap].sort((a, b) => a[0] - b[0]).map(([d, n]) => `${names[n]}:${d}`) }],
+  });
+
+  frames.push({
+    state: st(),
+    note: "Shortest paths from A. Badges hold the best distance found so far; the min-heap always hands us the closest unfinished node.",
+    predict: { question: "Which node is finalised first?", choices: ["A, at distance 0", "C, the cheapest edge", "B"], answer: 0 },
+  });
+  let askedUpdate = false;
+  while (heap.length) {
+    heap.sort((a, b) => a[0] - b[0]);
+    const [d, u] = heap.shift()!;
+    if (done.has(u) || d > dist[u]) {
+      frames.push({ state: st(), note: `Pop ${names[u]}:${d}, but ${names[u]} is already final at ${dist[u]}. Stale heap entry: skip it.` });
+      continue;
+    }
+    done.add(u);
+    frames.push({ state: st(u), note: `Pop ${names[u]} at distance ${d}. Nothing in the heap is closer, so ${d} is final.` });
+    for (const [a, b, w] of edges) {
+      if (a !== u && b !== u) continue;
+      const v = a === u ? b : a;
+      if (done.has(v)) continue;
+      const cand = dist[u] + w;
+      if (cand < dist[v]) {
+        const before = dist[v];
+        if (!askedUpdate && before !== INF) {
+          askedUpdate = true;
+          frames[frames.length - 1].predict = {
+            question: `${names[v]} is currently ${before}. Going via ${names[u]} costs ${dist[u]} + ${w} = ${cand}. What happens?`,
+            choices: [`Update ${names[v]} to ${cand} and push it`, "Keep the old distance", `Mark ${names[v]} final`],
+            answer: 0,
+          };
+        }
+        dist[v] = cand;
+        prev[v] = u;
+        heap.push([cand, v]);
+        frames.push({ state: st(u, [u, v]), note: `Relax ${names[u]}→${names[v]}: ${dist[u]} + ${w} = ${cand} beats ${show(before)}. Update and push ${names[v]}:${cand}.` });
+      }
+    }
+  }
+  frames.push({ state: st(), note: `All final: ${names.map((n, i) => `${n}=${dist[i]}`).join(", ")}. Highlighted edges form the shortest-path tree. O((V + E) log V) with a heap.` });
+  return frames;
+}
+
 export const GENERATORS = {
   "two-pointers": twoPointersFrames,
   "sliding-window": slidingWindowFrames,
@@ -598,4 +958,9 @@ export const GENERATORS = {
   "topo-sort": topoSortFrames,
   "coin-change": coinChangeFrames,
   lcs: lcsFrames,
+  intervals: intervalsFrames,
+  heap: heapFrames,
+  trie: trieFrames,
+  "union-find": unionFindFrames,
+  dijkstra: dijkstraFrames,
 } as const;

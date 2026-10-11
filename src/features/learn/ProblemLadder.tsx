@@ -48,7 +48,7 @@ export function ProblemLadder({ problems, skill }: { problems: ProblemRef[]; ski
   };
 
   return (
-    <Card>
+    <Card id="ladder" style={{ scrollMarginTop: "calc(var(--topbar-h) + 16px)" }}>
       <CardHeader title="Practice ladder" subtitle={`${solvedCount} of ${problems.length} solved · counts towards mastery`} />
       <ul className={s.ladder}>
         {problems.map(ref => {
@@ -57,7 +57,11 @@ export function ProblemLadder({ problems, skill }: { problems: ProblemRef[]; ski
             <li key={ref.slug} className={s.rung}>
               <div style={{ minWidth: 0 }}>
                 <div className={s.rungTitle}>
-                  {tracked?.solved ? <CheckCircle2 size={15} color="var(--success)" aria-label="Solved" /> : <Circle size={15} color="var(--text-3)" aria-hidden />}
+                  {tracked?.solved ? (
+                    <CheckCircle2 size={15} color="var(--success)" aria-label="Solved" />
+                  ) : (
+                    <Circle size={15} color="var(--text-3)" aria-hidden />
+                  )}
                   <a href={leetUrl(ref.slug)} target="_blank" rel="noreferrer noopener" style={{ color: "var(--text)" }}>
                     {ref.title}
                   </a>

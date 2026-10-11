@@ -12,6 +12,7 @@ const lesson: LessonBody = {
 - **Two heaps**: a max-heap for the lower half and a min-heap for the upper half give a running median.`,
     },
     { type: "signals", items: ["\"k largest / k smallest / k most frequent / k closest\"", "Merge k sorted lists or arrays", "Running median or \"median of a stream\"", "Always process the cheapest/earliest/smallest next (scheduling, Dijkstra)"] },
+    { type: "visualizer", id: "heap", caption: "A min-heap in action: offers sift up, poll moves the last element to the root and sifts it down." },
     {
       type: "code",
       lang: "java",

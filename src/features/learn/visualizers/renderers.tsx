@@ -136,7 +136,7 @@ function GraphView({ state }: { state: GraphState }) {
           const dy = b.y - a.y;
           const len = Math.hypot(dx, dy) || 1;
           const pad = e.directed ? Math.min(nodeW(toNode.label) / 2, 30) + 4 : 0;
-          return (
+          const line = (
             <line
               key={`${e.from}-${e.to}`}
               className={s.edge}
@@ -147,6 +147,20 @@ function GraphView({ state }: { state: GraphState }) {
               y2={b.y - (dy / len) * pad}
               markerEnd={e.directed ? `url(#${marker})` : undefined}
             />
+          );
+          if (!e.label) return line;
+          const mx = (a.x + b.x) / 2;
+          const my = (a.y + b.y) / 2;
+          return (
+            <g key={`${e.from}-${e.to}`}>
+              {line}
+              <g className={s.edgeLabel} data-tone={e.tone ?? "default"} transform={`translate(${mx}, ${my})`}>
+                <rect x={-11} y={-10} width={22} height={20} rx={6} />
+                <text textAnchor="middle" dominantBaseline="central">
+                  {e.label}
+                </text>
+              </g>
+            </g>
           );
         })}
         {state.nodes.map(n => {

@@ -9,8 +9,17 @@ import { levelInfo } from "@lib/levels";
 const TODAY = "2026-10-10";
 
 const problem = (id: string, extra: Partial<DSAProblem> = {}): DSAProblem => ({
-  id, name: id, topics: ["Arrays"], difficulty: "Medium", platform: "LeetCode",
-  solved: false, timeTaken: 0, pattern: "", mistakes: "", url: "", ...extra,
+  id,
+  name: id,
+  topics: ["Arrays"],
+  difficulty: "Medium",
+  platform: "LeetCode",
+  solved: false,
+  timeTaken: 0,
+  pattern: "",
+  mistakes: "",
+  url: "",
+  ...extra,
 });
 
 function base(): AppState {
@@ -133,5 +142,47 @@ describe("levels", () => {
     expect(levelInfo(1000).level).toBe(5);
     expect(levelInfo(4500).level).toBe(10);
     expect(levelInfo(1050)).toMatchObject({ level: 5, into: 50, span: 500 });
+  });
+});
+
+describe("arcade and design exercises", () => {
+  it("rewards only the first three rounds of each game per day", () => {
+    let s = base();
+    for (let i = 0; i < 5; i++) s = rootReducer(s, { type: "RECORD_ARCADE", gameId: "big-o", score: 150 });
+    const keys = s.activity[TODAY].awarded.filter(k => k.startsWith("arcade:big-o:"));
+    expect(keys).toEqual(["arcade:big-o:0", "arcade:big-o:1", "arcade:big-o:2"]);
+    expect(s.arcade["big-o"]).toMatchObject({ best: 150, plays: 5 });
+    s = rootReducer(s, { type: "RECORD_ARCADE", gameId: "estimate", score: 60 });
+    expect(s.activity[TODAY].awarded).toContain("arcade:estimate:0");
+  });
+
+  it("gives no XP for a zero-score round but still counts the play", () => {
+    let s = base();
+    const before = s.xp;
+    s = rootReducer(s, { type: "RECORD_ARCADE", gameId: "pattern-match", score: 0 });
+    expect(s.xp).toBe(before);
+    expect(s.arcade["pattern-match"].plays).toBe(1);
+  });
+
+  it("pays once when a design exercise is finished", () => {
+    let s = base();
+    const topic = {
+      id: "sd1",
+      title: "URL shortener",
+      status: "in-progress" as const,
+      tradeoffs: "",
+      notes: "",
+      diagramRef: "",
+      category: "exercise" as const,
+      exerciseId: "url-shortener",
+      answers: {},
+    };
+    s = rootReducer(s, { type: "ADD_SD_TOPIC", topic });
+    const before = s.xp;
+    s = rootReducer(s, { type: "UPDATE_SD_TOPIC", topic: { ...topic, status: "done", completedAt: TODAY } });
+    expect(s.xp - before).toBeGreaterThanOrEqual(XP.designExercise);
+    const after = s.xp;
+    s = rootReducer(s, { type: "UPDATE_SD_TOPIC", topic: { ...topic, status: "done", completedAt: TODAY, notes: "edit" } });
+    expect(s.xp).toBe(after);
   });
 });

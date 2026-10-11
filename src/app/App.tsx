@@ -14,8 +14,14 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { TutorProvider } from "@features/copilot/TutorContext";
 import { CopilotBridge, TutorButton } from "@features/copilot/CopilotBridge";
 import { GameDirector } from "@features/game/GameDirector";
+import { SessionProvider } from "@features/session/SessionContext";
+import { SessionBar } from "@features/session/SessionBar";
 
-const TutorDrawer = lazy(() => import("@features/copilot/TutorDrawer").then(m => ({ default: m.TutorDrawer })));
+const TutorDrawer = lazy(() =>
+  import("@features/copilot/TutorDrawer").then(m => ({
+    default: m.TutorDrawer,
+  })),
+);
 
 const LoginPage = lazy(() => import("@pages/LoginPage"));
 const SetupChoice = lazy(() => import("@components/SetupChoice"));
@@ -47,22 +53,25 @@ function Gate() {
 
   return (
     <TutorProvider>
-      <CopilotBridge>
-        {pathname === "/session" ? (
-          <Suspense fallback={<LoadingScreen label="Preparing your session…" />}>
-            <FullscreenSession />
+      <SessionProvider>
+        <CopilotBridge>
+          {pathname === "/session" ? (
+            <Suspense fallback={<LoadingScreen label="Preparing your session…" />}>
+              <FullscreenSession />
+            </Suspense>
+          ) : (
+            <AppShell topbarActions={<TutorButton />}>
+              <AppRoutes />
+              <SessionBar />
+            </AppShell>
+          )}
+          <Suspense fallback={null}>
+            <InterviewTimer />
+            <TutorDrawer />
           </Suspense>
-        ) : (
-          <AppShell topbarActions={<TutorButton />}>
-            <AppRoutes />
-          </AppShell>
-        )}
-        <Suspense fallback={null}>
-          <InterviewTimer />
-          <TutorDrawer />
-        </Suspense>
-        <GameDirector />
-      </CopilotBridge>
+          <GameDirector />
+        </CopilotBridge>
+      </SessionProvider>
     </TutorProvider>
   );
 }

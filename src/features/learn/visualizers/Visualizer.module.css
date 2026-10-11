@@ -353,6 +353,22 @@
 
 .edge[data-tone="done"] { stroke: color-mix(in srgb, var(--track-dsa) 60%, transparent); }
 .edge[data-tone="muted"] { stroke: var(--border); }
+.edge[data-tone="active"] { stroke: var(--brand); stroke-width: 2.5; }
+.edge[data-tone="found"] { stroke: var(--success); stroke-width: 2.5; }
+
+.edgeLabel rect {
+  fill: var(--surface-1);
+  stroke: var(--border-strong);
+}
+.edgeLabel text {
+  fill: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+.edgeLabel[data-tone="active"] rect { stroke: var(--brand); }
+.edgeLabel[data-tone="active"] text { fill: var(--brand-text); }
+.edgeLabel[data-tone="done"] rect { stroke: var(--track-dsa); }
 
 .nodeRect {
   fill: var(--surface-2);

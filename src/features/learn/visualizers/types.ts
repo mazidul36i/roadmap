@@ -45,7 +45,7 @@ export interface GraphNode {
 export interface GraphState {
   kind: "graph";
   nodes: GraphNode[];
-  edges: Array<{ from: string; to: string; tone?: Tone; directed?: boolean }>;
+  edges: Array<{ from: string; to: string; tone?: Tone; directed?: boolean; /** Weight or other label drawn at the midpoint. */ label?: string }>;
   lists?: Array<{ label: string; items: Array<string | number> }>;
   vars?: Array<[string, string | number]>;
 }

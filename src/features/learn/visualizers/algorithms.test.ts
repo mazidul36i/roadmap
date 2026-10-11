@@ -92,3 +92,40 @@ describe("visualizer generators", () => {
     expect(t.cells[5][3].value).toBe(3);
   });
 });
+
+describe("graph and structure visualizers", () => {
+  it("intervals merge into three blocks", async () => {
+    const { intervalsFrames } = await import("./algorithms");
+    const end = last(intervalsFrames()).state as ArrayState;
+    expect(end.stack?.items).toEqual(["1–6", "8–12", "15–18"]);
+  });
+
+  it("dijkstra finds the shortest distances from A", async () => {
+    const { dijkstraFrames } = await import("./algorithms");
+    const end = last(dijkstraFrames()).state as GraphState;
+    expect(end.nodes.map(n => `${n.label}=${n.badge}`)).toEqual(["A=0", "B=3", "C=2", "D=8", "E=10", "F=13"]);
+    expect(end.edges.every(e => e.label)).toBe(true);
+  });
+
+  it("heap keeps the minimum at the root after poll", async () => {
+    const { heapFrames } = await import("./algorithms");
+    const end = last(heapFrames()).state as GraphState;
+    const arr = end.lists![0].items.map(Number);
+    expect(arr[0]).toBe(2);
+    arr.forEach((v, i) => {
+      if (i > 0) expect(arr[Math.floor((i - 1) / 2)]).toBeLessThanOrEqual(v);
+    });
+  });
+
+  it("union-find ends with one set of six", async () => {
+    const { unionFindFrames } = await import("./algorithms");
+    const end = last(unionFindFrames()).state as GraphState;
+    expect(end.nodes.filter(n => n.badge !== undefined).map(n => n.badge)).toEqual([6]);
+  });
+
+  it("trie marks all five words", async () => {
+    const { trieFrames } = await import("./algorithms");
+    const end = last(trieFrames()).state as GraphState;
+    expect(end.lists![0].items).toEqual(["car", "cat", "card", "do", "dog"]);
+  });
+});

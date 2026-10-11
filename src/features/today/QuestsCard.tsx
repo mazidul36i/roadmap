@@ -38,11 +38,20 @@ export function QuestsCard({ className }: { className?: string }) {
           const isDone = !!q.doneAt;
           return (
             <li key={q.id}>
-              <Link to={q.to ?? "/"} className={cx(s.quest, isDone && s.done)} aria-label={`${q.title}. ${isDone ? "Complete" : `${q.progress} of ${q.target}`}. ${q.xp} XP.`}>
+              <Link
+                to={q.to ?? "/"}
+                className={cx(s.quest, isDone && s.done)}
+                aria-label={`${q.title}. ${isDone ? "Complete" : `${q.progress} of ${q.target}`}. ${q.xp} XP.`}
+              >
                 <span className={s.questIcon} aria-hidden>
                   <AnimatePresence mode="wait" initial={false}>
                     {isDone ? (
-                      <motion.span key="done" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: "spring", stiffness: 500, damping: 18 }}>
+                      <motion.span
+                        key="done"
+                        initial={{ scale: 0, rotate: -45 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                      >
                         <Check size={20} strokeWidth={3} />
                       </motion.span>
                     ) : (

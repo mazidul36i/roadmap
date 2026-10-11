@@ -69,21 +69,14 @@ const behStar: LessonBody = {
       prompt: "Which part of a STAR answer should take the most time?",
       choices: ["Situation", "Task", "Action", "Result"],
       answer: 2,
-      explanation:
-        "Interviewers assess your decisions and behaviour, which live in the Action.",
+      explanation: "Interviewers assess your decisions and behaviour, which live in the Action.",
     },
     {
       id: "star-q2",
       prompt: "What makes a Result strong?",
-      choices: [
-        "It's long",
-        "It's measurable and tied to the original problem, plus a reflection",
-        "It praises the team",
-        "It mentions technologies",
-      ],
+      choices: ["It's long", "It's measurable and tied to the original problem, plus a reflection", "It praises the team", "It mentions technologies"],
       answer: 1,
-      explanation:
-        "Quantify the impact and close the loop on the stakes you set up.",
+      explanation: "Quantify the impact and close the loop on the stakes you set up.",
     },
   ],
   cards: [
@@ -181,12 +174,7 @@ Use **Present → Past → Future**:
     {
       id: "intro-q2",
       prompt: "Why mention specific achievements in your intro?",
-      choices: [
-        "To fill time",
-        "To plant hooks for follow-up questions you've prepared",
-        "Interviewers require it",
-        "To avoid technical questions",
-      ],
+      choices: ["To fill time", "To plant hooks for follow-up questions you've prepared", "Interviewers require it", "To avoid technical questions"],
       answer: 1,
       explanation: "You steer the conversation towards your strongest stories.",
     },
@@ -222,46 +210,14 @@ const behCompetencies: LessonBody = {
       title: "What they probe and what earns the point",
       headers: ["Competency", "Typical question", "Strong signal"],
       rows: [
-        [
-          "Ownership",
-          "Tell me about something you drove end to end.",
-          "You noticed the problem, nobody asked, you saw it through after launch",
-        ],
-        [
-          "Conflict",
-          "A time you disagreed with a colleague or manager.",
-          "Disagreed with data, listened, committed to the outcome, relationship intact",
-        ],
-        [
-          "Failure",
-          "Tell me about a mistake.",
-          "Real stakes, owns it without excuses, concrete change afterwards",
-        ],
-        [
-          "Ambiguity",
-          "A project with unclear requirements.",
-          "Made assumptions explicit, de-risked with quick experiments",
-        ],
-        [
-          "Influence",
-          "Convincing others without authority.",
-          "Understood their incentives, built the case, gave credit",
-        ],
-        [
-          "Impact",
-          "Your most impactful project.",
-          "Business metric, not just technical output",
-        ],
-        [
-          "Mentoring",
-          "Helping someone grow.",
-          "Specific coaching, the person's measurable progress",
-        ],
-        [
-          "Prioritisation",
-          "Too much to do, too little time.",
-          "Explicit trade-off framework, said no to something",
-        ],
+        ["Ownership", "Tell me about something you drove end to end.", "You noticed the problem, nobody asked, you saw it through after launch"],
+        ["Conflict", "A time you disagreed with a colleague or manager.", "Disagreed with data, listened, committed to the outcome, relationship intact"],
+        ["Failure", "Tell me about a mistake.", "Real stakes, owns it without excuses, concrete change afterwards"],
+        ["Ambiguity", "A project with unclear requirements.", "Made assumptions explicit, de-risked with quick experiments"],
+        ["Influence", "Convincing others without authority.", "Understood their incentives, built the case, gave credit"],
+        ["Impact", "Your most impactful project.", "Business metric, not just technical output"],
+        ["Mentoring", "Helping someone grow.", "Specific coaching, the person's measurable progress"],
+        ["Prioritisation", "Too much to do, too little time.", "Explicit trade-off framework, said no to something"],
       ],
     },
     {
@@ -289,8 +245,7 @@ const behCompetencies: LessonBody = {
         "You escalated successfully",
       ],
       answer: 1,
-      explanation:
-        "Interviewers look for disagree-and-commit maturity, not winning.",
+      explanation: "Interviewers look for disagree-and-commit maturity, not winning.",
     },
     {
       id: "comp-q2",
@@ -341,31 +296,11 @@ const behClosing: LessonBody = {
       title: "Questions worth asking",
       headers: ["To", "Question", "What you learn"],
       rows: [
-        [
-          "Engineer",
-          "What did the last incident teach the team?",
-          "Blameless culture, operational maturity",
-        ],
-        [
-          "Engineer",
-          "How does code get from a laptop to production?",
-          "CI/CD health, autonomy",
-        ],
-        [
-          "Manager",
-          "What would make someone exceptional in this role in six months?",
-          "Real expectations",
-        ],
-        [
-          "Manager",
-          "How are priorities set when everything is urgent?",
-          "Planning sanity",
-        ],
-        [
-          "Anyone",
-          "What's something you'd change about how the team works?",
-          "Honest friction points",
-        ],
+        ["Engineer", "What did the last incident teach the team?", "Blameless culture, operational maturity"],
+        ["Engineer", "How does code get from a laptop to production?", "CI/CD health, autonomy"],
+        ["Manager", "What would make someone exceptional in this role in six months?", "Real expectations"],
+        ["Manager", "How are priorities set when everything is urgent?", "Planning sanity"],
+        ["Anyone", "What's something you'd change about how the team works?", "Honest friction points"],
       ],
     },
     {
@@ -390,27 +325,16 @@ const behClosing: LessonBody = {
     {
       id: "close-q1",
       prompt: "Which closing question best surfaces hidden concerns?",
-      choices: [
-        "What's the salary range?",
-        "Is there anything in my background you'd like me to clarify?",
-        "When can I start?",
-        "Do you like working here?",
-      ],
+      choices: ["What's the salary range?", "Is there anything in my background you'd like me to clarify?", "When can I start?", "Do you like working here?"],
       answer: 1,
       explanation: "It invites objections while you can still respond.",
     },
     {
       id: "close-q2",
       prompt: "Why ask engineers about their last incident?",
-      choices: [
-        "To trap them",
-        "It reveals blameless culture and operational maturity",
-        "It's required",
-        "To fill time",
-      ],
+      choices: ["To trap them", "It reveals blameless culture and operational maturity", "It's required", "To fill time"],
       answer: 1,
-      explanation:
-        "How teams talk about failure tells you a lot about working there.",
+      explanation: "How teams talk about failure tells you a lot about working there.",
     },
   ],
   cards: [

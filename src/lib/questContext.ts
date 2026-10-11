@@ -29,7 +29,7 @@ export function questContext(state: AppState, _today: string): QuestContext {
   return {
     reviewable: dueCardCount(state),
     nextLesson: lesson ? { id: lesson.id, title: lesson.title, path: lessonPath(lesson) } : undefined,
-    arcade: false,
+    arcade: true,
   };
 }
 

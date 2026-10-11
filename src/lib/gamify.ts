@@ -37,25 +37,28 @@ export const XP = {
 
 export const MAX_FREEZES = 2;
 
+/** Rewarded arcade rounds per game per day (more rounds still count for bests). */
+export const ARCADE_ROUNDS_PER_DAY = 3;
+
+export const arcadeXp = (score: number) => Math.max(3, Math.min(20, Math.round(score / 15)));
+
+/** Rewarded rounds left today for a game. */
+export function arcadeRoundsLeft(state: AppState, gameId: string, today: string = localDateKey()): number {
+  const prefix = `arcade:${gameId}:`;
+  return Math.max(0, ARCADE_ROUNDS_PER_DAY - (state.activity[today]?.awarded ?? []).filter(k => k.startsWith(prefix)).length);
+}
+
 interface Award {
   key: string;
   kind: ActivityKind;
   xp: number;
 }
 
-const STAGE_ORDER: AppStatus[] = [
-  "wishlist",
-  "applied",
-  "referred",
-  "interview-scheduled",
-  "technical-round",
-  "system-design-round",
-  "offer",
-];
+const STAGE_ORDER: AppStatus[] = ["wishlist", "applied", "referred", "interview-scheduled", "technical-round", "system-design-round", "offer"];
 
 function problemAward(p: DSAProblem, today: string): Award {
   const solvedToday = !p.solvedAt || p.solvedAt === today;
-  return { key: `problem:${p.id}`, kind: "problem", xp: solvedToday ? XP.problem[p.difficulty] ?? XP.problem.Medium : XP.problemBackfill };
+  return { key: `problem:${p.id}`, kind: "problem", xp: solvedToday ? (XP.problem[p.difficulty] ?? XP.problem.Medium) : XP.problemBackfill };
 }
 
 /** XP-worthy progress caused by one action. */
@@ -93,9 +96,7 @@ export function detectAwards(prev: AppState, next: AppState, action: Action, tod
     case "UPDATE_SD_TOPIC": {
       const before = prev.sdTopics.find(t => t.id === action.topic.id);
       const after = next.sdTopics.find(t => t.id === action.topic.id);
-      return after?.exerciseId && after.completedAt && !before?.completedAt
-        ? [{ key: `design:${after.id}`, kind: "design", xp: XP.designExercise }]
-        : [];
+      return after?.exerciseId && after.completedAt && !before?.completedAt ? [{ key: `design:${after.id}`, kind: "design", xp: XP.designExercise }] : [];
     }
     case "ADD_DAY_LOG":
       return toDateKey(action.log.date) === today ? [{ key: `journal:${today}`, kind: "journal", xp: XP.journal }] : [];
@@ -121,6 +122,11 @@ export function detectAwards(prev: AppState, next: AppState, action: Action, tod
         : [];
     case "RECORD_QUIZ":
       return action.score >= 0.8 ? [{ key: `quiz:${action.lessonId}`, kind: "quiz", xp: XP.quiz }] : [];
+    case "RECORD_ARCADE": {
+      const left = arcadeRoundsLeft(prev, action.gameId, today);
+      if (!left || action.score <= 0) return [];
+      return [{ key: `arcade:${action.gameId}:${ARCADE_ROUNDS_PER_DAY - left}`, kind: "arcade", xp: arcadeXp(action.score) }];
+    }
     case "REVIEW_CARD":
       return [{ key: `review:${action.cardId}`, kind: "review", xp: action.rating >= 3 ? XP.reviewRecalled : XP.reviewForgot }];
     default:

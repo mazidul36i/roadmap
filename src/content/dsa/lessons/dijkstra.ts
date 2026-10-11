@@ -10,6 +10,7 @@ const lesson: LessonBody = {
 The greedy step is safe because weights are non-negative: once a node comes off the heap with distance d, no future path can reach it more cheaply, since every remaining path is already at least d long and can only get longer.`,
     },
     { type: "signals", items: ["Weighted edges, \"minimum cost / time / effort\" to reach a node", "Network delay, cheapest flight, path with minimum effort", "All edge weights are non-negative", "A grid where moves have different costs"] },
+    { type: "visualizer", id: "dijkstra", caption: "Each pop finalises the closest node; relaxations push better distances; stale entries are skipped." },
     {
       type: "code",
       lang: "java",

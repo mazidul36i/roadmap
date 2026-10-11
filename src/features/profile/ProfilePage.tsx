@@ -162,7 +162,10 @@ export default function ProfilePage() {
 
       <section className={s.section} aria-labelledby="ach-heading">
         <h2 id="ach-heading" className={s.sectionTitle}>
-          Trophy room <span>{unlocked} of {ACHIEVEMENTS.length} unlocked</span>
+          Trophy room{" "}
+          <span>
+            {unlocked} of {ACHIEVEMENTS.length} unlocked
+          </span>
         </h2>
         {groups.map(([category, list]) => (
           <div key={category} style={{ marginBottom: 24 }}>
@@ -172,9 +175,13 @@ export default function ProfilePage() {
             <div className={s.achievements}>
               {list.map(a => {
                 const at = state.achievements[a.id];
-                const Icon = at ? ACHIEVEMENT_ICONS[a.icon] ?? Trophy : Lock;
+                const Icon = at ? (ACHIEVEMENT_ICONS[a.icon] ?? Trophy) : Lock;
                 return (
-                  <div key={a.id} className={cx(s.achievement, at ? s.unlocked : s.locked, a.rare && s.rare)} aria-label={`${a.title}: ${at ? "unlocked" : "locked"}. ${a.description}`}>
+                  <div
+                    key={a.id}
+                    className={cx(s.achievement, at ? s.unlocked : s.locked, a.rare && s.rare)}
+                    aria-label={`${a.title}: ${at ? "unlocked" : "locked"}. ${a.description}`}
+                  >
                     <span className={s.achIcon} aria-hidden>
                       <Icon size={20} />
                     </span>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Layers, MessagesSquare, Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 import { useApp } from "@context/AppContext";
@@ -44,6 +44,14 @@ export default function LessonPage() {
     };
   }, [lessonId]);
 
+  // Deep links like #ladder scroll once the lazily loaded body renders.
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!body || !hash) return;
+    const id = requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    return () => cancelAnimationFrame(id);
+  }, [body, hash]);
+
   // Opening a lesson marks it as started (so "Continue" and quests can find it).
   useEffect(() => {
     if (meta && !state.lessonProgress[meta.id]) dispatch({ type: "SET_LESSON_PROGRESS", lessonId: meta.id, progress: { lastBlock: 0 } });
@@ -86,8 +94,7 @@ export default function LessonPage() {
     }
   };
 
-  const complete = () =>
-    dispatch({ type: "COMPLETE_LESSON", lessonId: meta.id, cardKeys: (body?.cards ?? []).map(c => `lesson:${meta.id}:${c.id}`) });
+  const complete = () => dispatch({ type: "COMPLETE_LESSON", lessonId: meta.id, cardKeys: (body?.cards ?? []).map(c => `lesson:${meta.id}:${c.id}`) });
 
   return (
     <div className={s.lessonLayout} style={{ "--accent": accent } as CSSProperties}>
@@ -120,7 +127,13 @@ export default function LessonPage() {
         ) : (
           <>
             {body.blocks.map((block, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ duration: 0.25 }}>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.25 }}
+              >
                 <LessonBlock block={block} quiz={body.quiz} answers={answers} onAnswer={onAnswer} />
               </motion.div>
             ))}

@@ -13,6 +13,7 @@ const lesson: LessonBody = {
 Two optimisations make it fast: **path compression** (point every node you pass straight at the root) and **union by rank/size** (hang the smaller tree under the larger one). Together they give amortised O(α(n)) per operation, where α is the inverse Ackermann function: effectively ≤ 4 for any input you'll ever see.`,
     },
     { type: "signals", items: ["Connectivity that changes as edges are added (\"are a and b connected yet?\")", "Count connected components while edges stream in", "Detect a cycle in an **undirected** graph (union returns false)", "Kruskal's minimum spanning tree", "Grouping equivalent items: accounts merge, similar strings"] },
+    { type: "visualizer", id: "union-find", caption: "Union by size and path compression keep every tree shallow." },
     {
       type: "code",
       lang: "java",

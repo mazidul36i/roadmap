@@ -2,10 +2,8 @@ import { lazy, type ComponentType } from "react";
 import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { LEGACY_REDIRECTS } from "./nav";
 import NotFound from "./NotFound";
-import ComingSoon from "./ComingSoon";
 
-const page = <T extends Record<string, ComponentType>>(loader: () => Promise<T>, name: keyof T) =>
-  lazy(async () => ({ default: (await loader())[name] }));
+const page = <T extends Record<string, ComponentType>>(loader: () => Promise<T>, name: keyof T) => lazy(async () => ({ default: (await loader())[name] }));
 
 // Legacy pages (rebuilt phase by phase).
 const TodayPage = lazy(() => import("@features/today/TodayPage"));
@@ -15,22 +13,25 @@ const TrackPage = lazy(() => import("@features/learn/TrackPage"));
 const LessonPage = lazy(() => import("@features/learn/LessonPage"));
 const ExerciseRunner = lazy(() => import("@features/learn/design/ExerciseRunner"));
 const ReviewPage = lazy(() => import("@features/review/ReviewPage"));
+const ArcadeHub = lazy(() => import("@features/arcade/ArcadeHub"));
+const GamePage = lazy(() => import("@features/arcade/GamePage"));
 const Roadmap = lazy(() => import("@pages/Roadmap"));
 const DailyPlanner = lazy(() => import("@pages/DailyPlanner"));
 const Notes = lazy(() => import("@pages/Notes"));
-const StoryBank = lazy(() => import("@pages/StoryBank"));
+const StoriesPage = lazy(() => import("@features/practice/stories/StoriesPage"));
+const StoryWorkspace = lazy(() => import("@features/practice/stories/StoryWorkspace"));
 const ProblemsPage = lazy(() => import("@features/practice/problems/ProblemsPage"));
 const ProblemWorkspace = lazy(() => import("@features/practice/problems/ProblemWorkspace"));
 const Applications = lazy(() => import("@pages/Applications"));
-const MockInterviews = lazy(() => import("@pages/MockInterviews"));
+const MocksPage = lazy(() => import("@features/practice/mocks/MocksPage"));
+const MockRoom = lazy(() => import("@features/practice/mocks/MockRoom"));
+const MockDetail = lazy(() => import("@features/practice/mocks/MockDetail"));
 const ResourceLibrary = lazy(() => import("@pages/ResourceLibrary"));
 const Settings = lazy(() => import("@features/settings/SettingsPage"));
 
 const details = () => import("@pages/DetailPages");
-const StoryDetail = page(details, "StoryDetail");
 const SystemDesignDetail = page(details, "SystemDesignDetail");
 const ApplicationDetail = page(details, "ApplicationDetail");
-const MockInterviewDetail = page(details, "MockInterviewDetail");
 const ResourceDetail = page(details, "ResourceDetail");
 
 /** Redirects an old URL to its new home, carrying :params, ?query and #hash. */
@@ -53,15 +54,17 @@ export function AppRoutes() {
       <Route path="/learn/:track/:lesson" element={<LessonPage />} />
 
       <Route path="/review" element={<ReviewPage />} />
-      <Route path="/arcade" element={<ComingSoon feature="arcade" />} />
+      <Route path="/arcade" element={<ArcadeHub />} />
+      <Route path="/arcade/:game" element={<GamePage />} />
 
       <Route path="/practice" element={<Navigate to="/practice/problems" replace />} />
       <Route path="/practice/problems" element={<ProblemsPage />} />
       <Route path="/practice/problems/:id" element={<ProblemWorkspace />} />
-      <Route path="/practice/mocks" element={<MockInterviews />} />
-      <Route path="/practice/mocks/:id" element={<MockInterviewDetail />} />
-      <Route path="/practice/stories" element={<StoryBank />} />
-      <Route path="/practice/stories/:id" element={<StoryDetail />} />
+      <Route path="/practice/mocks" element={<MocksPage />} />
+      <Route path="/practice/mocks/ai" element={<MockRoom />} />
+      <Route path="/practice/mocks/:id" element={<MockDetail />} />
+      <Route path="/practice/stories" element={<StoriesPage />} />
+      <Route path="/practice/stories/:id" element={<StoryWorkspace />} />
 
       <Route path="/plan" element={<Roadmap />} />
       <Route path="/journal" element={<DailyPlanner />} />
@@ -86,4 +89,4 @@ export function AppRoutes() {
 }
 
 /** Full-screen routes rendered without the shell chrome. */
-export const FullscreenSession = lazy(() => import("@pages/FocusMode"));
+export const FullscreenSession = lazy(() => import("@features/session/SessionPage"));

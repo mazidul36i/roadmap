@@ -18,26 +18,10 @@ Three practical consequences for engineers:
       title: "Knobs and what they do",
       headers: ["Setting", "Effect", "Typical use"],
       rows: [
-        [
-          "Max output tokens",
-          "Caps response length (and cost)",
-          "Always set it",
-        ],
-        [
-          "Temperature / sampling",
-          "Higher = more varied, lower = more deterministic",
-          "Low for extraction, higher for brainstorming",
-        ],
-        [
-          "System prompt",
-          "Standing instructions and persona",
-          "Rules, tone, format",
-        ],
-        [
-          "Context (messages)",
-          "The conversation and any documents",
-          "Grounding facts for the answer",
-        ],
+        ["Max output tokens", "Caps response length (and cost)", "Always set it"],
+        ["Temperature / sampling", "Higher = more varied, lower = more deterministic", "Low for extraction, higher for brainstorming"],
+        ["System prompt", "Standing instructions and persona", "Rules, tone, format"],
+        ["Context (messages)", "The conversation and any documents", "Grounding facts for the answer"],
       ],
     },
     {
@@ -62,25 +46,14 @@ Three practical consequences for engineers:
     {
       id: "llm-q1",
       prompt: "Why does a model 'forget' earlier conversations?",
-      choices: [
-        "It deletes them",
-        "Each request only sees what's in its context window",
-        "Training resets nightly",
-        "Tokens expire",
-      ],
+      choices: ["It deletes them", "Each request only sees what's in its context window", "Training resets nightly", "Tokens expire"],
       answer: 1,
-      explanation:
-        "Models are stateless per request; chat apps resend history.",
+      explanation: "Models are stateless per request; chat apps resend history.",
     },
     {
       id: "llm-q2",
       prompt: "What drives the cost of an LLM call?",
-      choices: [
-        "Number of words in the system prompt only",
-        "Input and output tokens",
-        "Time of day",
-        "Temperature",
-      ],
+      choices: ["Number of words in the system prompt only", "Input and output tokens", "Time of day", "Temperature"],
       answer: 1,
       explanation: "Providers bill per token in and out.",
     },
@@ -135,20 +108,11 @@ If the description is empty, return empty arrays and summary "No description".`,
       title: "Techniques",
       headers: ["Technique", "When"],
       rows: [
-        [
-          "Delimit inputs (XML tags)",
-          "Always: separates instructions from data, reduces injection",
-        ],
+        ["Delimit inputs (XML tags)", "Always: separates instructions from data, reduces injection"],
         ["Few-shot examples", "Format or style is hard to describe"],
         ["Structured output (JSON schema)", "Any machine-consumed result"],
-        [
-          "Tool / function calling",
-          "The model needs live data or to take an action",
-        ],
-        [
-          "Ask for reasoning before the answer",
-          "Multi-step problems (or use a model's built-in thinking)",
-        ],
+        ["Tool / function calling", "The model needs live data or to take an action"],
+        ["Ask for reasoning before the answer", "Multi-step problems (or use a model's built-in thinking)"],
       ],
     },
     {
@@ -181,15 +145,9 @@ If the description is empty, return empty arrays and summary "No description".`,
     {
       id: "pr-q2",
       prompt: "In tool calling, who executes the function?",
-      choices: [
-        "The model",
-        "Your application code",
-        "The provider's servers always",
-        "The user",
-      ],
+      choices: ["The model", "Your application code", "The provider's servers always", "The user"],
       answer: 1,
-      explanation:
-        "The model only requests the call; you run it and send back the result.",
+      explanation: "The model only requests the call; you run it and send back the result.",
     },
   ],
   cards: [
@@ -271,28 +229,16 @@ const rag: LessonBody = {
     {
       id: "rag-q1",
       prompt: "What does an embedding represent?",
-      choices: [
-        "A compressed file",
-        "A vector where semantically similar text lands close together",
-        "A database index",
-        "A token count",
-      ],
+      choices: ["A compressed file", "A vector where semantically similar text lands close together", "A database index", "A token count"],
       answer: 1,
-      explanation:
-        "Nearest-neighbour search over embeddings finds related meaning, not just matching words.",
+      explanation: "Nearest-neighbour search over embeddings finds related meaning, not just matching words.",
     },
     {
       id: "rag-q2",
       prompt: "A RAG system gives wrong answers. What should you check first?",
-      choices: [
-        "Switch to a bigger model",
-        "Whether retrieval returned the right passages",
-        "Increase temperature",
-        "Remove citations",
-      ],
+      choices: ["Switch to a bigger model", "Whether retrieval returned the right passages", "Increase temperature", "Remove citations"],
       answer: 1,
-      explanation:
-        "If the right context isn't retrieved, no model can answer correctly.",
+      explanation: "If the right context isn't retrieved, no model can answer correctly.",
     },
   ],
   cards: [
@@ -384,28 +330,16 @@ String answer = chat.prompt()
     {
       id: "sai-q1",
       prompt: "How does Spring AI turn a response into a Java record?",
-      choices: [
-        "Manual regex",
-        "`.entity(MyRecord.class)` with structured output conversion",
-        "Jackson annotations on the prompt",
-        "It can't",
-      ],
+      choices: ["Manual regex", "`.entity(MyRecord.class)` with structured output conversion", "Jackson annotations on the prompt", "It can't"],
       answer: 1,
-      explanation:
-        "It instructs the model on the format and maps the JSON onto the type.",
+      explanation: "It instructs the model on the format and maps the JSON onto the type.",
     },
     {
       id: "sai-q2",
       prompt: "Where does RAG plug into Spring AI?",
-      choices: [
-        "A custom JDBC driver",
-        "An advisor such as QuestionAnswerAdvisor backed by a VectorStore",
-        "A servlet filter",
-        "Spring Batch",
-      ],
+      choices: ["A custom JDBC driver", "An advisor such as QuestionAnswerAdvisor backed by a VectorStore", "A servlet filter", "Spring Batch"],
       answer: 1,
-      explanation:
-        "Advisors enrich the prompt with retrieved context before the call.",
+      explanation: "Advisors enrich the prompt with retrieved context before the call.",
     },
   ],
   cards: [

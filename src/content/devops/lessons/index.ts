@@ -87,12 +87,7 @@ jobs:
     {
       id: "cicd-q2",
       prompt: "Why tag images with the commit SHA and promote the same image?",
-      choices: [
-        "Shorter names",
-        "Production runs exactly what was tested, and rollbacks are precise",
-        "Registries require it",
-        "It's faster to build",
-      ],
+      choices: ["Shorter names", "Production runs exactly what was tested, and rollbacks are precise", "Registries require it", "It's faster to build"],
       answer: 1,
       explanation: "Immutable, traceable artifacts.",
     },
@@ -168,24 +163,14 @@ ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "app.jar"]`,
     {
       id: "dock-q1",
       prompt: "Why copy pom.xml and download dependencies before copying src?",
-      choices: [
-        "Security",
-        "Layer caching: dependencies are only re-downloaded when pom.xml changes",
-        "Docker requires it",
-        "Smaller image",
-      ],
+      choices: ["Security", "Layer caching: dependencies are only re-downloaded when pom.xml changes", "Docker requires it", "Smaller image"],
       answer: 1,
       explanation: "Source changes often; dependencies rarely.",
     },
     {
       id: "dock-q2",
       prompt: "Main benefit of a multi-stage build?",
-      choices: [
-        "Faster runtime",
-        "The final image contains only what's needed to run, not build tools",
-        "It enables caching",
-        "It runs tests",
-      ],
+      choices: ["Faster runtime", "The final image contains only what's needed to run, not build tools", "It enables caching", "It runs tests"],
       answer: 1,
       explanation: "Smaller, safer images.",
     },
@@ -221,27 +206,12 @@ const k8sCore: LessonBody = {
       title: "The objects you'll use daily",
       headers: ["Object", "What it does"],
       rows: [
-        [
-          "Pod",
-          "One or more containers sharing a network namespace; the unit of scheduling",
-        ],
-        [
-          "Deployment",
-          "Keeps N identical pods running; handles rolling updates and rollbacks",
-        ],
-        [
-          "Service",
-          "Stable virtual IP and DNS name load-balancing to matching pods",
-        ],
-        [
-          "ConfigMap / Secret",
-          "Configuration and credentials injected as env vars or files",
-        ],
+        ["Pod", "One or more containers sharing a network namespace; the unit of scheduling"],
+        ["Deployment", "Keeps N identical pods running; handles rolling updates and rollbacks"],
+        ["Service", "Stable virtual IP and DNS name load-balancing to matching pods"],
+        ["ConfigMap / Secret", "Configuration and credentials injected as env vars or files"],
         ["Ingress", "HTTP routing from outside the cluster to Services"],
-        [
-          "HorizontalPodAutoscaler",
-          "Scales a Deployment's replicas by metrics",
-        ],
+        ["HorizontalPodAutoscaler", "Scales a Deployment's replicas by metrics"],
       ],
     },
     {
@@ -286,23 +256,16 @@ spec:
     {
       id: "k8s-q1",
       prompt: "How does a Service know which pods to send traffic to?",
-      choices: [
-        "By pod name",
-        "By label selector",
-        "By IP list in the manifest",
-        "By namespace only",
-      ],
+      choices: ["By pod name", "By label selector", "By IP list in the manifest", "By namespace only"],
       answer: 1,
-      explanation:
-        "Endpoints are the ready pods whose labels match the selector.",
+      explanation: "Endpoints are the ready pods whose labels match the selector.",
     },
     {
       id: "k8s-q2",
       prompt: "Which object performs rolling updates?",
       choices: ["Pod", "Service", "Deployment", "ConfigMap"],
       answer: 2,
-      explanation:
-        "A Deployment manages ReplicaSets and rolls pods over gradually.",
+      explanation: "A Deployment manages ReplicaSets and rolls pods over gradually.",
     },
   ],
   cards: [
@@ -362,11 +325,7 @@ const k8sOps: LessonBody = {
       rows: [
         ["Startup", "Still booting", "Waits; holds off other probes"],
         ["Liveness", "Process is stuck", "Restarts the container"],
-        [
-          "Readiness",
-          "Can't serve right now",
-          "Removes the pod from Service endpoints",
-        ],
+        ["Readiness", "Can't serve right now", "Removes the pod from Service endpoints"],
       ],
     },
     {
@@ -391,24 +350,14 @@ kubectl rollout undo deployment/orders            # roll back`,
     {
       id: "ops-q1",
       prompt: "A pod is running but receives no traffic. Most likely cause?",
-      choices: [
-        "Liveness failing",
-        "Readiness failing, so it's removed from endpoints",
-        "Image pull error",
-        "CPU limit too high",
-      ],
+      choices: ["Liveness failing", "Readiness failing, so it's removed from endpoints", "Image pull error", "CPU limit too high"],
       answer: 1,
       explanation: "Not-ready pods are excluded from the Service.",
     },
     {
       id: "ops-q2",
       prompt: "Why shouldn't liveness probes check the database?",
-      choices: [
-        "They're too slow",
-        "A DB outage would restart every pod, amplifying the incident",
-        "Kubernetes forbids it",
-        "It leaks credentials",
-      ],
+      choices: ["They're too slow", "A DB outage would restart every pod, amplifying the incident", "Kubernetes forbids it", "It leaks credentials"],
       answer: 1,
       explanation: "Liveness should only detect a stuck process.",
     },
@@ -449,30 +398,10 @@ const release: LessonBody = {
       title: "Strategies",
       headers: ["Strategy", "How", "Rollback", "Cost"],
       rows: [
-        [
-          "Rolling",
-          "Replace pods gradually",
-          "Roll forward/back gradually",
-          "Cheap; both versions live briefly",
-        ],
-        [
-          "Blue-green",
-          "Full new environment, switch traffic at once",
-          "Instant switch back",
-          "Double capacity during release",
-        ],
-        [
-          "Canary",
-          "Small % of traffic to new version, watch metrics, widen",
-          "Shift traffic back",
-          "Needs good metrics and traffic splitting",
-        ],
-        [
-          "Feature flags",
-          "Code ships dark, enabled per user/percentage",
-          "Toggle off, no deploy",
-          "Flag debt if never cleaned up",
-        ],
+        ["Rolling", "Replace pods gradually", "Roll forward/back gradually", "Cheap; both versions live briefly"],
+        ["Blue-green", "Full new environment, switch traffic at once", "Instant switch back", "Double capacity during release"],
+        ["Canary", "Small % of traffic to new version, watch metrics, widen", "Shift traffic back", "Needs good metrics and traffic splitting"],
+        ["Feature flags", "Code ships dark, enabled per user/percentage", "Toggle off, no deploy", "Flag debt if never cleaned up"],
       ],
     },
     {
@@ -496,8 +425,7 @@ const release: LessonBody = {
   quiz: [
     {
       id: "rel-q1",
-      prompt:
-        "Which strategy gives an instant rollback by switching traffic back?",
+      prompt: "Which strategy gives an instant rollback by switching traffic back?",
       choices: ["Rolling", "Blue-green", "Recreate", "Manual SSH"],
       answer: 1,
       explanation: "The old environment stays intact until you're confident.",
@@ -512,8 +440,7 @@ const release: LessonBody = {
         "Use a feature flag only",
       ],
       answer: 1,
-      explanation:
-        "Both old and new code versions must work during the rollout.",
+      explanation: "Both old and new code versions must work during the rollout.",
     },
   ],
   cards: [
