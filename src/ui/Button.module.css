@@ -1,0 +1,136 @@
+.button {
+  --btn-bg: var(--surface-2);
+  --btn-fg: var(--text);
+  --btn-border: var(--border-strong);
+  --btn-bg-hover: var(--surface-3);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--btn-bg-hover);
+  text-decoration: none;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.button svg {
+  flex-shrink: 0;
+}
+
+/* Variants */
+.primary {
+  --btn-bg: var(--brand);
+  --btn-fg: var(--on-brand);
+  --btn-border: transparent;
+  --btn-bg-hover: var(--brand-hover);
+}
+
+.primary:hover:not(:disabled) {
+  box-shadow: 0 8px 24px -10px var(--brand-glow);
+}
+
+.secondary {
+  --btn-bg: var(--surface-2);
+  --btn-border: var(--border-strong);
+}
+
+.ghost {
+  --btn-bg: transparent;
+  --btn-border: transparent;
+  --btn-fg: var(--text-2);
+  --btn-bg-hover: var(--surface-2);
+}
+
+.ghost:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.soft {
+  --btn-bg: var(--brand-soft);
+  --btn-fg: var(--brand-text);
+  --btn-border: transparent;
+  --btn-bg-hover: color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+.danger {
+  --btn-bg: var(--danger-soft);
+  --btn-fg: var(--danger);
+  --btn-border: color-mix(in srgb, var(--danger) 35%, transparent);
+  --btn-bg-hover: color-mix(in srgb, var(--danger) 24%, transparent);
+}
+
+/* Sizes */
+.sm {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--fs-xs);
+  gap: 6px;
+}
+
+.lg {
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font-size: var(--fs-md);
+  border-radius: var(--r-md);
+}
+
+.full {
+  width: 100%;
+}
+
+.loading {
+  color: transparent !important;
+}
+
+.spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  color: var(--btn-fg);
+}
+
+/* Icon buttons: square, always at least 40px for touch */
+.icon {
+  min-width: 40px;
+  padding: 0;
+}
+
+.icon.sm {
+  min-width: 32px;
+}
+
+.icon.lg {
+  min-width: 48px;
+}

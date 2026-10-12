@@ -1,11 +1,19 @@
 export type TaskStatus = "todo" | "inprogress" | "done";
 
+export interface TaskLink {
+  type: "lesson" | "problem" | "url";
+  /** Lesson id, problem id, or URL depending on `type`. */
+  ref: string;
+}
+
 export interface Task {
   id: string;
   weekId: string;
   title: string;
   status: TaskStatus;
   notes: string;
+  link?: TaskLink;
+  doneAt?: string;
 }
 
 export interface Week {
@@ -49,6 +57,14 @@ export interface StoryCard {
   tags: string[];
   notes?: string;
   linkedNoteIds?: string[];
+  rehearsals?: StoryRehearsal[];
+}
+
+export interface StoryRehearsal {
+  date: string; // YYYY-MM-DD
+  seconds: number;
+  rating: 1 | 2 | 3 | 4 | 5;
+  question?: string;
 }
 
 export type DSADifficulty = "Easy" | "Medium" | "Hard";
@@ -68,6 +84,36 @@ export interface DSAProblem {
   notes?: string;
   linkedNoteIds?: string[];
   patternNodeId?: string;
+  /** Local date (YYYY-MM-DD) the problem was first solved. */
+  solvedAt?: string;
+  addedAt?: string;
+  attempts?: ProblemAttempt[];
+  /** AI-written study brief, shown on the problem's review card and workspace. */
+  brief?: ProblemBrief;
+}
+
+export interface ProblemBrief {
+  /** What the problem asks, in original words. */
+  summary: string;
+  /** DSA skill ids (lesson ids) the optimal solution uses, most important first. */
+  patterns: string[];
+  /** Short name for the specific technique, e.g. "Floyd's cycle detection". */
+  technique: string;
+  insight: string;
+  steps: string[];
+  trap: string;
+  time: string;
+  space: string;
+  /** False when the AI wasn't sure which problem the title refers to. */
+  recognised: boolean;
+  /** ISO timestamp of when it was written. */
+  at: string;
+}
+
+export interface ProblemAttempt {
+  date: string; // YYYY-MM-DD
+  solved: boolean;
+  minutes: number;
 }
 
 export type SDStatus = "not-started" | "in-progress" | "done";
@@ -81,17 +127,28 @@ export interface SystemDesignTopic {
   diagramRef: string;
   category: "core" | "exercise";
   linkedNoteIds?: string[];
+  /** Set when this topic is an attempt at a built-in design exercise. */
+  exerciseId?: string;
+  /** Answers per exercise step. */
+  answers?: Record<string, string>;
+  /** Self-rubric scores (1..5) per criterion. */
+  selfScore?: Record<string, number>;
+  review?: SDReview;
+  elapsedSec?: number;
+  startedAt?: string; // YYYY-MM-DD
+  completedAt?: string; // YYYY-MM-DD
 }
 
-export type AppStatus =
-  | "wishlist"
-  | "applied"
-  | "referred"
-  | "interview-scheduled"
-  | "technical-round"
-  | "system-design-round"
-  | "offer"
-  | "rejected";
+export interface SDReview {
+  score: number; // 0..100
+  rubric: { criterion: string; score: number; comment: string }[];
+  strengths: string[];
+  gaps: string[];
+  nextSteps: string[];
+  at: string; // ISO
+}
+
+export type AppStatus = "wishlist" | "applied" | "referred" | "interview-scheduled" | "technical-round" | "system-design-round" | "offer" | "rejected";
 
 export interface InterviewDate {
   id: string;
@@ -114,7 +171,7 @@ export interface Application {
   linkedNoteIds?: string[];
 }
 
-export type MockType = "DSA" | "System Design" | "Resume/Story";
+export type MockType = "DSA" | "System Design" | "Resume/Story" | "Behavioral" | "Java";
 
 export interface MockInterview {
   id: string;
@@ -126,6 +183,19 @@ export interface MockInterview {
   interviewer: string;
   notes?: string;
   linkedNoteIds?: string[];
+  /** Set when the session was run by the AI interviewer. */
+  ai?: boolean;
+  rubric?: Record<string, number>;
+  /** One-line comment per rubric criterion (AI mocks). */
+  rubricNotes?: Record<string, string>;
+  strengths?: string[];
+  summary?: string;
+  recommendedTopics?: string[];
+  difficulty?: "easy" | "medium" | "hard";
+  company?: string;
+  durationMinutes?: number;
+  /** The transcript lives in users/{uid}/mocks/{id} (and a local copy). */
+  hasTranscript?: boolean;
 }
 
 export type ResourceType = "article" | "video" | "pdf" | "course" | "tool" | "repo";
@@ -143,7 +213,117 @@ export interface Resource {
   linkedNoteIds?: string[];
 }
 
+// ─── Learning & game layer (schema v2) ─────────────────────────────────────────
+
+export type TrackId = "dsa" | "system-design" | "java" | "behavioral" | "devops" | "ai";
+
+export interface Profile {
+  goal: "job-switch" | "upskill";
+  targetRole: string;
+  /** Local date the campaign should be finished by. */
+  targetDate?: string;
+  dailyGoalXp: number;
+  tracks: TrackId[];
+}
+
+export type ActivityKind =
+  | "task"
+  | "problem"
+  | "review"
+  | "lesson"
+  | "quiz"
+  | "story"
+  | "mock"
+  | "design"
+  | "journal"
+  | "arcade"
+  | "quest"
+  | "note"
+  | "application"
+  | "create"
+  | "legacy";
+
+export interface ActivityDay {
+  xp: number;
+  minutes: number;
+  /** Award keys already granted today, so the same action never pays twice. */
+  awarded: string[];
+  counts?: Partial<Record<ActivityKind, number>>;
+  /** True when a streak freeze was spent to cover this day. */
+  frozen?: boolean;
+}
+
+export type QuestKind = "review" | "lesson" | "problem" | "story" | "arcade" | "journal" | "pipeline" | "mock" | "design";
+
+export interface Quest {
+  id: string;
+  kind: QuestKind;
+  title: string;
+  target: number;
+  progress: number;
+  xp: number;
+  /** Route to open when the quest is clicked. */
+  to?: string;
+  /** Lesson / skill the quest is about, if any. */
+  ref?: string;
+  doneAt?: string;
+}
+
+export interface QuestDay {
+  date: string;
+  items: Quest[];
+  bonusClaimed?: boolean;
+}
+
+/** Compact FSRS card state; field names mirror ts-fsrs. */
+export interface CardState {
+  due: string; // ISO timestamp
+  stability: number;
+  difficulty: number;
+  elapsed_days: number;
+  scheduled_days: number;
+  learning_steps: number;
+  reps: number;
+  lapses: number;
+  state: number;
+  last_review?: string;
+  /** Local day the card first entered the deck (for the daily new-card cap). */
+  added?: string;
+  /** Local day of the first real review. */
+  started?: string;
+}
+
+export type CardSourceType = "lesson" | "note" | "problem" | "mock" | "story" | "manual" | "ai" | "arcade";
+
+export interface Flashcard {
+  id: string;
+  front: string;
+  back: string;
+  track: TrackId | "general";
+  tags: string[];
+  type: "basic" | "cloze" | "mcq";
+  choices?: string[];
+  source?: { type: CardSourceType; id?: string };
+  createdAt: string;
+}
+
+export interface LessonProgress {
+  doneAt?: string;
+  quizBest?: number;
+  /** Index of the last block the learner reached. */
+  lastBlock?: number;
+}
+
+export interface ArcadeStat {
+  best: number;
+  plays: number;
+  lastPlayed?: string;
+}
+
+export type ThemePreference = "dark" | "light" | "system";
+
 export interface AppState {
+  schemaVersion?: number;
   weeks: Week[];
   dayLogs: DayLog[];
   notes: Note[];
@@ -153,9 +333,24 @@ export interface AppState {
   applications: Application[];
   mockInterviews: MockInterview[];
   resources: Resource[];
-  studyStreak: string[]; // Array of ISO date strings
-  startDate: string; // When the 8-week plan started
+  /** @deprecated v1 streak; v2 derives streaks from `activity`. Kept for back-compat. */
+  studyStreak: string[];
+  startDate: string; // When the campaign started (YYYY-MM-DD)
   aiEnabled?: boolean; // Whether AI features are enabled for this user
-  theme?: "dark" | "light";
+  theme?: ThemePreference;
   leetcodeUsername?: string;
+  leetcodeLastSync?: string;
+
+  profile: Profile;
+  xp: number;
+  activity: Record<string, ActivityDay>;
+  streakFreezes: number;
+  achievements: Record<string, string>;
+  quests?: QuestDay;
+  srs: Record<string, CardState>;
+  userCards: Flashcard[];
+  lessonProgress: Record<string, LessonProgress>;
+  arcade: Record<string, ArcadeStat>;
+  /** Product-tour / onboarding flags. */
+  seen: Record<string, string>;
 }

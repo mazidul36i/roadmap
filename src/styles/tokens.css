@@ -1,0 +1,225 @@
+/*
+ * Forge design tokens.
+ * Primitive values live here once; components only reference the semantic
+ * tokens below (never raw hex). Dark ("Night Forge") is the default theme,
+ * light ("Daylight") overrides the semantic layer.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Surfaces ───────────────────────────────────────────── */
+  --bg: #0a0b10;
+  --surface-1: #12141c;
+  --surface-2: #181b26;
+  --surface-3: #202432;
+  --surface-hover: #1c2030;
+  --surface-sunken: #07080c;
+  --overlay: rgba(4, 5, 9, 0.66);
+  --border: rgba(237, 239, 247, 0.08);
+  --border-strong: rgba(237, 239, 247, 0.16);
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --text: #edeff7;
+  --text-2: #a8aec4;
+  --text-3: #767d97;
+  --text-inverse: #0a0b10;
+
+  /* ── Brand: Ember ───────────────────────────────────────── */
+  --brand: #ff7a45;
+  --brand-hover: #ff8f63;
+  --brand-press: #e8602c;
+  --on-brand: #1a0e08;
+  --brand-text: #ff9a70;
+  --brand-soft: rgba(255, 122, 69, 0.14);
+  --brand-glow: rgba(255, 122, 69, 0.32);
+
+  /* ── Rewards & status ───────────────────────────────────── */
+  --xp: #ffc53d;
+  --xp-soft: rgba(255, 197, 61, 0.14);
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.14);
+
+  /* ── Tracks (same hue everywhere: chips, nodes, charts) ── */
+  --track-dsa: #8b7cff;
+  --track-system-design: #38bdf8;
+  --track-java: #34d399;
+  --track-behavioral: #fbbf24;
+  --track-devops: #2dd4bf;
+  --track-ai: #f472b6;
+  --track-general: #a8aec4;
+
+  /* ── Gems (mastery tiers) ───────────────────────────────── */
+  --gem-rough: #767d97;
+  --gem-cut: #38bdf8;
+  --gem-polished: #8b7cff;
+  --gem-brilliant: #ffc53d;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  --fs-xs: 0.75rem;   /* 12 */
+  --fs-sm: 0.875rem;  /* 14 */
+  --fs-md: 1rem;      /* 16 */
+  --fs-lg: 1.125rem;  /* 18 */
+  --fs-xl: 1.25rem;   /* 20 */
+  --fs-2xl: 1.5rem;   /* 24 */
+  --fs-3xl: 1.875rem; /* 30 */
+  --fs-4xl: 2.375rem; /* 38 */
+  --fs-5xl: 3rem;     /* 48 */
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-body: 1.55;
+
+  /* ── Spacing (4px scale) ────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Shape & elevation ──────────────────────────────────── */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-full: 999px;
+
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --elev-2: 0 10px 28px -12px rgba(0, 0, 0, 0.7);
+  --elev-3: 0 28px 72px -20px rgba(0, 0, 0, 0.8);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand);
+
+  /* ── Layers ─────────────────────────────────────────────── */
+  --z-sticky: 10;
+  --z-nav: 30;
+  --z-drawer: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-palette: 80;
+  --z-celebrate: 90;
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Layout ─────────────────────────────────────────────── */
+  --sidebar-w: 248px;
+  --rail-w: 72px;
+  --topbar-h: 60px;
+  --bottomnav-h: 64px;
+  --content-max: 1280px;
+  --gutter: 32px;
+
+  /* ── Texture ────────────────────────────────────────────── */
+  --dot-grid: radial-gradient(rgba(237, 239, 247, 0.06) 1px, transparent 1px);
+
+  /* ── Syntax highlighting ────────────────────────────────── */
+  --code-bg: #0d0f15;
+  --code-fg: #d9dcea;
+  --syn-comment: #6b7290;
+  --syn-keyword: #ff9a70;
+  --syn-string: #9be3b4;
+  --syn-number: #ffc53d;
+  --syn-function: #8fc8ff;
+  --syn-type: #c3b6ff;
+  --syn-punct: #8e95ad;
+  --syn-operator: #e0a7ff;
+  --syn-highlight: rgba(255, 122, 69, 0.12);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f6f3;
+  --surface-1: #ffffff;
+  --surface-2: #f1efea;
+  --surface-3: #e8e5de;
+  --surface-hover: #f4f2ee;
+  --surface-sunken: #efede8;
+  --overlay: rgba(20, 22, 31, 0.42);
+  --border: rgba(20, 22, 31, 0.1);
+  --border-strong: rgba(20, 22, 31, 0.2);
+
+  --text: #14161f;
+  --text-2: #4a5068;
+  --text-3: #646a80;
+  --text-inverse: #ffffff;
+
+  --brand: #c2410c;
+  --brand-hover: #a8380a;
+  --brand-press: #8f3008;
+  --on-brand: #ffffff;
+  --brand-text: #c2410c;
+  --brand-soft: rgba(194, 65, 12, 0.1);
+  --brand-glow: rgba(194, 65, 12, 0.22);
+
+  --xp: #b45309;
+  --xp-soft: rgba(180, 83, 9, 0.1);
+  --success: #047857;
+  --success-soft: rgba(4, 120, 87, 0.1);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.1);
+  --danger: #b91c1c;
+  --danger-soft: rgba(185, 28, 28, 0.08);
+  --info: #0369a1;
+  --info-soft: rgba(3, 105, 161, 0.08);
+
+  --track-dsa: #5b4bd6;
+  --track-system-design: #0284c7;
+  --track-java: #059669;
+  --track-behavioral: #b45309;
+  --track-devops: #0f766e;
+  --track-ai: #db2777;
+  --track-general: #4a5068;
+
+  --gem-rough: #8a90a6;
+  --gem-cut: #0284c7;
+  --gem-polished: #5b4bd6;
+  --gem-brilliant: #d97706;
+
+  --elev-1: 0 1px 2px rgba(20, 22, 31, 0.06);
+  --elev-2: 0 10px 28px -14px rgba(20, 22, 31, 0.22);
+  --elev-3: 0 28px 72px -24px rgba(20, 22, 31, 0.3);
+
+  --dot-grid: radial-gradient(rgba(20, 22, 31, 0.07) 1px, transparent 1px);
+
+  --code-bg: #f5f3ef;
+  --code-fg: #22252f;
+  --syn-comment: #7a7f94;
+  --syn-keyword: #b3360a;
+  --syn-string: #0f7a43;
+  --syn-number: #9a5a00;
+  --syn-function: #1858a8;
+  --syn-type: #6040c8;
+  --syn-punct: #5b6076;
+  --syn-operator: #9a2f9e;
+  --syn-highlight: rgba(194, 65, 12, 0.08);
+}
+
+@media (max-width: 1023px) {
+  :root { --gutter: 24px; }
+}
+
+@media (max-width: 767px) {
+  :root { --gutter: 16px; }
+}

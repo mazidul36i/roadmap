@@ -23,12 +23,18 @@
 
     /* Path Aliases */
     "paths": {
+      "@app/*": ["./src/app/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@features/*": ["./src/features/*"],
+      "@content/*": ["./src/content/*"],
+      "@styles/*": ["./src/styles/*"],
       "@components/*": ["./src/components/*"],
       "@context/*": ["./src/context/*"],
       "@data/*": ["./src/data/*"],
       "@lib/*": ["./src/lib/*"],
       "@pages/*": ["./src/pages/*"],
-      "@app-types/*": ["./src/types/*"]
+      "@app-types/*": ["./src/types/*"],
+      "@ai-contract": ["./functions/src/contract.ts"]
     }
   },
   "include": [

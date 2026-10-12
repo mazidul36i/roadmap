@@ -1,0 +1,178 @@
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.section {
+  min-width: 0;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.section[data-tone="insight"] .label {
+  color: var(--brand-text);
+}
+
+.section[data-tone="trap"] .label {
+  color: var(--warning);
+}
+
+.body {
+  font-size: var(--fs-md);
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.body p {
+  margin: 0;
+}
+
+.section[data-tone="insight"] .body,
+.section[data-tone="trap"] .body {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--brand);
+  background: var(--brand-soft);
+}
+
+.section[data-tone="trap"] .body {
+  border-left-color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.technique {
+  font-weight: 600;
+  margin-bottom: var(--space-2) !important;
+}
+
+.patterns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.patternLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-1));
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.patternLink:hover {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface-1));
+}
+
+.patternLink svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 1.6em;
+  list-style: decimal;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.steps li::marker {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.complexity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.complexity span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+}
+
+.complexity small {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+.metaButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-text);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.metaButton:disabled {
+  color: var(--text-3);
+  cursor: default;
+}
+
+.unsure {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-sm);
+  background: var(--warning-soft);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+.unsure svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--warning);
+}

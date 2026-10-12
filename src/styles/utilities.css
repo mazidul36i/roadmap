@@ -1,0 +1,48 @@
+/* Small, deliberate utility set. Feature styling belongs in CSS Modules. */
+
+.u-stack { display: flex; flex-direction: column; gap: var(--stack-gap, var(--space-4)); }
+.u-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cluster-gap, var(--space-2)); }
+.u-row { display: flex; align-items: center; gap: var(--space-3); }
+.u-between { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.u-grow { flex: 1; min-width: 0; }
+
+.u-grid-auto {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(var(--min, 260px), 1fr));
+}
+
+.u-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.u-muted { color: var(--text-2); }
+.u-faint { color: var(--text-3); }
+.u-mono { font-family: var(--font-mono); }
+.u-display { font-family: var(--font-display); }
+.u-sm { font-size: var(--fs-sm); }
+.u-xs { font-size: var(--fs-xs); }
+.u-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.u-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.u-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  .u-hide-sm { display: none; }
+}

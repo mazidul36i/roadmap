@@ -1,0 +1,197 @@
+/* Shared styling for Radix overlays: tooltip, dialog, sheet, popover, menu. */
+
+/* ── Tooltip ───────────────────────────────────────────────── */
+.tooltip {
+  z-index: var(--z-palette);
+  max-width: 260px;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  background: var(--text);
+  color: var(--text-inverse);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: var(--elev-2);
+  animation: pop-in var(--dur-fast) var(--ease-out);
+}
+
+.tooltipArrow {
+  fill: var(--text);
+}
+
+/* ── Dialog ────────────────────────────────────────────────── */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  background: var(--overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fade-in var(--dur-base) var(--ease-out);
+}
+
+.dialog {
+  position: fixed;
+  z-index: var(--z-modal);
+  top: 50%;
+  left: 50%;
+  width: min(calc(100vw - 32px), var(--dialog-w, 520px));
+  max-height: min(86dvh, 860px);
+  display: flex;
+  flex-direction: column;
+  transform: translate(-50%, -50%);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-lg);
+  box-shadow: var(--elev-3);
+  animation: dialog-in var(--dur-base) var(--ease-out);
+}
+
+.dialog:focus-visible {
+  box-shadow: var(--elev-3);
+}
+
+.sm { --dialog-w: 420px; }
+.md { --dialog-w: 560px; }
+.lg { --dialog-w: 760px; }
+.xl { --dialog-w: 980px; }
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6) 0;
+}
+
+.dialogTitle {
+  font-size: var(--fs-xl);
+}
+
+.dialogDescription {
+  margin-top: var(--space-1);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+}
+
+.dialogBody {
+  padding: var(--space-5) var(--space-6);
+  overflow-y: auto;
+}
+
+.dialogFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6) var(--space-5);
+  border-top: 1px solid var(--border);
+}
+
+/* ── Sheet (side drawer) ───────────────────────────────────── */
+.sheet {
+  position: fixed;
+  z-index: var(--z-modal);
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: min(100vw, var(--sheet-w, 440px));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border-left: 1px solid var(--border-strong);
+  box-shadow: var(--elev-3);
+  animation: sheet-in var(--dur-slow) var(--ease-out);
+}
+
+.sheet.left {
+  right: auto;
+  left: 0;
+  border-left: none;
+  border-right: 1px solid var(--border-strong);
+  animation-name: sheet-in-left;
+}
+
+.sheetBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-5) var(--space-6);
+}
+
+/* ── Popover & menu ────────────────────────────────────────── */
+.popover,
+.menu {
+  z-index: var(--z-modal);
+  min-width: 200px;
+  padding: var(--space-1);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--elev-3);
+  animation: pop-in var(--dur-fast) var(--ease-out);
+}
+
+.popover {
+  padding: var(--space-4);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: 6px;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+.menuItem[data-highlighted] {
+  background: var(--surface-3);
+}
+
+.menuItem[data-disabled] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.menuItem.dangerItem {
+  color: var(--danger);
+}
+
+.menuSeparator {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background: var(--border);
+}
+
+.menuLabel {
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-2px); }
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+}
+
+@keyframes sheet-in {
+  from { transform: translateX(100%); }
+}
+
+@keyframes sheet-in-left {
+  from { transform: translateX(-100%); }
+}

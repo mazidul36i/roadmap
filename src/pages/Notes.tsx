@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Plus, Search, Tag, Trash2, X, Wand2 } from "lucide-react";
 import { uid, useApp } from "@context/AppContext";
 import { useConfirm } from "@context/ConfirmationContext";
 import type { Note, NoteCategory } from "@app-types/index";
-import { generateJSON, generateText } from "@lib/gemini";
+import { aiSummarize, aiTags } from "@lib/legacyAi";
 
 const CATEGORIES: { key: NoteCategory; label: string; color: string }[] = [
   { key: "weekly", label: "Weekly", color: "var(--accent)" },
@@ -55,7 +56,15 @@ export default function Notes() {
       setSelected(note.id);
       setCreating(false);
     } else if (selected) {
-      const orig = state.notes.find(n => n.id === selected)!;
+      const orig = state.notes.find(n => n.id === selected);
+      if (!orig) return;
+      // Opening a note must not count as editing it.
+      const unchanged =
+        orig.title === form.title &&
+        orig.content === form.content &&
+        orig.category === form.category &&
+        orig.tags.join("|") === form.tags.join("|");
+      if (unchanged) return;
       dispatch({ type: "UPDATE_NOTE", note: { ...orig, ...form, updatedAt: now } });
     }
   };
@@ -74,6 +83,15 @@ export default function Notes() {
     setForm({ title: note.title, content: note.content, category: note.category, tags: note.tags });
   };
 
+  // Deep link: /notes/:id opens that note.
+  const { id: routeNoteId } = useParams<{ id: string }>();
+  useEffect(() => {
+    if (!routeNoteId || routeNoteId === selected) return;
+    const note = state.notes.find(n => n.id === routeNoteId);
+    if (note) openNote(note);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeNoteId, state.notes.length]);
+
   const addTag = () => {
     const t = tagInput.trim();
     if (t && !form.tags.includes(t)) setForm(f => ({ ...f, tags: [...f.tags, t] }));
@@ -90,8 +108,9 @@ export default function Notes() {
       const prompt = `Extract 2-4 highly relevant, single-word or short-phrase keywords from this note content to use as tags. 
 Content: ${form.content.replace(/<[^>]+>/g, '')}
 Return a JSON array of strings.`;
-      const tags = await generateJSON(prompt);
-      if (Array.isArray(tags)) {
+      void prompt;
+      const tags = await aiTags(form.content.replace(/<[^>]+>/g, " "));
+      {
         setForm(f => {
           const newTags = tags.filter(t => !f.tags.includes(t.toLowerCase())).map(t => t.toLowerCase());
           return { ...f, tags: [...f.tags, ...newTags] };
@@ -114,7 +133,8 @@ Return a JSON array of strings.`;
     try {
       const prompt = `Summarize the following note into 3-4 concise bullet points. Return ONLY the bullet points, starting each with a dash (-).
 Note Content: ${form.content.replace(/<[^>]+>/g, '')}`;
-      const summary = await generateText(prompt);
+      void prompt;
+      const summary = await aiSummarize(form.content.replace(/<[^>]+>/g, " "), form.title);
       setAiSummary(summary);
     } catch (e) {
       console.error(e);
